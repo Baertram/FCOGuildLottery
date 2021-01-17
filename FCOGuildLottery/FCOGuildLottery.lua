@@ -11,6 +11,8 @@ local dfe   = FCOGuildLottery.dfe
 local dfv   = FCOGuildLottery.dfv
 local dfw   = FCOGuildLottery.dfw
 
+local logger = FCOGuildLottery.logger
+
 local em = EVENT_MANAGER
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -38,14 +40,15 @@ local function checkForHistyIsInitialized(isInitialCall)
 end
 
 --Player activated function
-function FCOGuildLottery.Player_Activated(eventId, isInitialCall)
+local function playerActivated(eventId, isInitialCall)
     df( "EVENT_PLAYER_ACTIVATED - initial: %s", tostring(isInitialCall))
+
     checkForHistyIsInitialized(isInitialCall)
 
     FCOGuildLottery.playerActivatedDone = true
 end
 
-function FCOGuildLottery.addonLoaded(eventName, addon)
+local function addonLoaded(eventName, addon)
     if addon ~= addonVars.addonName then return end
     em:UnregisterForEvent(eventName)
 
@@ -64,11 +67,11 @@ function FCOGuildLottery.addonLoaded(eventName, addon)
 
     --EVENTS
     --Register for the zone change/player ready event
-    em:RegisterForEvent(addonVars.addonName, EVENT_PLAYER_ACTIVATED, FCOGuildLottery.Player_Activated)
+    em:RegisterForEvent(addonVars.addonName .. "EVENT_PLAYER_ACTIVATED", EVENT_PLAYER_ACTIVATED, playerActivated)
 end
 
 function FCOGuildLottery.initialize()
-    em:RegisterForEvent(addonVars.addonName, EVENT_ADD_ON_LOADED, FCOGuildLottery.addonLoaded)
+    em:RegisterForEvent(addonVars.addonName .. "EVENT_ADD_ON_LOADED", EVENT_ADD_ON_LOADED, addonLoaded)
 end
 
 --Load the addon

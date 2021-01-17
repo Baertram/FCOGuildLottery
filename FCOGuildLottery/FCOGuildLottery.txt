@@ -6,7 +6,6 @@
 ## Description: A helper addon for guild lotteries
 ## SavedVariables: FCOGuildLottery_Settings
 ## DependsOn: LibAsync>=20301 LibAddonMenu-2.0>=32 LibCustomMenu>=694  LibHistoire>=392
-;## DependsOn: LibDateTime>=28
 ## OptionalDependsOn: LibDebugLogger>=201
 ## OptionalDependsOn: MasterMerchant>=3514 TamrielTradeCenter ArkadiusTradeTools ArkadiusTradeToolsSales
 

@@ -132,6 +132,15 @@ function FCOGuildLottery.buildAddonMenu()
             getFunc = function() return settings.debug  end,
             setFunc = function(value) settings.debug = value   end,
             default = function() return defaults.debug  end,
+        },
+        {
+            type    = "checkbox",
+            name    = "Chat output too (LibDebugLogger)",
+            tooltip = "If LibDebugLogger is enabled the logging will only be shown in the UI DebugLogViewer, or within the SavedVariables file LibDebugLogger.lua.\nIf you enable the setting there also will be a chat output shown for you if DebugLogViewer is not currently activated.",
+            getFunc = function() return settings.debugToChatToo  end,
+            setFunc = function(value) settings.debugToChatToo = value   end,
+            default = function() return defaults.debugToChatToo  end,
+            disabled = function() return not settings.debug or not LibDebugLogger or DebugLogViewer  end
         }
 
     } -- optionsTable

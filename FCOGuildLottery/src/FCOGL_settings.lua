@@ -33,6 +33,8 @@ function FCOGuildLottery.getSettings()
     local defaults = {
         --Debug
         debug = false,
+        debugToChatToo = false,
+
         --Server + account wide base setting
         alwaysUseClientLanguage			    = true,
         --Server + account wide settings
@@ -41,9 +43,11 @@ function FCOGuildLottery.getSettings()
         diceRollHistory = {},
         diceRollGuildLotteryHistory = {},
 
+        --false: Like MasterMerchant determines the sales from the history -> Until current time.
+        --true: cut-off at midnght of the current day
         cutOffGuildSalesHistoryCurrentDateMidnight = false,
 
-        autoPreFillChatEditBoxAfterDiceRollOnlyNumber = true,
+        autoPreFillChatEditBoxAfterDiceRollOnlyNumber = false,
         autoPreFillChatEditBoxAfterDiceRoll = false,
         preFillChatEditBoxAfterDiceRollTextTemplates = {
             normal = {
