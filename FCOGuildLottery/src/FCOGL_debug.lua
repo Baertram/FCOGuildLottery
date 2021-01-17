@@ -69,7 +69,7 @@ local function dfv(str, ...)
     if not isDebuggingEnabled() then return end
     if checkLogger() then
         --subLoggerVerbose:Verbose(string.format(str, ...)) Not working? Why not?
-        subLoggerVerbose:Info(string.format(str, ...)) --:Verbose() not working? Why not?
+        subLoggerVerbose:Verbose(string.format(str, ...)) --:Verbose() not working? Why not?
     else
         d(addonNamePre .. " VERBOSE " .. string.format(str, ...))
     end

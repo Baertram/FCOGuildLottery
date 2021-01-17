@@ -172,6 +172,7 @@ end
 function FCOGuildLottery.IsSellEventPendingForGuildId(guildId)
     if lh == nil or not FCOGuildLottery.libHistoireIsReady then return nil, nil end
     df( "IsSellEventPendingForGuildId - guildId: %s", tostring(guildId))
+--d( string.format("IsSellEventPendingForGuildId - guildId: %s", tostring(guildId)))
 
     --[[
         1. weißt du, dass du alle Daten hast wenn der SetIterationCompletedCallback aufgerufen wird
@@ -183,6 +184,7 @@ function FCOGuildLottery.IsSellEventPendingForGuildId(guildId)
     --All data was received already for the guildId?
     if FCOGuildLottery.guildSellListenerCompleted[guildId] == true then
         df("<guild sell listener was completed!")
+--d("<guild sell listener was completed!")
         return false, 0
     end
 
@@ -190,6 +192,7 @@ function FCOGuildLottery.IsSellEventPendingForGuildId(guildId)
     local isRunning = guildEventSellListener:IsRunning()
     if not isRunning then
         df("<guild sell listener not actively running!")
+--d("<guild sell listener not actively running!")
         return false, 0
     end
     --eventCount - the amount of stored or unlinked events that are currently waiting to be processed by the listener
@@ -197,6 +200,7 @@ function FCOGuildLottery.IsSellEventPendingForGuildId(guildId)
     --timeLeft - the estimated time in seconds it takes to process the remaining events or -1 if no estimate is possible
     local eventCount, processingSpeed, timeLeft = guildEventSellListener:GetPendingEventMetrics()
     df(">eventCount: %s, processingSpeed: %s, timeLeft: %s", tostring(eventCount), tostring(processingSpeed), tostring(timeLeft))
+--d(string.format(">eventCount: %s, processingSpeed: %s, timeLeft: %s", tostring(eventCount), tostring(processingSpeed), tostring(timeLeft)))
     local errorMsg = false
     if eventCount > 0 then
         --Workaround as there often happens to be the eventCount = 1, but the listener itsself at the guildHistory says: All data fetched?!
@@ -252,17 +256,18 @@ end
 local addTradeSellEvent = FCOGuildLottery.AddTradeSellEvent
 
 --Get guild store sell statistics from LibHistoire stored events
-function FCOGuildLottery.CollectGuildSellStats(guildId, startTradingDay, endTradingDay, uniqueIdentifier)
-    df( "CollectGuildSellStats - guildId: %s, startTradingDay: %s, endTradingDay: %s, uniqueIdentifier: %s", tostring(guildId),tostring(startTradingDay),tostring(endTradingDay),tostring(uniqueIdentifier) )
+function FCOGuildLottery.CollectGuildSellStats(guildId, startDate, endDate, uniqueIdentifier)
+    df( "CollectGuildSellStats - guildId: %s, startDate: %s, endDate: %s, uniqueIdentifier: %s", tostring(guildId),tostring(startDate),tostring(endDate),tostring(uniqueIdentifier) )
     if lh == nil or not FCOGuildLottery.libHistoireIsReady then
         dfe( "CollectGuildSellStats - Mandatory library \LibHistoire\' not found, or not ready yet!")
-    elseif guildId == nil or uniqueIdentifier == nil or uniqueIdentifier == "" or startTradingDay == nil or endTradingDay == nil or
-           startTradingDay == nil or endTradingDay == nil then
-        dfe( "CollectGuildSellStats - Either guildId: %s, startTradingDay: %s, endTradingDay: %s or uniqueIdentifier: %s are not given!", tostring(guildId),tostring(startTradingDay),tostring(endTradingDay),tostring(uniqueIdentifier))
+    elseif guildId == nil or uniqueIdentifier == nil or uniqueIdentifier == "" or startDate == nil or endDate == nil or
+           startDate == nil or endDate == nil then
+        dfe( "CollectGuildSellStats - Either guildId: %s, startTradingDay: %s, endTradingDay: %s or uniqueIdentifier: %s are not given!", tostring(guildId),tostring(startDate),tostring(endDate),tostring(uniqueIdentifier))
         return
-    elseif startTradingDay and endTradingDay and startTradingDay > endTradingDay then
-        dfe( "CollectGuildSellStats - startTradingDay: " ..tostring(startTradingDay) .. " is newer than endTradingDay: " ..tostring(endTradingDay))
+    elseif startDate and endDate and startDate > endDate then
+        dfe( "CollectGuildSellStats - startTradingDay: " ..tostring(startDate) .. " is newer than endTradingDay: " ..tostring(endDate))
     end
+--d(">>listener 0")
 
     --Create the listener for the guild history sold items
     local listener
@@ -275,16 +280,17 @@ function FCOGuildLottery.CollectGuildSellStats(guildId, startTradingDay, endTrad
         df(">re-using existing listener for guildId: %s", tostring(guildId))
     end
     if listener == nil then
-        dfe( "CollectGuildSellStats - Listener coud not be found/created! GuildId: " ..tostring(guildId) .. ", startTradingDay: " ..tostring(startTradingDay).. ", endTradingDay: " ..tostring(endTradingDay).. ", uniqueIdentifier: " ..tostring(uniqueIdentifier))
+        dfe( "CollectGuildSellStats - Listener coud not be found/created! GuildId: " ..tostring(guildId) .. ", startTradingDay: " ..tostring(startDate).. ", endTradingDay: " ..tostring(endDate).. ", uniqueIdentifier: " ..tostring(uniqueIdentifier))
         return
     end
     FCOGuildLottery.guildSellListeners[guildId] = listener
-
+--d(">>listener 1")
     --Did the timeframe change?
-    if FCOGuildLottery.currentlyUsedGuildSalesLotteryStartTime == nil or startTradingDay ~= FCOGuildLottery.currentlyUsedGuildSalesLotteryStartTime or
-            FCOGuildLottery.currentlyUsedGuildSalesLotteryEndTime == nil or endTradingDay ~= FCOGuildLottery.currentlyUsedGuildSalesLotteryEndTime or
+    if FCOGuildLottery.currentlyUsedGuildSalesLotteryStartTime == nil or startDate ~= FCOGuildLottery.currentlyUsedGuildSalesLotteryStartTime or
+            FCOGuildLottery.currentlyUsedGuildSalesLotteryEndTime == nil or endDate ~= FCOGuildLottery.currentlyUsedGuildSalesLotteryEndTime or
             FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier == nil or uniqueIdentifier ~= FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier then
-        df(">listener's timeFrame changed: %s to %s", os.date("%c", startTradingDay), os.date("%c", endTradingDay))
+        df(">listener's timeFrame changed: %s to %s", os.date("%c", startDate), os.date("%c", endDate))
+--d(string.format(">listener's timeFrame changed: %s to %s", os.date("%c", startDate), os.date("%c", endDate)))
 
         --Stop the listener if we want to set a new timeframe!
         if listener:IsRunning() then
@@ -293,8 +299,8 @@ function FCOGuildLottery.CollectGuildSellStats(guildId, startTradingDay, endTrad
         end
         --Slightly difference to MM data. maybe because SetTimeFrame includes the start but excludes the end?
         --listener:SetTimeFrame(startTradingDay, endTradingDay)
-        listener:SetAfterEventTime(startTradingDay) --Excluding the start
-        listener:SetBeforeEventTime(endTradingDay) --Including the end
+        listener:SetAfterEventTime(startDate) --Excluding the start
+        listener:SetBeforeEventTime(endDate) --Including the end
 
         --Create / reset the guildSalesStats for the current guildId, and the flag "callback completed"
         FCOGuildLottery.guildSellListenerCompleted[guildId] = false
@@ -305,7 +311,7 @@ function FCOGuildLottery.CollectGuildSellStats(guildId, startTradingDay, endTrad
             listener:SetNextEventCallback(function(eventType, eventId, eventTime, ...) --param1, param2, param3, param4, param5, param6
                 if eventType == GUILD_EVENT_ITEM_SOLD then
                     local guildIdOfListener = listener:GetGuildId()
-                    --dfv(">listener:SetNextEventCallback - guildId: %s, eventType: %s, eventTime: %s", tostring(guildIdOfListener), tostring(eventType), tostring(eventTime))
+                    dfv(">listener:SetNextEventCallback - guildId: %s, eventType: %s, eventTime: %s", tostring(guildIdOfListener), tostring(eventType), tostring(eventTime))
                     FCOGuildLottery.guildSellListenerCompleted[guildIdOfListener] = false
                     addTradeSellEvent(guildIdOfListener, uniqueIdentifier, eventType, eventId, eventTime, ...)
                 end
@@ -406,6 +412,8 @@ local function getDateMinusXDays(daysToGetBefore)
     if settings.cutOffGuildSalesHistoryCurrentDateMidnight == true then
         timeEnd = currentDayMidnight
     end
+--d(">getDateMinusXDays - startDate: " .. tostring(timeStart) .. ", endDate: " ..tostring(timeEnd))
+
     return timeStart, timeEnd
 end
 
@@ -414,14 +422,17 @@ end
 function FCOGuildLottery.PrepareSellStatsOfGuild(guildId, daysToGetBefore)
     if not guildId or not daysToGetBefore then return end
     --Get the actual trading week via LibDateTime
+    --Not needed!
     --local isoWeekAndYear, tradingWeekStart, tradingWeekEnd = getTraderWeekFromDate(daysToGetBefore)
+    --Manually calculate the last n days
     local startDate, endDate = getDateMinusXDays(daysToGetBefore)
+    --d( string.format("PrepareSellStatsOfGuild - guildId: %s, daysToGetBefore: %s, dateStart: %s, dateEnd: %s", tostring(guildId), tostring(daysToGetBefore), os.date("%c", startDate) , os.date("%c", endDate)))
     df( "PrepareSellStatsOfGuild - guildId: %s, daysToGetBefore: %s, dateStart: %s, dateEnd: %s", tostring(guildId), tostring(daysToGetBefore), os.date("%c", startDate) , os.date("%c", endDate))
 
     --77951 - Fair Trade Society
     --guildId = guildId or 77951
     --UniqueId: "GuildSellsLast%sDays_%s"
-    local uniqueIdentifier = buildUniqueId(guildId, tostring(startDate) .."-"..tostring(endDate))
+    local uniqueIdentifier = buildUniqueId(guildId, daysToGetBefore)
     FCOGuildLottery.CollectGuildSellStats(guildId, startDate, endDate, uniqueIdentifier)
     return uniqueIdentifier, startDate, endDate--, isoWeekAndYear
 end
@@ -458,6 +469,7 @@ function FCOGuildLottery.GetGuildSalesMemberCount(guildId, daysToGetBefore, star
     local currentlyUsedGuildSalesLotteryMemberCount = FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberCount
     if FCOGuildLottery.currentlyUsedGuildSalesLotteryData ~= nil and currentlyUsedGuildSalesLotteryMemberCount ~= nil and currentlyUsedGuildSalesLotteryMemberCount > 0 then
         df(">currentlyUsedGuildSalesLotteryMemberCount: " ..tostring(currentlyUsedGuildSalesLotteryMemberCount))
+--d(">currentlyUsedGuildSalesLotteryMemberCount: " ..tostring(currentlyUsedGuildSalesLotteryMemberCount))
         return currentlyUsedGuildSalesLotteryMemberCount
     else
         --Check the sales data for the guildId
@@ -488,6 +500,7 @@ function FCOGuildLottery.GetGuildSalesMemberCount(guildId, daysToGetBefore, star
             local sellStatsOfGuildId = FCOGuildLottery.guildSellStats[guildId]
             if sellStatsOfGuildId ~= nil then
                 uniqueIdentifier = uniqueIdentifier or buildUniqueId(guildId, daysToGetBefore)
+--d(">uniqueIdentifier: " ..tostring(uniqueIdentifier) .. ", daysToGetBefore: " ..tostring(daysToGetBefore))
                 local sellStatsDetailsOfGuildId = sellStatsOfGuildId[uniqueIdentifier]
                 if sellStatsDetailsOfGuildId ~= nil then
                     --df(">got here 2 - uniqueId data found")
@@ -778,6 +791,7 @@ end
 --Build the ranks list and get number of members having sold something in the timeframe
 function FCOGuildLottery.BuildGuildSalesMemberRank(guildId, daysBefore, startTime, endTime, uniqueIdentifier)
 df( "BuildGuildSalesMemberRank - guildId: %s, endTime: %s, daysBefore: %s, startTime: %s, uniqueId: %s", tostring(guildId), os.date("%c", endTime), tostring(daysBefore), os.date("%c", startTime) , tostring(uniqueIdentifier))
+--d( string.format("BuildGuildSalesMemberRank - guildId: %s, endTime: %s, daysBefore: %s, startTime: %s, uniqueId: %s", tostring(guildId), os.date("%c", endTime), tostring(daysBefore), os.date("%c", startTime) , tostring(uniqueIdentifier)))
     if guildId == nil or guildId == 0 then return end
     if FCOGuildLottery.IsSellEventPendingForGuildId(guildId) == true then
         --Reset all old data first
@@ -795,6 +809,7 @@ df( "BuildGuildSalesMemberRank - guildId: %s, endTime: %s, daysBefore: %s, start
         )
     end
 df(">guildSalesMemberCount: " ..tostring(guildSalesMemberCount))
+--d(">guildSalesMemberCount: " ..tostring(guildSalesMemberCount))
     return guildSalesMemberCount
 end
 
@@ -802,7 +817,8 @@ end
 --the sales data for. Following throws of the dice won't ask again until you reset it via the slash command
 --/
 function FCOGuildLottery.RollTheDiceForGuildSalesLottery()
-df( "RollTheDiceForGuildSalesLottery")
+--d("RollTheDiceForGuildSalesLottery")
+df( "RollTheDiceForGuildSalesLottery" )
     local guildId
     local guildIndex
 
@@ -835,10 +851,10 @@ df( "RollTheDiceForGuildSalesLottery")
         FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildName     = GetGuildName(guildId)
 
         --Update the LibHistoire data of the guild's sell history
-        local uniqueIdentifier, tradingWeekStart, tradingWeekEnd = FCOGuildLottery.PrepareSellStatsOfGuild(guildId, FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore)
-        FCOGuildLottery.currentlyUsedGuildSalesLotteryEndTime       = tradingWeekEnd
-        FCOGuildLottery.currentlyUsedGuildSalesLotteryStartTime     = tradingWeekStart
-        if not tradingWeekStart or not tradingWeekEnd then
+        local uniqueIdentifier, timeStart, timeEnd = FCOGuildLottery.PrepareSellStatsOfGuild(guildId, FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore)
+        FCOGuildLottery.currentlyUsedGuildSalesLotteryEndTime       = timeEnd
+        FCOGuildLottery.currentlyUsedGuildSalesLotteryStartTime     = timeStart
+        if not timeStart or not timeEnd then
             resetCurrentGuildSalesLotteryData()
             --showGuildEventsNoTraderWeekDeterminedMessage(dateStr)
             return
@@ -946,7 +962,6 @@ function FCOGuildLottery.StartNewGuildSalesLottery(guildIndex, daysBefore, dataW
         FCOGuildLottery.ResetCurrentGuildSalesLotteryData(false, true)
     end
     --Set the guildIndex and daysBefore to start a new guild sales lottery with function
-    --FCOGuildLottery.RollTheDiceForGuildSalesLottery()
     FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex = guildIndex
     FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore = daysBefore
     FCOGuildLottery.RollTheDiceForGuildSalesLottery()
@@ -1025,6 +1040,7 @@ function FCOGuildLottery.NewGuildSalesLotterySlashCommand(args)
     FCOGuildLottery.ResetCurrentGuildSalesLotteryData(false, true)
 
     local guildIndex, daysBefore = FCOGuildLottery.parseSlashCommandArguments(args, "/newgsl")
+--d("GuildIndex: " .. guildIndex .. ", daysBefore: " .. daysBefore)
     FCOGuildLottery.StartNewGuildSalesLottery(guildIndex, daysBefore, true)
 end
 
