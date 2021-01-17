@@ -1,0 +1,48 @@
+## Title: |c00FF00FCO |cFFFF00GuildLottery|r
+## Author: Baertram
+## Version: 0.1
+## AddOnVersion: 000001
+## APIVersion: 100033 100034
+## Description: A helper addon for guild lotteries
+## SavedVariables: FCOGuildLottery_Settings
+## DependsOn: LibAsync>=20301 LibAddonMenu-2.0>=32 LibCustomMenu>=694  LibHistoire>=392
+;## DependsOn: LibDateTime>=28
+## OptionalDependsOn: LibDebugLogger>=201
+## OptionalDependsOn: MasterMerchant>=3514 TamrielTradeCenter ArkadiusTradeTools ArkadiusTradeToolsSales
+
+## Libraries
+## Not included, please check the addon description and install them as standalone libraries!
+
+## Included constants
+FCOGL_constants.lua
+
+## Debugging
+src/FCOGL_debug.lua
+
+## Included addon functions
+src/FCOGL_functions.lua
+
+## Included addon settings LAM
+src/FCOGL_settingsMenu.lua
+
+## Included settings
+src/FCOGL_settings.lua
+
+## Included slash commands
+src/FCOGL_slashCommands.lua
+
+## Addon source
+FCOGuildLottery.lua
+
+;## Keybindings
+Bindings/Bindings.lua
+Bindings/Bindings.xml
+
+##XML
+
+; DISCLOSURE:
+; This Add-on is not created by, affiliated with or sponsored by ZeniMax
+; Media Inc. or its affiliates. The Elder Scrolls? and related logos are
+; registered trademarks or trademarks of ZeniMax Media Inc. in the United
+; States and/or other countries. All rights reserved.
+; You can read the full terms at https://account.elderscrollsonline.com/add-on-terms
