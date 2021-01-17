@@ -49,7 +49,7 @@ function FCOGuildLottery.buildAddonMenu()
 
         {
             type = 'description',
-            text = 'Helper addon for a guild lottery. Chat slash commands are:\n/dice <number>   Will roll a dice with <number> sides. If left empty this will roll a dice with 500 sides!\n/diceG1 - /diceG5  Will roll a dice for the number of guild members of guild 1 - 5\n/newgsl will reset the last used lottery data and start a new one\n/gsl will start a new guild sales lottery or roll the next dice for the active guilds sales lottery.\n/gsllast or /dicelast will show the last dice roll results in your local chat (or if you got it enabled: within the DebugLogViewer UI) again.',
+            text = 'Helper addon for a guild lottery. Chat slash commands are:\n/dice <number>   Will roll a dice with <number> sides. If left empty this will roll a dice with 500 sides!\n/diceG1 - /diceG5  Will roll a dice for the number of guild members of guild 1 - 5\n/newgsl <guildIndex 1 to 5> will reset the last used lottery data and start a new one\n/gsl will roll the next dice for the active guild sales lottery.\n/gsllast or /dicelast will show the last dice roll results in your local chat (or if you got it enabled: within the \'DebugLogViewer\' UI) again.',
         },
         {
             type = 'dropdown',
@@ -136,11 +136,11 @@ function FCOGuildLottery.buildAddonMenu()
         {
             type    = "checkbox",
             name    = "Chat output too (LibDebugLogger)",
-            tooltip = "If LibDebugLogger is enabled the logging will only be shown in the UI DebugLogViewer, or within the SavedVariables file LibDebugLogger.lua.\nIf you enable the setting there also will be a chat output shown for you if DebugLogViewer is not currently activated.",
+            tooltip = "If LibDebugLogger is enabled the logging will only be shown in the UI DebugLogViewer, or within the SavedVariables file LibDebugLogger.lua.\nIf you enable the setting there also will be a chat output shown for you, but only if:\n|c5F5F5F\'LibDebugLogger\' is loaded AND \'DebugLogViewer\' is currently not loaded|r.",
             getFunc = function() return settings.debugToChatToo  end,
             setFunc = function(value) settings.debugToChatToo = value   end,
             default = function() return defaults.debugToChatToo  end,
-            disabled = function() return not settings.debug or not LibDebugLogger or DebugLogViewer  end
+            disabled = function() return not settings.debug or not LibDebugLogger or DebugLogViewer end
         }
 
     } -- optionsTable

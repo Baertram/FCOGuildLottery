@@ -11,13 +11,15 @@ local settings
 
 --DEBUG FUNCTIONS
 local function isDebuggingEnabled()
-    settings = settings or FCOGuildLottery.settingsVars.settings
+    settings = FCOGuildLottery.settingsVars.settings
     return settings.debug
 end
 
 local function isExtraChatOutputEnabled()
-    settings = settings or FCOGuildLottery.settingsVars.settings
+    settings = FCOGuildLottery.settingsVars.settings
+--d("isExtraChatOutputEnabled - debug: " ..tostring(settings.debug) .. ", LibDebugLogger: " ..tostring(LibDebugLogger~=nil) .. ", DebugLogViewer: " ..tostring(DebugLogViewer~=nil))
     if not settings.debug or LibDebugLogger == nil or DebugLogViewer ~= nil then return false end
+--d(">debugToChatToo: " ..tostring(settings.debugToChatToo))
     return settings.debugToChatToo
 end
 
