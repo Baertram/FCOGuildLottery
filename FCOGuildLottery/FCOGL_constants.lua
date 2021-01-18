@@ -9,6 +9,7 @@ local addonVars = FCOGuildLottery.addonVars
 addonVars.addonVersion		        = 0.1
 addonVars.addonSavedVarsVersion	    = "0.01"
 addonVars.addonName				    = "FCOGuildLottery"
+addonVars.addonNameShort		    = "FCOGL"
 addonVars.addonNameMenu  		    = "FCO GuildLottery"
 addonVars.addonNameMenuDisplay	    = "|c00FF00FCO |cFFFF00 GuildLottery|r"
 addonVars.addonSavedVariablesName   = "FCOGuildLottery_Settings"
@@ -108,6 +109,7 @@ FCOGL_SEARCHDROP_PREFIX = "FCOGL_SEARCHDROP"
 FCOGL_GUILDSDROP_PREFIX = "FCOGL_GUILDSDROP"
 
 FCOGL_SEARCH_TYPE_NAME = 1
+
 FCOGL_SEARCH_TYPE_ITERATION_END = FCOGL_SEARCH_TYPE_NAME
 
 FCOGuildLottery.UI = {}

@@ -23,6 +23,7 @@ fcoglUI.CurrentState    = FCOGL_TAB_STATE_LOADING
 fcoglUI.CurrentTab      = FCOGL_TAB_GUILDSALESLOTTERY
 fcoglUI.comingFromSortScrollListSetupFunction = false
 fcoglUI.sortType = 1
+fcoglUI.selectedGuildDataBeforeUpdate = nil
 fcoglUI.searchBoxLastSelected = {}
 
 
@@ -434,7 +435,7 @@ function fcoglUI.initializeSearchDropdown(window, currentTab, searchBoxType)
                             [FCOGL_SEARCH_TYPE_NAME]     = false,
                         }, --exclude the search entries from the set search
             },
-            ["guilds"] = {dropdown=window.guildsDrop,  prefix=FCOGL_GUILDSDROP_PREFIX,  entryCount=FCOGL_SEARCH_TYPE_ITERATION_END,
+            ["guilds"] = {dropdown=window.guildsDrop,  prefix=FCOGL_GUILDSDROP_PREFIX,  entryCount=#FCOGuildLottery.guildsData,
                         exclude = {
                             [FCOGL_SEARCH_TYPE_NAME]     = false,
                         }, --exclude the search entries from the set search
@@ -470,7 +471,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
         --currentCharName = GetUnitName("player")
         --Format the name
         --currentCharName = zo_strformat(SI_UNIT_NAME, currentCharName)
-        selectedGuildDataBeforeUpdate = fcoglUI.selectedGuildDataBeforeUpdate or nil
+        selectedGuildDataBeforeUpdate = fcoglUI.selectedGuildDataBeforeUpdate
         if selectedGuildDataBeforeUpdate ~= nil and selectedGuildDataBeforeUpdate.guildId ~= nil then
             currentGuildId = selectedGuildDataBeforeUpdate.guildId
         else
@@ -483,21 +484,19 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
             local entry
             --Guilds combo box?
             if isGuildsCB then
-                local guildsData = FCOGuildLottery.guildsData[i]
-                entry = ZO_ComboBox:CreateItemEntry(guildsData.name, callback)
                 local guildId = -1
+                local guildsData = FCOGuildLottery.guildsData[i]
                 if guildsData ~= nil then
+                    entry = ZO_ComboBox:CreateItemEntry(guildsData.name, callback)
                     guildId = guildsData.id
                     if currentGuildId ~= nil and guildId == currentGuildId then
                         itemToSelect = i
                     end
-                else
-                    guildId = i
+                    entry.index      = guildsData.index
+                    entry.id         = guildId
+                    entry.name       = guildsData.name
+                    entry.gotTrader  = guildsData.gotTrader
                 end
-                entry.id         = guildId
-                entry.name       = guildsData.name
-                entry.nameClean  = guildsData.nameClean
-                entry.gotTrader  = guildsData.gotTrader
 
             --Search type combo box
             elseif isNameSearchCB then

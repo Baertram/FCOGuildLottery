@@ -15,6 +15,11 @@
 ## Included constants
 FCOGL_constants.lua
 
+## Fallback language English
+lang/en.lua
+## Load and overwrite EN with current client language e.g. de.lua for German
+lang/$(language).lua
+
 ## Debugging
 src/FCOGL_debug.lua
 
