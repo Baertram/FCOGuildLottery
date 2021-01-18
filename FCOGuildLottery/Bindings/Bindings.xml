@@ -13,7 +13,7 @@
             </Action>
             <Action name="FCOGL_RESET_GUILD_SALES">
                 <Down>
-                    FCOGL.ResetCurrentGuildSalesLotteryData()
+                    FCOGL.ResetCurrentGuildSalesLotteryData(false, true)
                 </Down>
             </Action>
         </Category>

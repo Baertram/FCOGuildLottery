@@ -7,16 +7,18 @@ local addonNamePre = FCOGuildLottery.addonNamePre
 local ldl = LibDebugLogger
 local logger
 local subLoggerVerbose
-local settings
 
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 --DEBUG FUNCTIONS
+
 local function isDebuggingEnabled()
-    settings = FCOGuildLottery.settingsVars.settings
+    local settings = FCOGuildLottery.settingsVars.settings
     return settings.debug
 end
 
 local function isExtraChatOutputEnabled()
-    settings = FCOGuildLottery.settingsVars.settings
+   local settings = FCOGuildLottery.settingsVars.settings
 --d("isExtraChatOutputEnabled - debug: " ..tostring(settings.debug) .. ", LibDebugLogger: " ..tostring(LibDebugLogger~=nil) .. ", DebugLogViewer: " ..tostring(DebugLogViewer~=nil))
     if not settings.debug or LibDebugLogger == nil or DebugLogViewer ~= nil then return false end
 --d(">debugToChatToo: " ..tostring(settings.debugToChatToo))
@@ -99,15 +101,17 @@ FCOGuildLottery.dfw = dfw
 
 --Verbose debug message formatted
 local function dfv(str, ...)
+--[[
     if not isDebuggingEnabled() then return end
     local noLogger = true
     if logger ~= nil and subLoggerVerbose ~= nil then
-        --subLoggerVerbose:Verbose(string.format(str, ...)) Not working as long as Verbose is not explicitly enabled in LibDebugLogger/StartUpConfig.lua!
+        subLoggerVerbose:Verbose(string.format(str, ...)) Not working as long as Verbose is not explicitly enabled in LibDebugLogger/StartUpConfig.lua!
         noLogger = false
     end
     if noLogger == true or isExtraChatOutputEnabled() then
         d(addonNamePre .. " VERBOSE " .. string.format(str, ...))
     end
+]]
 end
 FCOGuildLottery.dfv = dfv
 

@@ -27,17 +27,26 @@ src/FCOGL_settingsMenu.lua
 ## Included settings
 src/FCOGL_settings.lua
 
+## Included dialgs
+src/FCOGL_dialogs.lua
+
 ## Included slash commands
 src/FCOGL_slashCommands.lua
+
+## Included UI
+src/FCOGL_window.lua
+
 
 ## Addon source
 FCOGuildLottery.lua
 
-;## Keybindings
+## Keybindings
 Bindings/Bindings.lua
 Bindings/Bindings.xml
 
 ##XML
+xml/FCOGL_UI.xml
+xml/FCOGL_AskBeforeResetDialog.xml
 
 ; DISCLOSURE:
 ; This Add-on is not created by, affiliated with or sponsored by ZeniMax

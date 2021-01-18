@@ -86,3 +86,24 @@ FCOGuildLottery.defaultGuildSalesLotteryUniqueIdentifiers = {
     [4] = nil,
     [5] = nil,
 }
+
+------------------------------------------------------------------------------------------------------------------------
+FCOGuildLottery.dialogs = {}
+FCOGuildLottery.dialogs.names = {
+    resetGuildSalesLottery = "Dialog_ResetGuildSalesLottery",
+}
+
+
+------------------------------------------------------------------------------------------------------------------------
+FCOGL_TAB_GUILDSALESLOTTERY = 1
+
+FCOGuildLottery.UI = {}
+FCOGuildLottery.UI.SCENE_NAME = "FCOGuildLottery_UI_Scene"
+FCOGuildLottery.UI.SCROLLLIST_DATATYPE_GUILDSALESRANKING    =   1
+
+FCOGL_SEARCHDROP_PREFIX = "FCOGL_SEARCHDROP"
+FCOGL_GUILDSDROP_PREFIX = "FCOGL_GUILDSDROP"
+
+FCOGL_SEARCH_TYPE_NAME = 1
+FCOGL_SEARCH_TYPE_GUILD = 2
+FCOGL_SEARCH_TYPE_ITERATION_END = FCOGL_SEARCH_TYPE_GUILD

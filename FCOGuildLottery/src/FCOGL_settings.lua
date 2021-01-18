@@ -56,7 +56,19 @@ function FCOGuildLottery.getSettings()
             guilds = {
                 [1] = "#<<1>>, congratulations to \'<<C:2>>\'"
             },
+        },
+
+        --Date & time
+        use24hFormat        = false,
+        useCustomDateFormat = "",
+
+        --UI
+        -->Window
+        UIwindow = {
+            left    = 300,
+            top     = 150,
         }
+
     }
     FCOGuildLottery.settingsVars.defaults = defaults
 

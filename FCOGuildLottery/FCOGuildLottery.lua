@@ -65,6 +65,9 @@ local function addonLoaded(eventName, addon)
     --Build the LAM settings panel
     FCOGuildLottery.buildAddonMenu()
 
+    --Dialogs
+    FCOGuildLottery.AskBeforeResetDialogInitialize(FCOGLAskBeforeResetDialogXML, "resetGuildSalesLottery")
+
     --EVENTS
     --Register for the zone change/player ready event
     em:RegisterForEvent(addonVars.addonName .. "EVENT_PLAYER_ACTIVATED", EVENT_PLAYER_ACTIVATED, playerActivated)

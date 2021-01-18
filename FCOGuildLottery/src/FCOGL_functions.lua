@@ -93,6 +93,52 @@ local function chatOutputRolledDice(rolledDiceSide, rolledName, guildIndex)
     end
 end
 
+function FCOGuildLottery.buildGuildsDropEntries()
+--d("[FCOGuildLottery]buildGuildsDropEntries")
+    local guildsComboBoxEntryBase = {}
+    local cnt = 0
+    local guildsOfAccount = {}
+    for guildIndex=1, GetNumGuilds() do
+        local guildId = GetGuildId(guildIndex)
+        local gotTrader = (IsPlayerInGuild(guildId) and DoesGuildHavePrivilege(guildId, GUILD_PRIVILEGE_TRADING_HOUSE)) or false
+        guildsOfAccount[guildIndex] = {
+            index       = guildIndex,
+            id          = guildId,
+            name        = ZO_CachedStrFormat(SI_UNIT_NAME, GetGuildName(guildId)),
+            gotTrader   = gotTrader
+        }
+    end
+    for guildIndex, guildData in pairs(guildsOfAccount) do
+        cnt = cnt + 1
+        local stringId = FCOGL_GUILDSDROP_PREFIX .. tostring(guildIndex)
+        ZO_CreateStringId(stringId, guildData.name)
+        SafeAddVersion(stringId, 1)
+        table.insert(guildsComboBoxEntryBase, {
+            index               =   guildIndex,
+            id                  =   guildData.id,
+            name                =   guildData.name,
+            gotTrader           =   guildData.gotTrader,
+        })
+    end
+    --[[
+    --Sort the chars table by their name
+    if guildsComboBoxEntryBase ~= nil and #guildsComboBoxEntryBase > 0 then
+        table.sort(guildsComboBoxEntryBase,
+            --Sort function, returns true if item a will be before b
+            function(a,b)
+                --Move the current char to the top of the list (current char name starts with " -")
+                --if string.sub(tostring(a.name), 1, 2) == " -" or string.sub(tostring(b.name), 1, 2) == " -" then
+                --    return true
+                --else
+                    return a.name < b.name
+                --end
+            end
+        )
+    end
+    ]]
+    return guildsComboBoxEntryBase
+end
+
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
 --LibDateTime
@@ -491,8 +537,7 @@ function FCOGuildLottery.GetGuildSalesMemberCount(guildId, daysToGetBefore, star
 
         --Is the listener of this guild still working?
         if FCOGuildLottery.IsSellEventPendingForGuildId(guildId) == true then
-            --Reset all old data first
-            FCOGuildLottery.ResetCurrentGuildSalesLotteryData()
+            FCOGuildLottery.ResetCurrentGuildSalesLotteryData(true)
             return
         end
         --df(">got here 1: Listener okay, data should be there")
@@ -782,10 +827,23 @@ end
 function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, startingNewLottery)
     noSecurityQuestion = noSecurityQuestion or false
     if not noSecurityQuestion then
-        --TODO Show security question dialog
+        --Show security question dialog
         --Do you really want to reset... ?
+        local resetGuildSalesLotteryDialogName = FCOGuildLottery.getDialogName("resetGuildSalesLottery")
+        if resetGuildSalesLotteryDialogName ~= nil and not ZO_Dialogs_IsShowingDialog(resetGuildSalesLotteryDialogName) then
+            local data = {
+                title       = "Reset guild sales lottery",
+                question    = "Do you want to reset the currently active guild sales lottery?",
+                callbackData = {
+                    yes = function() resetCurrentGuildSalesLotteryData(startingNewLottery) end,
+                    no  = function() end,
+                },
+            }
+            ZO_Dialogs_ShowDialog(resetGuildSalesLotteryDialogName, data, nil, nil)
+        end
+    else
+        resetCurrentGuildSalesLotteryData(startingNewLottery)
     end
-    resetCurrentGuildSalesLotteryData(startingNewLottery)
 end
 
 --Build the ranks list and get number of members having sold something in the timeframe
@@ -794,8 +852,7 @@ df( "BuildGuildSalesMemberRank - guildId: %s, endTime: %s, daysBefore: %s, start
 --d( string.format("BuildGuildSalesMemberRank - guildId: %s, endTime: %s, daysBefore: %s, startTime: %s, uniqueId: %s", tostring(guildId), os.date("%c", endTime), tostring(daysBefore), os.date("%c", startTime) , tostring(uniqueIdentifier)))
     if guildId == nil or guildId == 0 then return end
     if FCOGuildLottery.IsSellEventPendingForGuildId(guildId) == true then
-        --Reset all old data first
-        FCOGuildLottery.ResetCurrentGuildSalesLotteryData()
+        FCOGuildLottery.ResetCurrentGuildSalesLotteryData(true)
         return
     end
     local guildSalesMemberCount = FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberCount
@@ -1049,3 +1106,47 @@ function FCOGuildLottery.GuildSalesLotteryLastRolledSlashCommand()
     if FCOGuildLottery.currentlyUsedGuildSalesLotteryLastRolledChatOutput == nil then return end
     dfa( FCOGuildLottery.currentlyUsedGuildSalesLotteryLastRolledChatOutput )
 end
+
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+--Tooltip functions
+function FCOGuildLottery.buildTooltip(tooltipText, zoStrFormatReplaceText1, zoStrFormatReplaceText2, zoStrFormatReplaceText3)
+    local ttText = ""
+    if zoStrFormatReplaceText1 ~= nil then
+        if zoStrFormatReplaceText3 ~= nil then
+            ttText = zo_strformat(tooltipText, zoStrFormatReplaceText1, zoStrFormatReplaceText2, zoStrFormatReplaceText3)
+        elseif zoStrFormatReplaceText2 ~= nil then
+            ttText = zo_strformat(tooltipText, zoStrFormatReplaceText1, zoStrFormatReplaceText2)
+        else
+            ttText = zo_strformat(tooltipText, zoStrFormatReplaceText1)
+        end
+    else
+        ttText = tooltipText
+    end
+    return ttText
+end
+
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+--Date & time functions
+function FCOGuildLottery.getDateTimeFormatted(dateTimeStamp)
+    local dateTimeStr = ""
+    if dateTimeStamp ~= nil then
+        --Format the timestamp to the output version again
+        if os and os.date then
+            local settings = FCOGuildLottery.settingsVars.settings
+            if settings.useCustomDateFormat ~= nil and settings.useCustomDateFormat ~= "" then
+                dateTimeStr = os.date(settings.useCustomDateFormat, dateTimeStamp)
+            else
+                if settings.use24hFormat then
+                    dateTimeStr = os.date("%d.%m.%y, %H:%M:%S", dateTimeStamp)
+                else
+                    dateTimeStr = os.date("%y-%m-%d, %I:%M:%S %p", dateTimeStamp)
+                end
+
+            end
+        end
+    end
+    return dateTimeStr
+end
+
