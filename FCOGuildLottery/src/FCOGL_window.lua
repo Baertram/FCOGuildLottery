@@ -554,7 +554,7 @@ function FCOGL_UI_OnMouseEnter( rowControlEnter )
                 tooltipText = tooltipText .. "\n" .. GetString(WISHLIST_TOOLTIP_COLOR_KEY) .. GetString(WISHLIST_HEADER_DATE) .. "|r: " .. GetString(WISHLIST_TOOLTIP_COLOR_VALUE) .. dateTimeStr .. "|r"
             end
             if tooltipText ~= "" then
-                fcoglUI.ShowTooltip(rowControlEnter, TOP, tooltipText)
+                FCOGuildLottery.ShowTooltip(rowControlEnter, TOP, tooltipText)
             end
         end
     end
@@ -562,12 +562,12 @@ end
 
 function FCOGL_UI_OnMouseExit( rowControlExit )
 	FCOGuildLottery.UI.window:Row_OnMouseExit(rowControlExit)
-    fcoglUI.HideTooltip()
+    FCOGuildLottery.HideTooltip()
 end
 
 function FCOGL_UI_OnMouseUp( rowControlUp, button, upInside )
     if upInside then
-        fcoglUI.HideTooltip()
+        FCOGuildLottery.HideTooltip()
     end
 end
 
@@ -611,26 +611,6 @@ function fcoglUI.OnWindowMoveStop()
     local settings = FCOGuildLottery.settingsVars.settings
     settings.UIwindow.left  = frameControl:GetLeft()
     settings.UIwindow.top   = frameControl:GetTop()
-end
-
-function fcoglUI.ShowTooltip(ctrl, tooltipPosition, tooltipText, zoStrFormatReplaceText1, zoStrFormatReplaceTex2, zoStrFormatReplaceText3)
---d("[WL]ShowTooltip - ctrl: " ..tostring(ctrl:GetName()) .. ", text: " .. tostring(tooltipText))
-    if ctrl == nil or tooltipText == nil or tooltipText == "" then return false end
-	local tooltipPositions = {
-        [TOP]       = true,
-        [RIGHT]     = true,
-        [BOTTOM]    = true,
-        [LEFT]      = true,
-    }
-    if not tooltipPositions[tooltipPosition] then
-        tooltipPosition = LEFT
-	end
-	local ttText = FCOGuildLottery.buildTooltip(tooltipText, zoStrFormatReplaceText1, zoStrFormatReplaceTex2, zoStrFormatReplaceText3)
-    ZO_Tooltips_ShowTextTooltip(ctrl, tooltipPosition, ttText)
-end
-
-function fcoglUI.HideTooltip()
-    ZO_Tooltips_HideTextTooltip()
 end
 
 local function resetSortGroupHeader(currentTab)

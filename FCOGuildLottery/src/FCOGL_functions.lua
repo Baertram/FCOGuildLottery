@@ -1126,6 +1126,27 @@ function FCOGuildLottery.buildTooltip(tooltipText, zoStrFormatReplaceText1, zoSt
     return ttText
 end
 
+function FCOGuildLottery.ShowTooltip(ctrl, tooltipPosition, tooltipText, zoStrFormatReplaceText1, zoStrFormatReplaceTex2, zoStrFormatReplaceText3)
+--d("[WL]ShowTooltip - ctrl: " ..tostring(ctrl:GetName()) .. ", text: " .. tostring(tooltipText))
+    if ctrl == nil or tooltipText == nil or tooltipText == "" then return false end
+	local tooltipPositions = {
+        [TOP]       = true,
+        [RIGHT]     = true,
+        [BOTTOM]    = true,
+        [LEFT]      = true,
+    }
+    if not tooltipPositions[tooltipPosition] then
+        tooltipPosition = LEFT
+	end
+	local ttText = FCOGuildLottery.buildTooltip(tooltipText, zoStrFormatReplaceText1, zoStrFormatReplaceTex2, zoStrFormatReplaceText3)
+    ZO_Tooltips_ShowTextTooltip(ctrl, tooltipPosition, ttText)
+end
+
+function FCOGuildLottery.HideTooltip()
+    ZO_Tooltips_HideTextTooltip()
+end
+
+
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
 --Date & time functions
