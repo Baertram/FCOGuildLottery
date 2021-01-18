@@ -33,6 +33,16 @@ fcoglUI.searchBoxLastSelected = {}
 FCOGuildLottery.UI.windowClass = ZO_SortFilterList:Subclass()
 local fcoglWindowClass = FCOGuildLottery.UI.windowClass
 
+local function setWindowPosition(windowFrame)
+    if not windowFrame or (windowFrame and not windowFrame.SetAnchor) then return end
+    local settings = FCOGuildLottery.settingsVars.settings
+    local uiWindowSettings = settings.UIwindow
+
+    windowFrame:ClearAnchors()
+    windowFrame:SetDimensions(uiWindowSettings.width, uiWindowSettings.height)
+    windowFrame:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, uiWindowSettings.left, uiWindowSettings.top)
+end
+
 --Update the title of a scene's fragment with a new text
 local function updateSceneFragmentTitle(sceneName, fragment, childName, newTitle)
     childName = childName or "Label"
@@ -95,15 +105,12 @@ function fcoglWindowClass:Setup( )
         end
         return(ZO_TableOrderingFunction(listEntry1.data, listEntry2.data, self.currentSortKey, self.sortKeys, self.currentSortOrder))
 	end
-
+    --Search
 	self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("SearchDrop"))
     fcoglUI.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, "name")
     --Guilds
-    FCOGuildLottery.guildsData = {}
-    FCOGuildLottery.guildsData = FCOGuildLottery.buildGuildsDropEntries()
     self.guildsDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("GuildsDrop"))
     fcoglUI.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, "guilds")
-
 
     --Search box and search functions
 	self.searchBox = self.frame:GetNamedChild("SearchBox")
@@ -132,15 +139,15 @@ function fcoglWindowClass:Setup( )
     self.headerLocality = self.headers:GetNamedChild("Locality")
 
     --Add the FCOGL scene
-	fcoglUI.scene = ZO_Scene:New(fcoglUI.SCENE_NAME, SCENE_MANAGER)
+	--fcoglUI.scene = ZO_Scene:New(fcoglUI.SCENE_NAME, SCENE_MANAGER)
     --fcoglUI.scene:AddFragment(ZO_SetTitleFragment:New(FCOGL_TITLE))
-	fcoglUI.scene:AddFragment(ZO_FadeSceneFragment:New(FCOGLFrame))
-	fcoglUI.scene:AddFragment(TITLE_FRAGMENT)
-	fcoglUI.scene:AddFragment(RIGHT_BG_FRAGMENT)
-	fcoglUI.scene:AddFragment(FRAME_EMOTE_FRAGMENT_JOURNAL)
-	fcoglUI.scene:AddFragment(CODEX_WINDOW_SOUNDS)
-	fcoglUI.scene:AddFragmentGroup(FRAGMENT_GROUP.MOUSE_DRIVEN_UI_WINDOW)
-	fcoglUI.scene:AddFragmentGroup(FRAGMENT_GROUP.FRAME_TARGET_STANDARD_RIGHT_PANEL)
+	--fcoglUI.scene:AddFragment(ZO_FadeSceneFragment:New(FCOGLFrame))
+	--fcoglUI.scene:AddFragment(TITLE_FRAGMENT)
+	--fcoglUI.scene:AddFragment(RIGHT_BG_FRAGMENT)
+	--fcoglUI.scene:AddFragment(FRAME_EMOTE_FRAGMENT_JOURNAL)
+	--fcoglUI.scene:AddFragment(CODEX_WINDOW_SOUNDS)
+	--fcoglUI.scene:AddFragmentGroup(FRAGMENT_GROUP.MOUSE_DRIVEN_UI_WINDOW)
+	--fcoglUI.scene:AddFragmentGroup(FRAGMENT_GROUP.FRAME_TARGET_STANDARD_RIGHT_PANEL)
 
     --Build initial masterlist via self:BuildMasterList()
 --d("[fcoglUI.Setup] RefreshData > BuildMasterList ???")
@@ -425,13 +432,11 @@ function fcoglUI.initializeSearchDropdown(window, currentTab, searchBoxType)
             ["name"] = {dropdown=window.searchDrop,  prefix=FCOGL_SEARCHDROP_PREFIX,  entryCount=FCOGL_SEARCH_TYPE_ITERATION_END,
                         exclude = {
                             [FCOGL_SEARCH_TYPE_NAME]     = false,
-                            [FCOGL_SEARCH_TYPE_GUILD]    = true,
                         }, --exclude the search entries from the set search
             },
             ["guilds"] = {dropdown=window.guildsDrop,  prefix=FCOGL_GUILDSDROP_PREFIX,  entryCount=FCOGL_SEARCH_TYPE_ITERATION_END,
                         exclude = {
-                            [FCOGL_SEARCH_TYPE_NAME]     = true,
-                            [FCOGL_SEARCH_TYPE_GUILD]    = false,
+                            [FCOGL_SEARCH_TYPE_NAME]     = false,
                         }, --exclude the search entries from the set search
             },
         },
@@ -483,7 +488,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
                 local guildId = -1
                 if guildsData ~= nil then
                     guildId = guildsData.id
-                    if guildId == currentGuildId then
+                    if currentGuildId ~= nil and guildId == currentGuildId then
                         itemToSelect = i
                     end
                 else
@@ -592,18 +597,35 @@ function fcoglUI.createWindow(doShow)
     end
 end
 
-function fcoglUI.Show()
+function fcoglUI.Show(doShow)
     fcoglUI.createWindow(true)
-    local sceneName = fcoglUI.SCENE_NAME
-    if (FCOGuildLottery.UI.window.frame:IsControlHidden()) then
-        SCENE_MANAGER:Show(sceneName)
-        FCOGuildLottery.UI.windowShown = true
+    local windowFrame = FCOGuildLottery.UI.window.frame
+    if windowFrame == nil then return end
+    if doShow ~= nil then
+        if doShow == true then
+            setWindowPosition(windowFrame)
+        end
+        windowFrame:SetHidden(not doShow)
+        FCOGuildLottery.UI.windowShown = doShow
     else
-        SCENE_MANAGER:Hide(sceneName)
-        FCOGuildLottery.UI.windowShown = false
+        --local sceneName = fcoglUI.SCENE_NAME
+        if (windowFrame:IsControlHidden()) then
+            --SCENE_MANAGER:Show(sceneName)
+            setWindowPosition(windowFrame)
+            windowFrame:SetHidden(false)
+
+            FCOGuildLottery.UI.windowShown = true
+        else
+            windowFrame:SetHidden(true)
+            --SCENE_MANAGER:Hide(sceneName)
+
+            FCOGuildLottery.UI.windowShown = false
+        end
     end
 end
 FCOGuildLottery.ToggleUI = fcoglUI.Show
+--TODO for debugging only
+FCOGLT = fcoglUI.Show
 
 function fcoglUI.OnWindowMoveStop()
     local frameControl = FCOGuildLottery.UI.window.frame

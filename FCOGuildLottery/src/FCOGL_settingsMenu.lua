@@ -15,6 +15,11 @@ local dfw   = FCOGuildLottery.dfw
 ------------------------------------------------------------------------------------------------------------------------
 --LibAddonMenu-2.0 SETTINGS MENU
 
+function FCOGuildLottery.ShowLAMSettings()
+    if FCOGuildLottery.FCOSettingsPanel == nil then return end
+    FCOGuildLottery.LAM:OpenToPanel(FCOGuildLottery.FCOSettingsPanel)
+end
+
 function FCOGuildLottery.buildAddonMenu()
     local settings = FCOGuildLottery.settingsVars.settings
     if not settings or not FCOGuildLottery.LAM then return false end

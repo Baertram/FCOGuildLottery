@@ -65,6 +65,8 @@ function FCOGuildLottery.getSettings()
         --UI
         -->Window
         UIwindow = {
+            width   = 930,
+            height  = 690,
             left    = 300,
             top     = 150,
             sortKeys = {

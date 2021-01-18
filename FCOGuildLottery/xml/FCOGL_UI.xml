@@ -81,16 +81,15 @@
 					  pressed="/esoui/art/menubar/gamepad/gp_playermenu_icon_activityfinder.dds"
 			/>
 			<OnClicked>
-				FCOGL.SetTab(FCOGL_TAB_GUILDSALESLOTTERY)
+				FCOGL.UI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY)
 			</OnClicked>
 			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, TOP, GetString(FCOGL_BUTTON_SEARCH_TT))
+				FCOGL.ShowTooltip(self, TOP, "Guild sales")
 			</OnMouseEnter>
 			<OnMouseExit>
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-		<!--
 		<Button name="FCOGLButtonList" virtual="true">
 			<Dimensions x="50" y="50" />
 			<Textures normal="/esoui/art/journal/journal_tabicon_cadwell_up.dds"
@@ -100,7 +99,7 @@
 				FCOGL.SetTab(FCOGL_TAB_FCOGL)
 			</OnClicked>
 			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, TOP, GetString(FCOGL_BUTTON_FCOGL_TT))
+				FCOGL.ShowTooltip(self, TOP, "List")
 			</OnMouseEnter>
 			<OnMouseExit>
 				FCOGL.HideTooltip()
@@ -115,14 +114,14 @@
 				FCOGL.SetTab(FCOGL_TAB_HISTORY)
 			</OnClicked>
 			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, TOP, GetString(FCOGL_BUTTON_HISTORY_TT))
+				FCOGL.ShowTooltip(self, TOP, "History")
 			</OnMouseEnter>
 			<OnMouseExit>
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
 		<Button name="FCOGLButtonSettings" virtual="true">
-			<Dimensions x="35" y="35" />
+			<Dimensions x="28" y="28" />
 			<Textures normal="esoui/art/chatwindow/chat_options_up.dds"
 					  pressed="esoui/art/chatwindow/chat_options_down.dds"
 					  mouseOver="esoui/art/chatwindow/chat_options_over.dds"/>
@@ -130,22 +129,22 @@
 				FCOGL.ShowLAMSettings()
 			</OnClicked>
 			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, TOP, GetString(FCOGL_BUTTON_SETTINGS_TT))
+				FCOGL.ShowTooltip(self, TOP, "Open settings")
 			</OnMouseEnter>
 			<OnMouseExit>
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-		<Button name="FCOGLButtonSetItemCollection" virtual="true">
-			<Dimensions x="28" y="28" />
-			<Textures normal="esoui/art/collections/collections_tabIcon_itemSets_up.dds"
-					  pressed="esoui/art/collections/collections_tabIcon_itemSets_down.dds"
-					  mouseOver="esoui/art/collections/collections_tabIcon_itemSets_over.dds"/>
+		<Button name="FCOGLButtonClose" virtual="true">
+			<Dimensions x="20" y="20" />
+			<Textures normal="esoui/art/buttons/decline_up.dds"
+					  pressed="esoui/art/buttons/decline_down.dds"
+					  mouseOver="esoui/art/buttons/decline_over.dds" />
 			<OnClicked>
-				FCOGL.openSetItemCollectionBrowser()
+				FCOGL.UI.Show(false)
 			</OnClicked>
 			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, TOP, GetString(FCOGL_BUTTON_SET_ITEM_COLLECTION_TT))
+				FCOGL.ShowTooltip(self, TOP, "Close")
 			</OnMouseEnter>
 			<OnMouseExit>
 				FCOGL.HideTooltip()
@@ -160,69 +159,18 @@
 			<OnClicked>
 			</OnClicked>
 			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_BUTTON_RELOAD_TT))
+				FCOGL.ShowTooltip(self, RIGHT, "Refresh")
 			</OnMouseEnter>
 			<OnMouseExit>
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-		<!--
-        <Button name="FCOGLButtonRemoveAll" virtual="true">
-            <Dimensions x="30" y="30" />
-            <Textures normal="/esoui/art/buttons/minus_up.dds"
-                      mouseOver="esoui/art/buttons/minus_over.dds"
-                      pressed="esoui/art/buttons/minus_down.dds"
-                      disabled="esoui/art/buttons/minus_disabled.dds" />
-            <OnClicked>
-                FCOGL.ShowRemoveAllItems(true)
-            </OnClicked>
-            <OnMouseEnter>
-                FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_BUTTON_REMOVE_ALL_TT))
-            </OnMouseEnter>
-            <OnMouseExit>
-                FCOGL.HideTooltip()
-            </OnMouseExit>
-        </Button>
-		<Button name="FCOGLButtonCopyToChar" virtual="true">
-			<Dimensions x="40" y="40" />
-			<Textures normal="esoui/art/hud/radialicon_addfriend_up.dds"
-					  mouseOver="esoui/art/hud/radialicon_addfriend_over.dds"
-					  pressed="esoui/art/hud/radialicon_addfriend_up.dds"
-					  disabled="esoui/art/hud/radialicon_addfriend_disabled.dds" />
-			<OnClicked>
-				FCOGL.ShowChooseChar(true, nil, true)
-			</OnClicked>
-			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_BUTTON_COPY_FCOGL_TT))
-			</OnMouseEnter>
-			<OnMouseExit>
-				FCOGL.HideTooltip()
-			</OnMouseExit>
-		</Button>
-		<Button name="FCOGLButtonRemoveHistory" virtual="true">
-			<Dimensions x="30" y="30" />
-			<Textures normal="/esoui/art/buttons/minus_up.dds"
-					  mouseOver="esoui/art/buttons/minus_over.dds"
-					  pressed="esoui/art/buttons/minus_down.dds"
-					  disabled="esoui/art/buttons/minus_disabled.dds" />
-			<OnClicked>
-				FCOGL.ShowClearHistory(true)
-			</OnClicked>
-			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_BUTTON_REMOVE_HISTORY_TT))
-			</OnMouseEnter>
-			<OnMouseExit>
-				FCOGL.HideTooltip()
-			</OnMouseExit>
-		</Button>
-		-->
-
 
 		<!-- Frame/Window -->
-		<TopLevelControl name="FCOGLFrame" mouseEnabled="true" movable="true" clampedToScreen="true" hidden="true" >
-			<Dimensions x="800" y="600" />
+		<TopLevelControl name="FCOGLFrame" mouseEnabled="true" movable="true" clampedToScreen="true" hidden="true" > <!--inherits="ZO_RightPanelFootPrint"-->
+			<Dimensions x="930" y="690" />
 			<DimensionConstraints minX="400" minY="300" />
-            <Anchor point="CENTER" />
+			<Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER" offsetX="300" offsetY="-100"/>
 			<OnMoveStop>
 				FCOGL.UI.OnWindowMoveStop()
 			</OnMoveStop>
@@ -380,24 +328,26 @@
 					<Anchor point="TOPRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT"
 							offsetX="-190" offsetY="-50" />
 				</Button>
-				<!--
-				<Button name="$(parent)TabList" inherits="FCOGLButtonList">
+				<Button name="$(parent)TabList" inherits="FCOGLButtonList" hidden="true">
 					<Anchor point="TOPRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT"
 							offsetX="-140" offsetY="-50" />
 				</Button>
-				<Button name="$(parent)TabHistory" inherits="FCOGLButtonHistory">
+				<Button name="$(parent)TabHistory" inherits="FCOGLButtonHistory" hidden="true">
 					<Anchor point="TOPRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT"
 							offsetX="-90" offsetY="-50" />
 				</Button>
 				<Button name="$(parent)TabSettings" inherits="FCOGLButtonSettings">
-					<Anchor point="TOPRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT"
-							offsetX="-40" offsetY="-55" />
+					<Anchor point="BOTTOMRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT"
+							offsetX="-30" offsetY="-2" />
 				</Button>
-				<Button name="$(parent)TabSetItemCollection" inherits="FCOGLButtonSetItemCollection">
-					<Anchor point="BOTTOMLEFT" relativeTo="$(parent)TabHistory" relativePoint="BOTTOMRIGHT"
-							offsetX="2" offsetY="0" />
+				<Button name="$(parent)TabClose" inherits="FCOGLButtonClose">
+					<Anchor point="BOTTOMRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT"
+							offsetX="-2"  offsetY="-2" />
 				</Button>
-				-->
+
+		    	<Backdrop name="$(parent)BG" alpha="1" inherits="ZO_DefaultBackdrop" centerColor="666666">
+		    		<AnchorFill/>
+				</Backdrop>
 			</Controls>
 		</TopLevelControl>
 	</Controls>

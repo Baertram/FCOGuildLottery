@@ -68,6 +68,9 @@ local function addonLoaded(eventName, addon)
     --Dialogs
     FCOGuildLottery.AskBeforeResetDialogInitialize(FCOGLAskBeforeResetDialogXML, "resetGuildSalesLottery")
 
+    --Get the guilds data for the dropdown boxes
+    FCOGuildLottery.guildsData = FCOGuildLottery.buildGuildsDropEntries()
+
     --EVENTS
     --Register for the zone change/player ready event
     em:RegisterForEvent(addonVars.addonName .. "EVENT_PLAYER_ACTIVATED", EVENT_PLAYER_ACTIVATED, playerActivated)

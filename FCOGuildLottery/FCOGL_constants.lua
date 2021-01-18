@@ -68,7 +68,10 @@ FCOGuildLottery.settingsVars.defaults = {}
 FCOGuildLottery.playerActivatedDone = false
 
 ------------------------------------------------------------------------------------------------------------------------
-FCOGuildLottery.otherAddons = {}
+--FCOGuildLottery.otherAddons = {}
+
+------------------------------------------------------------------------------------------------------------------------
+FCOGuildLottery.guildsData = {}
 
 ------------------------------------------------------------------------------------------------------------------------
 FCOGuildLottery.lastRolledChatOutput = nil
@@ -95,20 +98,20 @@ FCOGuildLottery.dialogs.names = {
     resetGuildSalesLottery = "Dialog_ResetGuildSalesLottery",
 }
 
-
 ------------------------------------------------------------------------------------------------------------------------
 FCOGL_TAB_GUILDSALESLOTTERY = 1
 
 FCOGL_TAB_STATE_LOADING = 1
 FCOGL_TAB_STATE_LOADED  = 2
 
-FCOGuildLottery.UI = {}
-FCOGuildLottery.UI.SCENE_NAME = "FCOGuildLottery_UI_Scene"
-FCOGuildLottery.UI.SCROLLLIST_DATATYPE_GUILDSALESRANKING    =   1
-
 FCOGL_SEARCHDROP_PREFIX = "FCOGL_SEARCHDROP"
 FCOGL_GUILDSDROP_PREFIX = "FCOGL_GUILDSDROP"
 
 FCOGL_SEARCH_TYPE_NAME = 1
-FCOGL_SEARCH_TYPE_GUILD = 2
-FCOGL_SEARCH_TYPE_ITERATION_END = FCOGL_SEARCH_TYPE_GUILD
+FCOGL_SEARCH_TYPE_ITERATION_END = FCOGL_SEARCH_TYPE_NAME
+
+FCOGuildLottery.UI = {}
+FCOGuildLottery.UI.window = nil
+FCOGuildLottery.UI.SCENE_NAME = "FCOGuildLottery_UI_Scene"
+FCOGuildLottery.UI.SCROLLLIST_DATATYPE_GUILDSALESRANKING    =   1
+
