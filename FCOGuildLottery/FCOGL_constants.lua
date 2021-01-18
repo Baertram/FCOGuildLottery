@@ -1,6 +1,8 @@
 if FCOGL == nil then FCOGL = {} end
 local FCOGuildLottery = FCOGL
 
+FCOGuildLottery.clientLang = GetCVar("language.2")
+
 ------------------------------------------------------------------------------------------------------------------------
 FCOGuildLottery.addonVars = {}
 local addonVars = FCOGuildLottery.addonVars
@@ -96,6 +98,9 @@ FCOGuildLottery.dialogs.names = {
 
 ------------------------------------------------------------------------------------------------------------------------
 FCOGL_TAB_GUILDSALESLOTTERY = 1
+
+FCOGL_TAB_STATE_LOADING = 1
+FCOGL_TAB_STATE_LOADED  = 2
 
 FCOGuildLottery.UI = {}
 FCOGuildLottery.UI.SCENE_NAME = "FCOGuildLottery_UI_Scene"

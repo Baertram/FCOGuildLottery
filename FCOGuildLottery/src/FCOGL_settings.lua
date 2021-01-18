@@ -67,6 +67,12 @@ function FCOGuildLottery.getSettings()
         UIwindow = {
             left    = 300,
             top     = 150,
+            sortKeys = {
+              [FCOGL_TAB_GUILDSALESLOTTERY] = "name",
+            },
+            sortOrder = {
+              [FCOGL_TAB_GUILDSALESLOTTERY] = ZO_SORT_ORDER_DOWN,
+            },
         }
 
     }
