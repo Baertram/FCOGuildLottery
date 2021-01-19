@@ -30,34 +30,38 @@
 				<Texture name="$(parent)BG" inherits="ZO_ThinListBgStrip" />
                 <Label name="$(parent)Rank" inherits="FCOGLRowLabel">
                     <Anchor point="LEFT" />
-                    <Dimensions x="15" y="30" />
+                    <Dimensions x="50" y="30" />
                 </Label>
-                <Label name="$(parent)DateTime" inherits="FCOGLRowLabel">
+                <!--
+				<Label name="$(parent)DateTime" inherits="FCOGLRowLabel">
                     <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Rank" />
                     <Dimensions x="135" y="30" />
                 </Label>
+                -->
 				<Label name="$(parent)Name" inherits="FCOGLRowLabel">
-					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)DateTime" />
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Rank" />
 					<Dimensions x="200" y="30" />
 				</Label>
+				<!--
 				<Label name="$(parent)Item" inherits="FCOGLRowLabel">
 					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Name" />
 					<Dimensions x="100" y="30" />
 				</Label>
-				<Label name="$(parent)Amount" inherits="FCOGLRowLabel">
-					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Item" />
-					<Dimensions x="90" y="30" />
-				</Label>
+				-->
 				<Label name="$(parent)Price" inherits="FCOGLRowLabel">
-					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Amount" />
-					<Dimensions x="100" y="30" />
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Name" />
+					<Dimensions x="80" y="30" />
 				</Label>
 				<Label name="$(parent)Tax" inherits="FCOGLRowLabel">
 					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Price" />
-					<Dimensions x="100" y="30" />
+					<Dimensions x="80" y="30" />
+				</Label>
+				<Label name="$(parent)Amount" inherits="FCOGLRowLabel">
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Tax" />
+					<Dimensions x="150" y="30" />
 				</Label>
                 <Label name="$(parent)Info" inherits="FCOGLRowLabel">
-                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Tax" />
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Amount" />
                     <Dimensions x="300" y="30" />
 					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-16" />
                 </Label>
@@ -253,22 +257,25 @@
                                 ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_RANK), "rank", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
                             </OnInitialized>
                             <Anchor point="TOPLEFT" />
-                            <Dimensions x="135" y="32" />
+                            <Dimensions x="50" y="32" />
                         </Control>
-                        <Control name="$(parent)DateTime" inherits="FCOGLSortHeader">
+                        <!--
+						<Control name="$(parent)DateTime" inherits="FCOGLSortHeader">
                             <OnInitialized>
                                 ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_DATE), "timestamp", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
                             </OnInitialized>
 							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Rank" />
                             <Dimensions x="135" y="32" />
                         </Control>
+                        -->
 						<Control name="$(parent)Name" inherits="FCOGLSortHeader">
 							<OnInitialized>
 								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_NAME), "name", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
 							</OnInitialized>
-							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)DateTime" />
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Rank" />
 							<Dimensions x="200" y="32" />
 						</Control>
+						<!--
 						<Control name="$(parent)Item" inherits="FCOGLSortHeader">
 							<OnInitialized>
 								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_ITEM), "itemLink", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
@@ -276,19 +283,13 @@
 							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Name" />
 							<Dimensions x="100" y="32" />
 						</Control>
-						<Control name="$(parent)Amount" inherits="FCOGLSortHeader">
-							<OnInitialized>
-								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_AMOUNT), "amount", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
-							</OnInitialized>
-							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Item" />
-							<Dimensions x="90" y="32" />
-						</Control>
+						-->
 						<Control name="$(parent)Price" inherits="FCOGLSortHeader">
 							<OnInitialized>
 								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_PRICE), "price", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
 							</OnInitialized>
-							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Amount" />
-							<Dimensions x="130" y="32" />
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Name" />
+							<Dimensions x="80" y="32" />
 						</Control>
                         <Control name="$(parent)Tax" inherits="FCOGLSortHeader">
                             <OnInitialized>
@@ -297,13 +298,20 @@
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Price" />
                             <Dimensions x="80" y="32" />
                         </Control>
+						<Control name="$(parent)Amount" inherits="FCOGLSortHeader">
+							<OnInitialized>
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_AMOUNT), "amount", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+							</OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Tax" />
+							<Dimensions x="150" y="32" />
+						</Control>
                         <Control name="$(parent)Info" inherits="FCOGLSortHeader">
                             <OnInitialized>
                                 ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_INFO), "info", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
                             </OnInitialized>
-                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Tax" />
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Amount" />
 							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$(parent)" offsetX="-16" />
-                            <Dimensions x="100" y="32" />
+                            <Dimensions x="300" y="32" />
                         </Control>
 					</Controls>
 				</Control>

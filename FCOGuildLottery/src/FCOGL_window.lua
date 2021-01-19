@@ -130,12 +130,12 @@ function fcoglWindowClass:Setup( )
     --Sort headers
 	self.headers        = self.frame:GetNamedChild("Headers")
     self.headerRank     = self.headers:GetNamedChild("Rank")
-    self.headerDate     = self.headers:GetNamedChild("DateTime")
+    --self.headerDate     = self.headers:GetNamedChild("DateTime")
     self.headerName     = self.headers:GetNamedChild("Name")
-    self.headerItem     = self.headers:GetNamedChild("Item")
-    self.headerAmount   = self.headers:GetNamedChild("Amount")
+    --self.headerItem     = self.headers:GetNamedChild("Item")
 	self.headerPrice    = self.headers:GetNamedChild("Price")
 	self.headerTax      = self.headers:GetNamedChild("Tax")
+    self.headerAmount   = self.headers:GetNamedChild("Amount")
 	self.headerInfo     = self.headers:GetNamedChild("Info")
 
     --Add the FCOGL scene
@@ -709,12 +709,12 @@ function fcoglWindowClass:UpdateUI(state)
             self.frame:GetNamedChild("Headers"):SetHidden(false)
 
             self.headerRank:SetHidden(false)
-            self.headerDate:SetHidden(false)
+            --self.headerDate:SetHidden(false)
             self.headerName:SetHidden(false)
-            self.headerItem:SetHidden(false)
-            self.headerAmount:SetHidden(false)
+            --self.headerItem:SetHidden(false)
             self.headerPrice:SetHidden(false)
             self.headerTax:SetHidden(false)
+            self.headerAmount:SetHidden(false)
             self.headerInfo:SetHidden(false)
 
             --Reset the sortGroupHeader
