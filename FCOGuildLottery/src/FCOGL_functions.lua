@@ -108,11 +108,12 @@ function FCOGuildLottery.buildGuildsDropEntries()
         guildsOfAccount[guildIndex] = {
             index       = guildIndex,
             id          = guildId,
-            name        = guildName,
+            name        = string.format("(%s) %s", tostring(guildIndex), guildName),
+            nameClean   = guildName,
             gotTrader   = gotTrader
         }
     end
-    for guildIndex, guildData in pairs(guildsOfAccount) do
+    for guildIndex, guildData in ipairs(guildsOfAccount) do
         cnt = cnt + 1
         local stringId = FCOGL_GUILDSDROP_PREFIX .. tostring(guildIndex)
         ZO_CreateStringId(stringId, guildData.name)
@@ -121,6 +122,7 @@ function FCOGuildLottery.buildGuildsDropEntries()
             index               =   guildIndex,
             id                  =   guildData.id,
             name                =   guildData.name,
+            nameClean           =   guildData.nameClean,
             gotTrader           =   guildData.gotTrader,
         })
     end
@@ -686,13 +688,17 @@ local function rollADiceUntilNewValue(diceSides, rolledBefore)
     local validRollFound = false
     local abortCounter = 0
     local diceSide
-    while validRollFound == false or abortCounter < 100 do
+    while validRollFound == false or abortCounter <= diceSides do
         abortCounter = abortCounter + 1
+        --Pop some random numbers to make it really random
+        math.random(); math.random(); math.random()
         diceSide = zo_roundToZero(math.random(1, diceSides))
         if rolledBefore == nil or ( rolledBefore ~= nil and not rolledBefore[diceSide]) then
+            rolledBefore = rolledBefore or {}
             rolledBefore[diceSide] = true
+            --Force end of while loop
             validRollFound = true
-            abortCounter = 100
+            abortCounter = diceSides + 1
         else
             df(">Rolled a duplicate number \'%s\'. Re-rolling directly ...", tostring(diceSide))
         end
@@ -741,8 +747,6 @@ df( "RollTheDice - sidesOfDice: " ..tostring(sidesOfDice)  ..", noChatOutput: " 
 
     local now = GetTimeStamp()
     math.randomseed(os.time()) -- random initialize
-    --Pop some random numbers to make it really random
-    math.random(); math.random(); math.random()
 
     local diceRollTypeGuild = FCOGuildLottery.currentlyUsedDiceRollType
     local isGuildSalesLottery = (diceRollTypeGuild == FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY) or false
@@ -753,11 +757,17 @@ df( "RollTheDice - sidesOfDice: " ..tostring(sidesOfDice)  ..", noChatOutput: " 
     if isGuildSalesLottery == true then
         if FCOGuildLottery.currentlyUsedGuildSalesLotteryRolls ~= nil then
             diceSide = rollADiceUntilNewValue(sidesOfDice, FCOGuildLottery.currentlyUsedGuildSalesLotteryRolls)
+            if sidesOfDice == 1 then
+                --Reset the table
+                FCOGuildLottery.currentlyUsedGuildSalesLotteryRolls = {}
+            end
         else
             dfe("> Guild sales lottery previously rolled dice throws were not found! Aborting now...")
             resetCurrentGuildSalesLotteryData()
         end
     else
+        --Pop some random numbers to make it really random
+        math.random(); math.random(); math.random()
         diceSide = zo_roundToZero(math.random(1, sidesOfDice))
     end
 
