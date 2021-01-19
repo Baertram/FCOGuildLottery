@@ -500,7 +500,6 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
             --Search type combo box
             elseif isNameSearchCB then
                 local entryText = GetString(prefix, i)
-d(">Got here! entryText: " ..tostring(entryText))
                 --entryText = entryText .. GetString(setSearchCBEntryStart, i)
                 entry = ZO_ComboBox:CreateItemEntry(entryText, callback)
                 entry.id = i

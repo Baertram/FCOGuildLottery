@@ -61,7 +61,7 @@ FCOGL.IsGuildIndexValid = IsGuildIndexValid
 
 local function getGuildIdAndName(guildIndex)
     local guildId = GetGuildId(guildIndex)
-    local guildName = GetGuildName(guildId)
+    local guildName = ZO_CachedStrFormat(SI_UNIT_NAME, GetGuildName(guildId))
     return guildId, guildName
 end
 FCOGL.getGuildIdAndName = getGuildIdAndName
@@ -101,10 +101,14 @@ function FCOGuildLottery.buildGuildsDropEntries()
     for guildIndex=1, GetNumGuilds() do
         local guildId = GetGuildId(guildIndex)
         local gotTrader = (IsPlayerInGuild(guildId) and DoesGuildHavePrivilege(guildId, GUILD_PRIVILEGE_TRADING_HOUSE)) or false
+        local guildName = ZO_CachedStrFormat(SI_UNIT_NAME, GetGuildName(guildId))
+        if not gotTrader then
+            guildName = "|cFF0000" .. guildName .. "|r"
+        end
         guildsOfAccount[guildIndex] = {
             index       = guildIndex,
             id          = guildId,
-            name        = ZO_CachedStrFormat(SI_UNIT_NAME, GetGuildName(guildId)),
+            name        = guildName,
             gotTrader   = gotTrader
         }
     end
@@ -161,6 +165,18 @@ end
 local function showNewGSLSlashCommandHelp()
     local newGSLChatErrorMessage = "Please use the slash command /newgsl <guildIndex> <daysBeforeCurrent> to start a new guild sales lottery.\nReplace <guildIndex> with the index 81 to 5) of your guilds, and optinally replace <daysBeforeCurrent> with the count of days you want to check the guild sales history for.\nIf this 2nd parameter is left empty " ..tostring(FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS) .. " days will be used as default value.\n\nAfter starting a new guild sales lottery via /newgsl you can use /gsl to throw the next dice."
     dfa(newGSLChatErrorMessage)
+end
+
+
+local function checkAndShowNoTraderMessage(guildIndex)
+    local guildId, guildName = getGuildIdAndName(guildIndex)
+    local gotTrader = (IsPlayerInGuild(guildId) and DoesGuildHavePrivilege(guildId, GUILD_PRIVILEGE_TRADING_HOUSE)) or false
+    if not gotTrader then
+        local noTraderChatErrorMessage = "Either you are not a member of the guild \'%s\' aymore, or ths guild does not use a trader."
+        dfa(noTraderChatErrorMessage, guildName)
+        return true
+    end
+    return false
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -1014,6 +1030,10 @@ function FCOGuildLottery.StartNewGuildSalesLottery(guildIndex, daysBefore, dataW
         showNewGSLSlashCommandHelp()
         return
     end
+    if checkAndShowNoTraderMessage(guildIndex) == true then
+        return
+    end
+
     dataWasResetAlready = dataWasResetAlready or false
     if not dataWasResetAlready then
         FCOGuildLottery.ResetCurrentGuildSalesLotteryData(false, true)

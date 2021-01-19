@@ -154,7 +154,6 @@
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-		-->
 		<Button name="FCOGLButtonReload" virtual="true">
 			<Dimensions x="30" y="30" />
 			<Textures normal="/esoui/art/help/help_tabicon_feedback_up.dds"
@@ -164,6 +163,35 @@
 			</OnClicked>
 			<OnMouseEnter>
 				FCOGL.ShowTooltip(self, RIGHT, "Refresh")
+			</OnMouseEnter>
+			<OnMouseExit>
+				FCOGL.HideTooltip()
+			</OnMouseExit>
+		</Button>
+		<Button name="FCOGLButtonNewGuildSalesLottery" virtual="true">
+			<Dimensions x="30" y="30" />
+			<Textures normal="/esoui/art/tutorial/tutorial_idexicon_gettingstarted_up.dds"
+					  mouseOver="/esoui/art/tutorial/tutorial_idexicon_gettingstarted_over.dds"
+                      pressed="/esoui/art/tutorial/tutorial_idexicon_gettingstarted_down.dds" />
+			<OnClicked>
+				FCOGL.StartNewGuildSalesLottery(FCOGLFrameGuildsDrop.m_comboBox.m_selectedItemData.index, FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS, true)
+			</OnClicked>
+			<OnMouseEnter>
+				FCOGL.ShowTooltip(self, RIGHT, "Start new guild sales lottery")
+			</OnMouseEnter>
+			<OnMouseExit>
+				FCOGL.HideTooltip()
+			</OnMouseExit>
+		</Button>
+		<Button name="FCOGLButtonRollTheDice" virtual="true">
+			<Dimensions x="30" y="30" />
+			<Textures normal="/esoui/art/lfg/gamepad/gp_lfg_menuicon_random.dds"
+					  mouseOver="/esoui/art/lfg/gamepad/gp_lfg_menuicon_random.dds"
+                      pressed="/esoui/art/lfg/gamepad/gp_lfg_menuicon_random.dds" />
+			<OnClicked>
+			</OnClicked>
+			<OnMouseEnter>
+				FCOGL.ShowTooltip(self, RIGHT, "Roll the dice")
 			</OnMouseEnter>
 			<OnMouseExit>
 				FCOGL.HideTooltip()
@@ -346,6 +374,12 @@
 					<Anchor point="BOTTOMRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT"
 							offsetX="-2"  offsetY="-2" />
 				</Button>
+
+				<Button name="$(parent)NewGuildSalesLottery" inherits="FCOGLButtonNewGuildSalesLottery">
+					<Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPLEFT"
+							offsetX="4"  offsetY="4" />
+				</Button>
+
 
 				<!--Background -->
 		    	<Backdrop name="$(parent)BG" alpha="1" inherits="FCOGL_WindowsBackdrop" centerColor="666666">
