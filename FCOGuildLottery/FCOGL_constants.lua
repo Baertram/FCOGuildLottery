@@ -37,6 +37,8 @@ FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS = 7 -- 1 week
 
 ------------------------------------------------------------------------------------------------------------------------
 --String constants
+FCOGuildLottery.lang = {}
+
 FCOGuildLottery.constStr = {}
 FCOGuildLottery.constStr.guildLotteryLastNDays = "GuildSellsLast%sDays_%s" --1st: days, 2nd: guildName
 
@@ -100,6 +102,7 @@ FCOGuildLottery.dialogs.names = {
 }
 
 ------------------------------------------------------------------------------------------------------------------------
+--UI
 FCOGL_TAB_GUILDSALESLOTTERY = 1
 
 FCOGL_TAB_STATE_LOADING = 1
