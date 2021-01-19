@@ -84,7 +84,7 @@ function fcoglWindowClass:Setup( )
     fcoglUI.CurrentTab = FCOGL_TAB_GUILDSALESLOTTERY
 
 	--Scroll UI
-	ZO_ScrollList_AddDataType(self.list, fcoglUI.SCROLLLIST_DATATYPE_GUILDSALESRANKING, "FCOGLRow", 30, function(control, data)
+	ZO_ScrollList_AddDataType(self.list, fcoglUI.SCROLLLIST_DATATYPE_GUILDSALESRANKING, "FCOGLRowGuildSales", 30, function(control, data)
         self:SetupItemRow(control, data)
     end)
 	ZO_ScrollList_EnableHighlight(self.list, "ZO_ThinListHighlight")
@@ -128,16 +128,15 @@ function fcoglWindowClass:Setup( )
         return(self:ProcessItemEntry(stringSearch, data, searchTerm, cache))
     end)
     --Sort headers
-	self.headers = self.frame:GetNamedChild("Headers")
-    self.headerDate = self.headers:GetNamedChild("DateTime")
-    self.headerSetItemCollectionState = self.headers:GetNamedChild("SetItemCollectionState")
-    self.headerName = self.headers:GetNamedChild("Name")
-	self.headerArmorOrWeaponType = self.headers:GetNamedChild("ArmorOrWeaponType")
-	self.headerSlot = self.headers:GetNamedChild("Slot")
-	self.headerTrait = self.headers:GetNamedChild("Trait")
-    self.headerQuality = self.headers:GetNamedChild("Quality")
-    self.headerUsername = self.headers:GetNamedChild("UserName")
-    self.headerLocality = self.headers:GetNamedChild("Locality")
+	self.headers        = self.frame:GetNamedChild("Headers")
+    self.headerRank     = self.headers:GetNamedChild("Rank")
+    self.headerDate     = self.headers:GetNamedChild("DateTime")
+    self.headerName     = self.headers:GetNamedChild("Name")
+    self.headerItem     = self.headers:GetNamedChild("Item")
+    self.headerAmount   = self.headers:GetNamedChild("Amount")
+	self.headerPrice    = self.headers:GetNamedChild("Price")
+	self.headerTax      = self.headers:GetNamedChild("Tax")
+	self.headerInfo     = self.headers:GetNamedChild("Info")
 
     --Add the FCOGL scene
 	--fcoglUI.scene = ZO_Scene:New(fcoglUI.SCENE_NAME, SCENE_MANAGER)
@@ -501,6 +500,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
             --Search type combo box
             elseif isNameSearchCB then
                 local entryText = GetString(prefix, i)
+d(">Got here! entryText: " ..tostring(entryText))
                 --entryText = entryText .. GetString(setSearchCBEntryStart, i)
                 entry = ZO_ComboBox:CreateItemEntry(entryText, callback)
                 entry.id = i
@@ -667,13 +667,15 @@ function fcoglWindowClass:updateSortHeaderAnchorsAndPositions(wlTab, nameHeaderW
 --d("[fcoglWindowClass]:updateSortHeaderAnchorsAndPositions")
     if wlTab == FCOGL_TAB_GUILDSALESLOTTERY then
         if fcoglUI.CurrentState == FCOGL_TAB_STATE_LOADED then
+            --[[
             self.headerDate:ClearAnchors()
             self.headerName:ClearAnchors()
             self.headerName:SetAnchor(TOPLEFT, self.headers, nil, 0, 0)
             self.headerName:SetDimensions(nameHeaderWidth, nameHeaderHeight)
-            self.headerLocality:ClearAnchors()
-            self.headerLocality:SetAnchor(TOPLEFT, self.headerName, TOPRIGHT, 0, 0)
-            self.headerLocality:SetAnchor(TOPRIGHT, self.headers, TOPRIGHT, -16, 0)
+            self.headerInfo:ClearAnchors()
+            self.headerInfo:SetAnchor(TOPLEFT, self.headerName, TOPRIGHT, 0, 0)
+            self.headerInfo:SetAnchor(TOPRIGHT, self.headers, TOPRIGHT, -16, 0)
+            ]]
         end
     end
 end
@@ -705,13 +707,15 @@ function fcoglWindowClass:UpdateUI(state)
             self.searchBox:SetHidden(false)
 
             self.frame:GetNamedChild("Headers"):SetHidden(false)
+
+            self.headerRank:SetHidden(false)
             self.headerDate:SetHidden(false)
-            self.headerSetItemCollectionState:SetHidden(false)
-            self.headerArmorOrWeaponType:SetHidden(false)
-            self.headerSlot:SetHidden(false)
-            self.headerTrait:SetHidden(false)
-            self.headerUsername:SetHidden(false)
-            self.headerLocality:SetHidden(false)
+            self.headerName:SetHidden(false)
+            self.headerItem:SetHidden(false)
+            self.headerAmount:SetHidden(false)
+            self.headerPrice:SetHidden(false)
+            self.headerTax:SetHidden(false)
+            self.headerInfo:SetHidden(false)
 
             --Reset the sortGroupHeader
             resetSortGroupHeader(fcoglUI.CurrentTab)

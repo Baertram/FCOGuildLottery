@@ -15,7 +15,7 @@
             </Controls>
         </Control>
         <!-- Virtual Rows -->
-		<Control name="FCOGLRow" mouseEnabled="true" virtual="true">
+		<Control name="FCOGLRowGuildSales" mouseEnabled="true" virtual="true">
 			<Dimensions y="30" />
 			<OnMouseEnter>
 				FCOGL_UI_OnMouseEnter(self)
@@ -28,57 +28,57 @@
 			</OnMouseUp>
 			<Controls>
 				<Texture name="$(parent)BG" inherits="ZO_ThinListBgStrip" />
-                <Label name="$(parent)DateTime" inherits="FCOGLRowLabel">
+                <Label name="$(parent)Rank" inherits="FCOGLRowLabel">
                     <Anchor point="LEFT" />
+                    <Dimensions x="15" y="30" />
+                </Label>
+                <Label name="$(parent)DateTime" inherits="FCOGLRowLabel">
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Rank" />
                     <Dimensions x="135" y="30" />
                 </Label>
 				<Label name="$(parent)Name" inherits="FCOGLRowLabel">
 					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)DateTime" />
 					<Dimensions x="200" y="30" />
 				</Label>
-				<Label name="$(parent)ArmorOrWeaponType" inherits="FCOGLRowLabel">
+				<Label name="$(parent)Item" inherits="FCOGLRowLabel">
 					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Name" />
 					<Dimensions x="100" y="30" />
 				</Label>
-				<Label name="$(parent)Slot" inherits="FCOGLRowLabel">
-					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)ArmorOrWeaponType" />
+				<Label name="$(parent)Amount" inherits="FCOGLRowLabel">
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Item" />
 					<Dimensions x="90" y="30" />
 				</Label>
-				<Label name="$(parent)Trait" inherits="FCOGLRowLabel">
-					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Slot" />
-					<Dimensions x="130" y="30" />
+				<Label name="$(parent)Price" inherits="FCOGLRowLabel">
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Amount" />
+					<Dimensions x="100" y="30" />
 				</Label>
-                <Label name="$(parent)UserName" inherits="FCOGLRowLabel">
-                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Trait" />
-                    <Dimensions x="80" y="30" />
-                </Label>
-                <Label name="$(parent)Locality" inherits="FCOGLRowLabel">
-                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)UserName" />
-                    <Dimensions x="100" y="30" />
-                </Label>
-				<Label name="$(parent)Quality" inherits="FCOGLRowLabel">
-					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Locality" />
-					<Dimensions x="80" y="30" />
+				<Label name="$(parent)Tax" inherits="FCOGLRowLabel">
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Price" />
+					<Dimensions x="100" y="30" />
 				</Label>
-                <Label name="$(parent)SetItemCollectionState" inherits="FCOGLRowLabel">
-                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Quality"/>
-                    <Dimensions x="26" y="26" />
-					<Controls>
-						<Texture name="$(parent)Marker" tier="HIGH">
-							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)SetItemCollectionState" />
-							<Dimensions x="26" y="26" />
-						</Texture>
-					</Controls>
+                <Label name="$(parent)Info" inherits="FCOGLRowLabel">
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Tax" />
+                    <Dimensions x="300" y="30" />
 					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-16" />
                 </Label>
 			</Controls>
 		</Control>
+		<!--Virtual backdrops -->
+		<Backdrop name="FCOGL_WindowsBackdrop" inherits="ZO_DarkThinFrame" virtual="true">
+			<Anchor point="TOPLEFT" offsetX="-4" offsetY="-4"/>
+            <Anchor point="BOTTOMRIGHT" offsetX="4" offsetY="4"/>
+            <Edge file="EsoUI/Art/Miscellaneous/dark_edgeFrame_8_thin.dds" edgeFileWidth="64" edgeFileHeight="8" />
+            <Center file="EsoUI/Art/Miscellaneous/Gamepad/gp_edgeFill.dds" />
+			<!--<Center file="/esoui/art/upsell/upsell_greymoor_bg.dds" /> -->
+        </Backdrop>
+
 		<!-- Virtual Buttons -->
-		<Button name="FCOGLButtonSearch" virtual="true">
+		<Button name="FCOGLButtonGuildSales" virtual="true">
 			<Dimensions x="50" y="50" />
-			<Textures normal="/esoui/art/miscellaneous/search_icon.dds"
-					  mouseOver="/esoui/art/buttons/checkbox_mouseover.dds"
-					  pressed="/esoui/art/menubar/gamepad/gp_playermenu_icon_activityfinder.dds"
+			<Textures normal="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_up.dds"
+					  mouseOver="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_over.dds"
+					  pressed="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_down.dds"
+					  disabled="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_disabled.dds"
 			/>
 			<OnClicked>
 				FCOGL.UI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY)
@@ -242,16 +242,24 @@
                     </Controls>
 				</Control>
 
+				<!-- Sort headers -->
 				<Control name="$(parent)Headers">
 					<Anchor point="TOPLEFT" offsetX="30" offsetY="51" />
 					<Anchor point="TOPRIGHT" offsetY="51" />
 					<Dimensions y="32" />
 					<Controls>
+                        <Control name="$(parent)Rank" inherits="FCOGLSortHeader">
+                            <OnInitialized>
+                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_RANK), "rank", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+                            </OnInitialized>
+                            <Anchor point="TOPLEFT" />
+                            <Dimensions x="135" y="32" />
+                        </Control>
                         <Control name="$(parent)DateTime" inherits="FCOGLSortHeader">
                             <OnInitialized>
                                 ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_DATE), "timestamp", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
                             </OnInitialized>
-                            <Anchor point="TOPLEFT" />
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Rank" />
                             <Dimensions x="135" y="32" />
                         </Control>
 						<Control name="$(parent)Name" inherits="FCOGLSortHeader">
@@ -261,55 +269,41 @@
 							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)DateTime" />
 							<Dimensions x="200" y="32" />
 						</Control>
-						<Control name="$(parent)ArmorOrWeaponType" inherits="FCOGLSortHeader">
+						<Control name="$(parent)Item" inherits="FCOGLSortHeader">
 							<OnInitialized>
-								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_TYPE), "armorOrWeaponTypeName", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_ITEM), "itemLink", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
 							</OnInitialized>
 							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Name" />
 							<Dimensions x="100" y="32" />
 						</Control>
-						<Control name="$(parent)Slot" inherits="FCOGLSortHeader">
+						<Control name="$(parent)Amount" inherits="FCOGLSortHeader">
 							<OnInitialized>
-								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_SLOT), "slotName", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_AMOUNT), "amount", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
 							</OnInitialized>
-							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)ArmorOrWeaponType" />
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Item" />
 							<Dimensions x="90" y="32" />
 						</Control>
-						<Control name="$(parent)Trait" inherits="FCOGLSortHeader">
+						<Control name="$(parent)Price" inherits="FCOGLSortHeader">
 							<OnInitialized>
-								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_TRAIT), "traitName", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_PRICE), "price", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
 							</OnInitialized>
-							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Slot" />
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Amount" />
 							<Dimensions x="130" y="32" />
 						</Control>
-                        <Control name="$(parent)UserName" inherits="FCOGLSortHeader">
+                        <Control name="$(parent)Tax" inherits="FCOGLSortHeader">
                             <OnInitialized>
-                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_USERNAME), "username", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_TAX), "tax", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
                             </OnInitialized>
-                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Trait" />
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Price" />
                             <Dimensions x="80" y="32" />
                         </Control>
-                        <Control name="$(parent)Locality" inherits="FCOGLSortHeader">
+                        <Control name="$(parent)Info" inherits="FCOGLSortHeader">
                             <OnInitialized>
-                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_LOCALITY), "locality", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_INFO), "info", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
                             </OnInitialized>
-                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)UserName" />
-                            <Dimensions x="100" y="32" />
-                        </Control>
-						<Control name="$(parent)Quality" inherits="FCOGLSortHeader">
-							<OnInitialized>
-								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_QUALITY), "quality", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
-							</OnInitialized>
-							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Locality" />
-							<Dimensions x="80" y="32" />
-						</Control>
-                        <Control name="$(parent)SetItemCollectionState" inherits="FCOGLSortHeader">
-                            <OnInitialized>
-                                ZO_SortHeader_Initialize(self, "+", "knownInSetItemCollectionBook", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
-                            </OnInitialized>
-                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Quality"/>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Tax" />
 							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$(parent)" offsetX="-16" />
-                            <Dimensions x="30" y="32" />
+                            <Dimensions x="100" y="32" />
                         </Control>
 					</Controls>
 				</Control>
@@ -324,7 +318,7 @@
 				</Label>
 
 				<!-- Tab Buttons -->
-				<Button name="$(parent)TabSearch" inherits="FCOGLButtonSearch">
+				<Button name="$(parent)TabGuildSales" inherits="FCOGLButtonGuildSales">
 					<Anchor point="TOPRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT"
 							offsetX="-190" offsetY="-50" />
 				</Button>
@@ -345,7 +339,8 @@
 							offsetX="-2"  offsetY="-2" />
 				</Button>
 
-		    	<Backdrop name="$(parent)BG" alpha="1" inherits="ZO_DefaultBackdrop" centerColor="666666">
+				<!--Background -->
+		    	<Backdrop name="$(parent)BG" alpha="1" inherits="FCOGL_WindowsBackdrop" centerColor="666666">
 		    		<AnchorFill/>
 				</Backdrop>
 			</Controls>
