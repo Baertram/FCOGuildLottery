@@ -19,6 +19,8 @@ local dfw   = FCOGuildLottery.dfw
 --UI variables
 FCOGuildLottery.UI = FCOGuildLottery.UI or {}
 local fcoglUI = FCOGuildLottery.UI
+local fcoglUIwindow
+
 fcoglUI.CurrentState    = FCOGL_TAB_STATE_LOADING
 fcoglUI.CurrentTab      = FCOGL_TAB_GUILDSALESLOTTERY
 fcoglUI.comingFromSortScrollListSetupFunction = false
@@ -159,11 +161,14 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
     self.masterList = {}
 
     if fcoglUI.CurrentTab == FCOGL_TAB_GUILDSALESLOTTERY then
-        local rankingData = FCOGuildLottery.guildSellStats[GetGuildId(3)] --Fair Trade Society
+        if FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier == nil or
+           FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId == nil then return end
+        local guildId = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId
+        local rankingData = FCOGuildLottery.guildSellStats and FCOGuildLottery.guildSellStats[guildId]
         if rankingData == nil or #rankingData == 0 then return false end
         for i = 1, #rankingData do
             local item = rankingData[i]
-            table.insert(self.masterList, fcoglUI.CreateRankingEntryForItem(item))
+            table.insert(self.masterList, fcoglUI.CreateGuildSalesRankingEntry(item))
         end
     end
 end
@@ -175,59 +180,44 @@ function fcoglWindowClass:SetupItemRow(control, data )
     --d(">>>      [fcoglWindow:SetupItemRow] " ..tostring(data.names[clientLang]))
     control.data = data
     --local updateSortHeaderDimensionsAndAnchors = false
-    local setItemCollectionStateColumn = control:GetNamedChild("SetItemCollectionState")
-    local markerTexture = setItemCollectionStateColumn:GetNamedChild("Marker")
+    local rankColumn = control:GetNamedChild("Rank")
     local nameColumn = control:GetNamedChild("Name")
     nameColumn.normalColor = ZO_DEFAULT_TEXT
     if not data.columnWidth then data.columnWidth = 200 end
     nameColumn:SetDimensions(data.columnWidth, 30)
     nameColumn:SetText(data.name)
-    local armorOrWeaponTypeColumn = control:GetNamedChild("ArmorOrWeaponType")
-    local slotColumn = control:GetNamedChild("Slot")
-    local traitColumn = control:GetNamedChild("Trait")
-    local dateColumn = control:GetNamedChild("DateTime")
-    local qualityColumn = control:GetNamedChild("Quality")
-    local userNameColumn = control:GetNamedChild("UserName")
-    local localityColumn = control:GetNamedChild("Locality")
-    localityColumn.localityName = nil
+    local priceColumn = control:GetNamedChild("Price")
+    local taxColumn = control:GetNamedChild("Tax")
+    --local dateColumn = control:GetNamedChild("DateTime")
+    local amountColumn = control:GetNamedChild("Amount")
+    local infoColumn = control:GetNamedChild("Info")
     ------------------------------------------------------------------------------------------------------------------------
     if fcoglUI.CurrentTab == FCOGL_TAB_GUILDSALESLOTTERY then
-        local dateTimeStamp = data.timestamp
-        local dateTimeStr = fcoglUI.getDateTimeFormatted(dateTimeStamp)
-        dateColumn:ClearAnchors()
-        dateColumn:SetAnchor(LEFT, control, nil, 0, 0)
-        dateColumn:SetText(dateTimeStr)
-        dateColumn:SetHidden(false)
+        --local dateTimeStamp = data.timestamp
+        --local dateTimeStr = fcoglUI.getDateTimeFormatted(dateTimeStamp)
+        --dateColumn:ClearAnchors()
+        --dateColumn:SetAnchor(LEFT, control, nil, 0, 0)
+        --dateColumn:SetText(dateTimeStr)
+        --dateColumn:SetHidden(false)
+        rankColumn:SetHidden(false)
+        rankColumn:ClearAnchors()
+        rankColumn:SetAnchor(LEFT, control, nil, 0, 0)
         nameColumn:SetHidden(false)
         nameColumn:ClearAnchors()
-        nameColumn:SetAnchor(LEFT, dateColumn, RIGHT, 0, 0)
-        userNameColumn:SetHidden(true)
-        qualityColumn:SetHidden(false)
-        localityColumn:SetHidden(true)
-        localityColumn:ClearAnchors()
-        armorOrWeaponTypeColumn:SetHidden(false)
-        slotColumn:SetHidden(false)
-        traitColumn:SetHidden(false)
-        armorOrWeaponTypeColumn.normalColor = ZO_DEFAULT_TEXT
-        local armorOrWeaponTypeColumnText = ""
-        armorOrWeaponTypeColumn:SetText(armorOrWeaponTypeColumnText)
-        slotColumn.normalColor = ZO_DEFAULT_TEXT
-        slotColumn:SetText("")
-        traitColumn.normalColor = ZO_DEFAULT_TEXT
-        --Add the icon to the trait column
-        local traitId = data.trait
-        local traitText = ""
-        traitColumn:SetText(traitText)
-        local qualityText = ""
-        qualityColumn:ClearAnchors()
-        qualityColumn:SetAnchor(LEFT, traitColumn, RIGHT, 0, 0)
-        qualityColumn:SetText(qualityText)
-        setItemCollectionStateColumn:SetHidden(false)
-        setItemCollectionStateColumn:ClearAnchors()
-        setItemCollectionStateColumn:SetAnchor(LEFT, qualityColumn, RIGHT, 0, 0)
-        markerTexture:SetTexture("")
-        markerTexture:SetHidden(true)
-        setItemCollectionStateColumn:SetAnchor(RIGHT, control, RIGHT, -16, 0)
+        nameColumn:SetAnchor(LEFT, rankColumn, RIGHT, 0, 0)
+        priceColumn:SetHidden(false)
+        priceColumn:ClearAnchors()
+        priceColumn:SetAnchor(LEFT, nameColumn, RIGHT, 0, 0)
+        taxColumn:SetHidden(false)
+        taxColumn:ClearAnchors()
+        taxColumn:SetAnchor(LEFT, priceColumn, RIGHT, 0, 0)
+        amountColumn:SetHidden(false)
+        amountColumn:ClearAnchors()
+        amountColumn:SetAnchor(LEFT, taxColumn, RIGHT, 0, 0)
+        infoColumn:SetHidden(false)
+        infoColumn:ClearAnchors()
+        infoColumn:SetAnchor(LEFT, amountColumn, RIGHT, 0, 0)
+        infoColumn:SetAnchor(RIGHT, control, RIGHT, 0, 0)
     end
     --Set the row to the list now
     ZO_SortFilterList.SetupRow(self, control, data)
@@ -288,15 +278,13 @@ function fcoglWindowClass:BuildSortKeys()
     else
         --Get the tiebraker for the 2nd sort after the selected column
         self.sortKeys = {
-            ["timestamp"]               = { isId64          = true, tiebreaker = "name"  }, --isNumeric = true
-            ["knownInSetItemCollectionBook"] = { caseInsensitive = true, isNumeric = true, tiebreaker = "name" },
-            ["name"]                    = { caseInsensitive = true },
-            ["armorOrWeaponTypeName"]   = { caseInsensitive = true, tiebreaker = "name" },
-            ["slotName"]                = { caseInsensitive = true, tiebreaker = "name" },
-            ["traitName"]               = { caseInsensitive = true, tiebreaker = "name" },
-            ["quality"]                 = { caseInsensitive = true, tiebreaker = "name" },
-            ["username"]                = { caseInsensitive = true, tiebreaker = "name" },
-            ["locality"]                = { caseInsensitive = true, tiebreaker = "name" },
+           -- ["rank"]               = { isId64          = true, isNumeric = true, tiebreaker = "name"  },
+            ["rank"]               = { isNumeric = true,       tiebreaker = "name"  },
+            ["name"]               = { caseInsensitive = true                       },
+            ["price"]              = { caseInsensitive = true, tiebreaker = "name"  },
+            ["tax"]                = { caseInsensitive = true, tiebreaker = "name"  },
+            ["amount"]             = { caseInsensitive = true, tiebreaker = "name"  },
+            ["info"]               = { caseInsensitive = true, tiebreaker = "name"  },
         }
     end
 end
@@ -533,7 +521,7 @@ end
 --- FCOGL Row
 ------------------------------------------------
 function FCOGL_UI_OnMouseEnter( rowControlEnter )
-	FCOGuildLottery.UI.window:Row_OnMouseEnter(rowControlEnter)
+	fcoglUIwindow:Row_OnMouseEnter(rowControlEnter)
     local showAdditionalTextTooltip = false
     if showAdditionalTextTooltip then
         local data = rowControlEnter.data
@@ -564,7 +552,7 @@ function FCOGL_UI_OnMouseEnter( rowControlEnter )
 end
 
 function FCOGL_UI_OnMouseExit( rowControlExit )
-	FCOGuildLottery.UI.window:Row_OnMouseExit(rowControlExit)
+	fcoglUIwindow:Row_OnMouseExit(rowControlExit)
     FCOGuildLottery.HideTooltip()
 end
 
@@ -580,53 +568,63 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 --FCOGuildLottery UI functions
 
-function fcoglUI.CreateRankingEntryForItem(item)
-    return item
+function fcoglUI.CreateGuildSalesRankingEntry(item)
+    --[[
+        --Columns of "item":
+        --Rank
+        --Name seller
+        --Name buyer
+        --Sum sold
+        --Sum tax
+        --Sum items sold
+    ]]
+    local guildSalesRankingLine = {
+        rank =      1,
+        name =      "Hello World",
+        price =     1000000,
+        tax =       2000,
+        amount =    12,
+        info =      "Information text",
+    }
+    return guildSalesRankingLine
 end
 
 
-function fcoglUI.createWindow(doShow)
-    doShow = doShow or false
+function fcoglUI.createWindow()
     if (not FCOGuildLottery.UI.window) then
         FCOGuildLottery.UI.window = fcoglWindowClass:New(FCOGLFrame)
+        fcoglUIwindow = FCOGuildLottery.UI.window
     end
-    if doShow then
-        FCOGuildLottery.UI.window:UpdateUI(FCOGL_TAB_STATE_LOADED)
+end
+
+local function showUIWindow(doShow)
+    local windowFrame = fcoglUIwindow.frame
+    if windowFrame == nil then return end
+    --Toggle show/hide
+    if doShow == nil then
+        --Recursively call
+        showUIWindow(windowFrame:IsControlHidden())
+        return
+    else
+        --Explicitly show/hide
+        windowFrame:SetHidden(not doShow)
+        FCOGuildLottery.UI.windowShown = doShow
+        if doShow == true then
+            setWindowPosition(windowFrame)
+            fcoglUIwindow:UpdateUI(FCOGL_TAB_STATE_LOADED)
+        end
     end
 end
 
 function fcoglUI.Show(doShow)
-    fcoglUI.createWindow(true)
-    local windowFrame = FCOGuildLottery.UI.window.frame
-    if windowFrame == nil then return end
-    if doShow ~= nil then
-        if doShow == true then
-            setWindowPosition(windowFrame)
-        end
-        windowFrame:SetHidden(not doShow)
-        FCOGuildLottery.UI.windowShown = doShow
-    else
-        --local sceneName = fcoglUI.SCENE_NAME
-        if (windowFrame:IsControlHidden()) then
-            --SCENE_MANAGER:Show(sceneName)
-            setWindowPosition(windowFrame)
-            windowFrame:SetHidden(false)
-
-            FCOGuildLottery.UI.windowShown = true
-        else
-            windowFrame:SetHidden(true)
-            --SCENE_MANAGER:Hide(sceneName)
-
-            FCOGuildLottery.UI.windowShown = false
-        end
-    end
+--d(">Show: " ..tostring(doShow))
+    fcoglUI.createWindow()
+    showUIWindow(doShow)
 end
 FCOGuildLottery.ToggleUI = fcoglUI.Show
---TODO for debugging only
-FCOGLT = fcoglUI.Show
 
 function fcoglUI.OnWindowMoveStop()
-    local frameControl = FCOGuildLottery.UI.window.frame
+    local frameControl = fcoglUIwindow.frame
     if not frameControl then return end
     local settings = FCOGuildLottery.settingsVars.settings
     settings.UIwindow.left  = frameControl:GetLeft()
@@ -635,7 +633,7 @@ end
 
 local function resetSortGroupHeader(currentTab)
 --d("[WL.resetSortGroupHeader]")
-    local UIwindow = FCOGuildLottery.UI.window
+    local UIwindow = fcoglUIwindow
     if UIwindow.sortHeaderGroup then
         local settings = FCOGuildLottery.settingsVars.settings
         local sortHeaderKey = settings.UIwindow.sortKeys[currentTab] or "name"
@@ -653,11 +651,10 @@ end
 
 function fcoglUI.saveSortGroupHeader(currentTab)
 --d("[WL.saveSortGroupHeader]")
-    if FCOGuildLottery.UI.window then
-        local UIwindow = FCOGuildLottery.UI.window
+    if fcoglUIwindow then
         local settings = FCOGuildLottery.settingsVars.settings
-        settings.UIwindow.sortKeys[currentTab]  = UIwindow.currentSortKey
-        settings.UIwindow.sortOrder[currentTab] = UIwindow.currentSortOrder
+        settings.UIwindow.sortKeys[currentTab]  = fcoglUIwindow.currentSortKey
+        settings.UIwindow.sortOrder[currentTab] = fcoglUIwindow.currentSortOrder
     end
 end
 
@@ -683,30 +680,39 @@ function fcoglWindowClass:UpdateUI(state)
 	fcoglUI.CurrentState = state
 --d("[fcoglWindow:UpdateUI] state: " ..tostring(state) .. ", currentTab: " ..tostring(fcoglUI.CurrentTab))
 
-    local normalSearchTexture = "/esoui/art/menubar/gamepad/gp_playermenu_icon_activityfinder.dds"
     local frameControl = self.frame
     ------------------------------------------------------------------------------------------------------------------------
     --SEARCH tab
-	if fcoglUI.CurrentTab == WISHLIST_TAB_SEARCH then
-        frameControl:GetNamedChild("TabSearch"):SetNormalTexture(normalSearchTexture)
-
+	if fcoglUI.CurrentTab == FCOGL_TAB_GUILDSALESLOTTERY then
 --......................................................................................................................
-        --Sets are not loaded yet -> Show load button
         if fcoglUI.CurrentState == FCOGL_TAB_STATE_LOADED then
             --WLW_UpdateSceneFragmentTitle(WISHLIST_SCENE_NAME, TITLE_FRAGMENT, "Label", GetString(WISHLIST_TITLE) ..  " - " .. zo_strformat(GetString(WISHLIST_SETS_LOADED), 0))
-            updateSceneFragmentTitle(WISHLIST_SCENE_NAME, TITLE_FRAGMENT, "Label", GetString(WISHLIST_TITLE) .. " - " .. GetString(WISHLIST_BUTTON_SEARCH_TT):upper())
+            --updateSceneFragmentTitle(WISHLIST_SCENE_NAME, TITLE_FRAGMENT, "Label", GetString(WISHLIST_TITLE) .. " - " .. GetString(WISHLIST_BUTTON_SEARCH_TT):upper())
 
-            frameControl:GetNamedChild("TabList"):SetEnabled(true)
+            --Hide currently unused tabs
+            frameControl:GetNamedChild("TabList"):SetEnabled(false)
+            frameControl:GetNamedChild("TabList"):SetHidden(true)
+            frameControl:GetNamedChild("TabHistory"):SetEnabled(false)
+            frameControl:GetNamedChild("TabHistory"):SetHidden(true)
+            --Unhide the current tab
 
-            self.frame:GetNamedChild("Reload"):SetHidden(false)
+            --Unhide buttons at the tab
+            self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetEnabled(true)
+            self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetHidden(false)
+            self.frame:GetNamedChild("RollTheDice"):SetEnabled(true)
+            self.frame:GetNamedChild("RollTheDice"):SetHidden(false)
+            self.frame:GetNamedChild("NewGuildSalesLottery"):SetEnabled(true)
+            self.frame:GetNamedChild("NewGuildSalesLottery"):SetHidden(false)
+            --Unhide the search
+            self.searchBox:SetHidden(false)
             self.frame:GetNamedChild("Search"):SetHidden(false)
+            --Unhide the dropdown boxes
             self.frame:GetNamedChild("SearchDrop"):SetHidden(false)
             self.frame:GetNamedChild("GuildsDrop"):SetHidden(false)
+            --Unhide the scroll list
             self.frame:GetNamedChild("List"):SetHidden(false)
-            self.searchBox:SetHidden(false)
-
+            --Unhide the scroll list headers
             self.frame:GetNamedChild("Headers"):SetHidden(false)
-
             self.headerRank:SetHidden(false)
             --self.headerDate:SetHidden(false)
             self.headerName:SetHidden(false)
@@ -728,15 +734,19 @@ end -- fcoglWindow:UpdateUI(state)
 
 --Change the tabs at the WishList menu
 function fcoglUI.SetTab(index)
+df("SetTab - index: %s", tostring(index))
+    if not fcoglUIwindow then return end
+    --Do not activate active tab
+    if fcoglUI.CurrentTab and fcoglUI.CurrentTab == index then return end
     --Save the current sort order and key
     fcoglUI.saveSortGroupHeader(fcoglUI.CurrentTab)
     --Change to the new tab
     fcoglUI.CurrentTab = index
     --Clear the master list of the currently shown ZO_SortFilterList
-    ZO_ScrollList_Clear(FCOGuildLottery.UI.window.list)
-    FCOGuildLottery.UI.window.masterList = {}
+    ZO_ScrollList_Clear(fcoglUIwindow.list)
+    fcoglUIwindow.masterList = {}
     --Reset variable
     fcoglUI.comingFromSortScrollListSetupFunction = false
     --Update the UI (hide/show items)
-    FCOGuildLottery.UI.window:UpdateUI(fcoglUI.CurrentState)
+    fcoglUIwindow:UpdateUI(fcoglUI.CurrentState)
 end

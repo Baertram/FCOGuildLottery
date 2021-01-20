@@ -98,7 +98,7 @@ FCOGuildLottery.defaultGuildSalesLotteryUniqueIdentifiers = {
 ------------------------------------------------------------------------------------------------------------------------
 FCOGuildLottery.dialogs = {}
 FCOGuildLottery.dialogs.names = {
-    resetGuildSalesLottery = "Dialog_ResetGuildSalesLottery",
+    ["resetGuildSalesLottery"] = "Dialog_ResetGuildSalesLottery",
 }
 
 ------------------------------------------------------------------------------------------------------------------------

@@ -75,7 +75,8 @@ function FCOGuildLottery.getSettings()
             sortOrder = {
               [FCOGL_TAB_GUILDSALESLOTTERY] = ZO_SORT_ORDER_DOWN,
             },
-        }
+        },
+        showUIAfterDiceRoll = false,
 
     }
     FCOGuildLottery.settingsVars.defaults = defaults

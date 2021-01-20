@@ -174,7 +174,7 @@
 					  mouseOver="/esoui/art/tutorial/tutorial_idexicon_gettingstarted_over.dds"
                       pressed="/esoui/art/tutorial/tutorial_idexicon_gettingstarted_down.dds" />
 			<OnClicked>
-				FCOGL.StartNewGuildSalesLottery(FCOGLFrameGuildsDrop.m_comboBox.m_selectedItemData.index, FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS, true)
+				FCOGL.StartNewGuildSalesLottery(FCOGLFrameGuildsDrop.m_comboBox.m_selectedItemData.index, FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS, false)
 			</OnClicked>
 			<OnMouseEnter>
 				FCOGL.ShowTooltip(self, RIGHT, "Start new guild sales lottery")
@@ -189,6 +189,7 @@
 					  mouseOver="/esoui/art/lfg/gamepad/gp_lfg_menuicon_random.dds"
                       pressed="/esoui/art/lfg/gamepad/gp_lfg_menuicon_random.dds" />
 			<OnClicked>
+				FCOGL.RollTheDiceCheck()
 			</OnClicked>
 			<OnMouseEnter>
 				FCOGL.ShowTooltip(self, RIGHT, "Roll the dice")
@@ -366,6 +367,8 @@
 					<Anchor point="TOPRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT"
 							offsetX="-90" offsetY="-50" />
 				</Button>
+
+				<!-- Small tab buttons at the top right -->
 				<Button name="$(parent)TabSettings" inherits="FCOGLButtonSettings">
 					<Anchor point="BOTTOMRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT"
 							offsetX="-30" offsetY="-2" />
@@ -375,11 +378,19 @@
 							offsetX="-2"  offsetY="-2" />
 				</Button>
 
-				<Button name="$(parent)NewGuildSalesLottery" inherits="FCOGLButtonNewGuildSalesLottery">
+				<!-- Normal buttons at the tabs, left side e.g -->
+				<Button name="$(parent)RollTheDice" inherits="FCOGLButtonRollTheDice">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPLEFT"
-							offsetX="4"  offsetY="4" />
+							offsetX="4"  offsetY="6" />
 				</Button>
-
+				<Button name="$(parent)NewGuildSalesLottery" inherits="FCOGLButtonNewGuildSalesLottery">
+					<Anchor point="TOPLEFT" relativeTo="$(parent)RollTheDice" relativePoint="TOPRIGHT"
+							offsetX="40"  offsetY="0" />
+				</Button>
+				<Button name="$(parent)ReloadGuildSalesLottery" inherits="FCOGLButtonReload">
+					<Anchor point="TOPLEFT" relativeTo="$(parent)NewGuildSalesLottery" relativePoint="TOPRIGHT"
+							offsetX="10"  offsetY="0" />
+				</Button>
 
 				<!--Background -->
 		    	<Backdrop name="$(parent)BG" alpha="1" inherits="FCOGL_WindowsBackdrop" centerColor="666666">

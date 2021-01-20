@@ -73,13 +73,12 @@ function FCOGuildLottery.slashCommands()
     end
 
     --Reset slash command for the guild sales lottery
-    SLASH_COMMANDS["/newguildsaleslottery"] = FCOGuildLottery.NewGuildSalesLotterySlashCommand
     SLASH_COMMANDS["/newgsl"]               = FCOGuildLottery.NewGuildSalesLotterySlashCommand
 
     --Start new/Roll dice W<numberOfGuildSales> for guild sales lottery
-    SLASH_COMMANDS["/guildsaleslottery"]    = FCOGuildLottery.GuildSalesLotterySlashCommand
     SLASH_COMMANDS["/gsl"]                  = FCOGuildLottery.GuildSalesLotterySlashCommand
 
     SLASH_COMMANDS["/gsllast"]              = FCOGuildLottery.GuildSalesLotteryLastRolledSlashCommand
 
+    SLASH_COMMANDS["/fcogl"]                = function() FCOGuildLottery.ToggleUI() end
 end

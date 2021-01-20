@@ -3,6 +3,7 @@ local FCOGuildLottery = FCOGL
 
 local addonVars = FCOGuildLottery.addonVars
 local addonNamePre = FCOGuildLottery.addonNamePre
+local addonName = addonVars.addonName
 
 --Debug messages
 local df    = FCOGuildLottery.df
@@ -21,7 +22,7 @@ local em = EVENT_MANAGER
 
 local function checkForHistyIsInitialized(isInitialCall)
     local loopsDone = 0
-    local uniqueName = addonVars.addonName .. "_IsHistyReady"
+    local uniqueName = addonName .. "_IsHistyReady"
     local function updateCheck()
         loopsDone = loopsDone + 1
         if loopsDone >= 100 then
@@ -49,7 +50,7 @@ local function playerActivated(eventId, isInitialCall)
 end
 
 local function addonLoaded(eventName, addon)
-    if addon ~= addonVars.addonName then return end
+    if addon ~= addonName then return end
     em:UnregisterForEvent(eventName)
 
     --[[LIBRARIES]]
@@ -66,18 +67,18 @@ local function addonLoaded(eventName, addon)
     FCOGuildLottery.buildAddonMenu()
 
     --Dialogs
-    FCOGuildLottery.AskBeforeResetDialogInitialize(FCOGLAskBeforeResetDialogXML, "resetGuildSalesLottery")
+    FCOGuildLottery.AskBeforeResetDialogInitialize(FCOGLAskBeforeResetDialogXML, FCOGuildLottery.getDialogName("resetGuildSalesLottery"))
 
     --Get the guilds data for the dropdown boxes
     FCOGuildLottery.guildsData = FCOGuildLottery.buildGuildsDropEntries()
 
     --EVENTS
     --Register for the zone change/player ready event
-    em:RegisterForEvent(addonVars.addonName .. "EVENT_PLAYER_ACTIVATED", EVENT_PLAYER_ACTIVATED, playerActivated)
+    em:RegisterForEvent(addonName .. "EVENT_PLAYER_ACTIVATED", EVENT_PLAYER_ACTIVATED, playerActivated)
 end
 
 function FCOGuildLottery.initialize()
-    em:RegisterForEvent(addonVars.addonName .. "EVENT_ADD_ON_LOADED", EVENT_ADD_ON_LOADED, addonLoaded)
+    em:RegisterForEvent(addonName .. "EVENT_ADD_ON_LOADED", EVENT_ADD_ON_LOADED, addonLoaded)
 end
 
 --Load the addon
