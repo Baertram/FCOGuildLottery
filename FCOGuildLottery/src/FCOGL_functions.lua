@@ -309,6 +309,8 @@ function FCOGuildLottery.AddTradeSellEvent(guildId, uniqueIdentifier, eventType,
         tax         = param6  --tax
     }
 
+    --[[
+    --TODO: For debugging and comparison with MM data!
     local guildName = GetGuildName(guildId)
     FCOGuildLottery._FCOGL7DaysData = FCOGuildLottery._FCOGL7DaysData or {}
     FCOGuildLottery._FCOGL7DaysData[guildName] = FCOGuildLottery._FCOGL7DaysData[guildName] or {}
@@ -318,6 +320,7 @@ function FCOGuildLottery.AddTradeSellEvent(guildId, uniqueIdentifier, eventType,
       stack = param3,
       wasKiosk = (param2 ~= nil and true) or false,
     }
+    ]]
 
 end
 local addTradeSellEvent = FCOGuildLottery.AddTradeSellEvent
@@ -605,21 +608,37 @@ function FCOGuildLottery.GetGuildSalesMemberCount(guildId, daysToGetBefore, star
                                 --Increase the counter for the sells of this member by 1
                                 FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellCounts[memberName] = currentCount + 1
                                 --Increase the counter for the sells value (price) of this member by the price of the actual item
-                                local actualSellSumOfMember = FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellSums[memberName]
-                                if actualSellSumOfMember == nil then actualSellSumOfMember = 0 end
-                                FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellSums[memberName] = actualSellSumOfMember + guildSellData.price
+                                FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellSums[memberName] = FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellSums[memberName] or {
+                                    sumPrice = 0,
+                                    sumTax   = 0,
+                                    sumQuantity = 0,
+                                }
+                                local actualSellSumDataOfMember = FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellSums[memberName]
+                                FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellSums[memberName].sumPrice       = actualSellSumDataOfMember.sumPrice    + guildSellData.price
+                                FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellSums[memberName].sumTax         = actualSellSumDataOfMember.sumTax      + guildSellData.tax
+                                FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellSums[memberName].sumQuantity    = actualSellSumDataOfMember.sumQuantity + guildSellData.quantity
                             end
                         end
                     end
-                    for memberName, sumPriceOfSoldItems in pairs(FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellSums) do
-                        if sumPriceOfSoldItems > 0 then
-                            table.insert(FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellRank, {
-                                memberName  = memberName,
-                                soldSum     = sumPriceOfSoldItems
-                            })
-                        end
+                    for memberName, sumData in pairs(FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellSums) do
+                        table.insert(FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellRank, {
+                            --rank
+                            --memberName
+                            --soldSum
+                            --taxSum
+                            --amountSum
+                            rank        = -1,
+                            memberName  = memberName,
+                            soldSum     = sumData.sumPrice,
+                            taxSum      = sumData.sumTax,
+                            amountSum   = tostring(currentlyUsedGuildSalesLotteryMemberSellCounts[memberName]) .. "/" .. tostring(sumData.sumQuantity),
+                        })
                     end
                     table.sort(FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellRank, function(a,b) return a.soldSum > b.soldSum end)
+                    --Update the rank in the table data now
+                    for rank, tabData in ipairs(FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellRank) do
+                        tabData.rank = rank
+                    end
                     countMembersHavingSold = FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberCount
                 end
             end
@@ -1010,7 +1029,7 @@ df( "RollTheDiceForGuildSalesLottery" )
                 end
                 if not windowFrame:IsControlHidden() then
                     --Set the UI tab to "Guild Sales Lottery" and refresh the data
-                    fcoglUI:SetTab(FCOGL_TAB_GUILDSALESLOTTERY)
+                    fcoglUI:SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true) --activate even if already shown, to update it
                 end
             end
         end

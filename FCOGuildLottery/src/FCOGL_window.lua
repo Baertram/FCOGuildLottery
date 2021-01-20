@@ -46,6 +46,7 @@ local function setWindowPosition(windowFrame)
     windowFrame:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, uiWindowSettings.left, uiWindowSettings.top)
 end
 
+--[[
 --Update the title of a scene's fragment with a new text
 local function updateSceneFragmentTitle(sceneName, fragment, childName, newTitle)
     childName = childName or "Label"
@@ -71,6 +72,7 @@ local function updateSceneFragmentTitle(sceneName, fragment, childName, newTitle
     end
     return false
 end
+]]
 
 
 function fcoglWindowClass:New(control )
@@ -158,26 +160,29 @@ end
 
 function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
     calledFromFilterFunction = calledFromFilterFunction or false
-    self.masterList = {}
+    df("list:BuildMasterList-calledFromFilterFunction: %s", tostring(calledFromFilterFunction))
 
     if fcoglUI.CurrentTab == FCOGL_TAB_GUILDSALESLOTTERY then
+df(">1")
         if FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier == nil or
            FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId == nil then return end
-        local guildId = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId
-        local rankingData = FCOGuildLottery.guildSellStats and FCOGuildLottery.guildSellStats[guildId]
+df(">2")
+        self.masterList = {}
+
+        local rankingData = FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellRank
         if rankingData == nil or #rankingData == 0 then return false end
         for i = 1, #rankingData do
             local item = rankingData[i]
             table.insert(self.masterList, fcoglUI.CreateGuildSalesRankingEntry(item))
         end
+        --self:updateSortHeaderAnchorsAndPositions(fcoglUI.CurrentTab, settings.maxNameColumnWidth, 32)
     end
 end
 
 --Setup the data of each row which gets added to the ZO_SortFilterList
-function fcoglWindowClass:SetupItemRow(control, data )
+function fcoglWindowClass:SetupItemRow(control, data)
     if fcoglUI.comingFromSortScrollListSetupFunction then return end
     --local clientLang = fcoglUI.clientLang or fcoglUI.fallbackSetLang
-    --d(">>>      [fcoglWindow:SetupItemRow] " ..tostring(data.names[clientLang]))
     control.data = data
     --local updateSortHeaderDimensionsAndAnchors = false
     local rankColumn = control:GetNamedChild("Rank")
@@ -202,22 +207,28 @@ function fcoglWindowClass:SetupItemRow(control, data )
         rankColumn:SetHidden(false)
         rankColumn:ClearAnchors()
         rankColumn:SetAnchor(LEFT, control, nil, 0, 0)
+        rankColumn:SetText(data.rank)
         nameColumn:SetHidden(false)
         nameColumn:ClearAnchors()
         nameColumn:SetAnchor(LEFT, rankColumn, RIGHT, 0, 0)
+        nameColumn:SetText(data.name)
         priceColumn:SetHidden(false)
         priceColumn:ClearAnchors()
         priceColumn:SetAnchor(LEFT, nameColumn, RIGHT, 0, 0)
+        priceColumn:SetText(data.price)
         taxColumn:SetHidden(false)
         taxColumn:ClearAnchors()
         taxColumn:SetAnchor(LEFT, priceColumn, RIGHT, 0, 0)
+        taxColumn:SetText(data.tax)
         amountColumn:SetHidden(false)
         amountColumn:ClearAnchors()
         amountColumn:SetAnchor(LEFT, taxColumn, RIGHT, 0, 0)
+        amountColumn:SetText(data.amount)
         infoColumn:SetHidden(false)
         infoColumn:ClearAnchors()
         infoColumn:SetAnchor(LEFT, amountColumn, RIGHT, 0, 0)
         infoColumn:SetAnchor(RIGHT, control, RIGHT, 0, 0)
+        infoColumn:SetText(data.info)
     end
     --Set the row to the list now
     ZO_SortFilterList.SetupRow(self, control, data)
@@ -522,6 +533,7 @@ end
 ------------------------------------------------
 function FCOGL_UI_OnMouseEnter( rowControlEnter )
 	fcoglUIwindow:Row_OnMouseEnter(rowControlEnter)
+    --[[
     local showAdditionalTextTooltip = false
     if showAdditionalTextTooltip then
         local data = rowControlEnter.data
@@ -549,6 +561,7 @@ function FCOGL_UI_OnMouseEnter( rowControlEnter )
             end
         end
     end
+    ]]
 end
 
 function FCOGL_UI_OnMouseExit( rowControlExit )
@@ -569,21 +582,22 @@ end
 --FCOGuildLottery UI functions
 
 function fcoglUI.CreateGuildSalesRankingEntry(item)
+    --local uniqueId = FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier
+    --local guildId = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId
     --[[
         --Columns of "item":
-        --Rank
-        --Name seller
-        --Name buyer
-        --Sum sold
-        --Sum tax
-        --Sum items sold
+        --rank
+        --memberName
+        --soldSum
+        --taxSum
+        --amountSum
     ]]
     local guildSalesRankingLine = {
-        rank =      1,
-        name =      "Hello World",
-        price =     1000000,
-        tax =       2000,
-        amount =    12,
+        rank =      item.rank,
+        name =      item.memberName,
+        price =     item.soldSum,
+        tax =       item.taxSum,
+        amount =    item.amountSum,
         info =      "Information text",
     }
     return guildSalesRankingLine
@@ -721,6 +735,8 @@ function fcoglWindowClass:UpdateUI(state)
             self.headerTax:SetHidden(false)
             self.headerAmount:SetHidden(false)
             self.headerInfo:SetHidden(false)
+
+            self.searchBox:Clear()
 
             --Reset the sortGroupHeader
             resetSortGroupHeader(fcoglUI.CurrentTab)
