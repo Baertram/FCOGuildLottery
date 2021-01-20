@@ -181,6 +181,7 @@ end
 
 --Setup the data of each row which gets added to the ZO_SortFilterList
 function fcoglWindowClass:SetupItemRow(control, data)
+df("SetupItemRow")
     if fcoglUI.comingFromSortScrollListSetupFunction then return end
     --local clientLang = fcoglUI.clientLang or fcoglUI.fallbackSetLang
     control.data = data

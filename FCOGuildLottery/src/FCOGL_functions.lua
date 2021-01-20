@@ -1029,7 +1029,7 @@ df( "RollTheDiceForGuildSalesLottery" )
                 end
                 if not windowFrame:IsControlHidden() then
                     --Set the UI tab to "Guild Sales Lottery" and refresh the data
-                    fcoglUI:SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true) --activate even if already shown, to update it
+                    fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true) --activate even if already shown, to update it
                 end
             end
         end
