@@ -1030,6 +1030,8 @@ df( "RollTheDiceForGuildSalesLottery" )
                 if not windowFrame:IsControlHidden() then
                     --Set the UI tab to "Guild Sales Lottery" and refresh the data
                     fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true) --activate even if already shown, to update it
+                    --Scroll to the currently rolled member rank line
+                    --TODO
                 end
             end
         end

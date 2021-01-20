@@ -163,10 +163,8 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
     df("list:BuildMasterList-calledFromFilterFunction: %s", tostring(calledFromFilterFunction))
 
     if fcoglUI.CurrentTab == FCOGL_TAB_GUILDSALESLOTTERY then
-df(">1")
         if FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier == nil or
            FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId == nil then return end
-df(">2")
         self.masterList = {}
 
         local rankingData = FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellRank
@@ -181,7 +179,7 @@ end
 
 --Setup the data of each row which gets added to the ZO_SortFilterList
 function fcoglWindowClass:SetupItemRow(control, data)
-df("SetupItemRow")
+--df("SetupItemRow")
     if fcoglUI.comingFromSortScrollListSetupFunction then return end
     --local clientLang = fcoglUI.clientLang or fcoglUI.fallbackSetLang
     control.data = data
@@ -241,8 +239,8 @@ function fcoglWindowClass:FilterScrollList()
 	ZO_ClearNumericallyIndexedTable(scrollData)
 
     --Get the search method chosen at the search dropdown
-    --self.searchType = self.searchDrop:GetSelectedItemData().id
-    self.searchType = 1
+    --self.searchType = 1
+    self.searchType = self.searchDrop:GetSelectedItemData().id
     --Check the search text
     local searchInput = self.searchBox:GetText()
 
@@ -336,8 +334,8 @@ function fcoglWindowClass:OrderedSearch(haystack, needles )
 	return(true)
 end
 
-function fcoglWindowClass:SearchByCriteria(data, searchInput)
-    if data == nil or searchInput == nil or searchInput == "" then return nil end
+function fcoglWindowClass:SearchByCriteria(data, searchInput, searchType)
+    if data == nil or searchInput == nil or searchInput == ""  or searchType == nil then return nil end
     local searchValueType = type(searchInput)
     local searchInputLower
     local searchValueIsString = false
@@ -355,51 +353,45 @@ function fcoglWindowClass:SearchByCriteria(data, searchInput)
         end
     end
 
+
+
 --[[
-    data["type"]                    = 1 -- for the search method to work -> Find the processor in zo_stringsearch:Process()
-    data["id"]                      = itemId
-    data["setId"]                   = histDataOfCharId["setId"]
-    data["itemType"]                = histDataOfCharId["itemType"]
-    data["itemTypeName"]            = itemTypeName
-    data["trait"]                   = histDataOfCharId["trait"]
-    data["traitName"]               = traitTypeName
-    data["armorOrWeaponType"]       = histDataOfCharId["armorOrWeaponType"]
-    data["armorOrWeaponTypeName"]   = armorOrWeaponTypeName
-    data["slot"]                    = histDataOfCharId["slot"]
-    data["slotName"]                = slotTypeName
-    data["quality"]                 = histDataOfCharId["quality"]
-    data["qualityName"]             = qualityName
-    data["name"]                    = histDataOfCharId["setName"]
-    data["itemLink"]                = itemLink
-    data["bonuses"]                 = numBonuses -- the number of the bonuses of the set
-    data["timestamp"]               = histDataOfCharId["timestamp"]
-    data["username"]                = histDataOfCharId["username"]
-    data["displayName"]             = histDataOfCharId["displayName"]
-    data["locality"]                = histDataOfCharId["locality"]
-    data["knownInSetItemCollectionBook"] = histDataOfCharId["knownInSetItemCollectionBook"]
-    --LibSets data
-    data["setType"]         = mlData.setType
-    data["traitsNeeded"]    = mlData.traitsNeeded
-    data["dlcId"]           = mlData.dlcId
-    data["zoneIds"]         = mlData.zoneIds
-    data["wayshrines"]      = mlData.wayshrines
-    data["zoneIdNames"]     = mlData.zoneIdNames
-    data["wayshrineNames"]  = mlData.wayshrineNames
-    data["dlcName"]         = mlData.dlcName
-    data["setTypeName"]     = mlData.setTypeName
-    data["armorTypes"]      = mlData.armorTypes
-    data["dropMechanics"]   = mlData.dropMechanics
+    data["name"]
+    data["rank"]
+    data["amount"]
+    data["price"]
+    data["tax"]
+    data["info"]
 ]]
     return false
 end
 
 function fcoglWindowClass:CheckForMatch(data, searchInput )
-    return(self:SearchByCriteria(data, searchInput))
+    local searchType = self.searchType
+    if searchType ~= nil then
+        --Search by name
+        if searchType == FCOGL_SEARCH_TYPE_NAME then
+            local isMatch = false
+            local searchInputNumber = tonumber(searchInput)
+            if searchInputNumber ~= nil then
+                local searchValueType = type(searchInputNumber)
+                if searchValueType == "number" then
+                    isMatch = searchInputNumber == data.rank or false
+                end
+            else
+                isMatch = self.search:IsMatch(searchInput, data)
+            end
+            return isMatch
+        else
+            return(self:SearchByCriteria(data, searchInput, searchType))
+        end
+    end
+	return(false)
 end
 
 function fcoglWindowClass:ProcessItemEntry(stringSearch, data, searchTerm )
 --d("[WLW.ProcessItemEntry] stringSearch: " ..tostring(stringSearch) .. ", setName: " .. tostring(data.name:lower()) .. ", searchTerm: " .. tostring(searchTerm))
-	if ( zo_plainstrfind(data.name:lower(), searchTerm) ) then
+	if ( data.name and zo_plainstrfind(data.name:lower(), searchTerm) ) then
 		return(true)
 	end
 	return(false)
@@ -594,6 +586,7 @@ function fcoglUI.CreateGuildSalesRankingEntry(item)
         --amountSum
     ]]
     local guildSalesRankingLine = {
+        type =      FCOGL_SEARCH_TYPE_NAME, -- for the search method to work -> Find the processor in zo_stringsearch:Process()
         rank =      item.rank,
         name =      item.memberName,
         price =     item.soldSum,
