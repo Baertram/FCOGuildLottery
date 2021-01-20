@@ -21,7 +21,7 @@ local dfw   = FCOGuildLottery.dfw
 --FUNCTIONS
 
 --Guild functions
-local function resetCurrentGuildSalesLotteryData(startingNewLottery)
+local function resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex, daysBefore)
     startingNewLottery = startingNewLottery or false
     if startingNewLottery == false and FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier == nil then
         return
@@ -51,6 +51,9 @@ local function resetCurrentGuildSalesLotteryData(startingNewLottery)
         df("<END: guild sales lottery data was deleted <<<<<<<<<<<<<<<<<<<<<")
     else
         df("<OLD guild sales lottery data was deleted - STARTING a new lottery now >>>>>>>>>>>>>>>>>>>>")
+        if guildIndex ~= nil and daysBefore ~= nil then
+            FCOGuildLottery.NewGuildSalesLottery(guildIndex, daysBefore)
+        end
     end
 end
 
@@ -851,7 +854,7 @@ end
 
 --Reset the stored / last used data and enable a new lottery dice throw, where the popups of guild and timeFrame selection
 --are showing up again
-function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, startingNewLottery)
+function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, startingNewLottery, guildIndex, daysBefore)
     noSecurityQuestion = noSecurityQuestion or false
     local resetDataNow = false
     if not noSecurityQuestion then
@@ -866,7 +869,9 @@ function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, s
                     title       = "Reset guild sales lottery",
                     question    = "Do you want to reset the currently\nactive guild sales lottery?",
                     callbackData = {
-                        yes = function() resetCurrentGuildSalesLotteryData(startingNewLottery) end,
+                        yes = function()
+                            resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex, daysBefore)
+                        end,
                         no  = function() end,
                     },
                 }
@@ -877,7 +882,7 @@ function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, s
         end
     end
     if resetDataNow == true then
-        resetCurrentGuildSalesLotteryData(startingNewLottery)
+        resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex, daysBefore)
     end
 end
 
@@ -996,13 +1001,14 @@ df( "RollTheDiceForGuildSalesLottery" )
             local fcoglUI = FCOGuildLottery.UI
             local fcoglUIwindow = fcoglUI and fcoglUI.window
             if fcoglUIwindow ~= nil then
-                if fcoglUIwindow:IsControlHidden() then
+                local windowFrame = fcoglUIwindow.frame
+                if windowFrame:IsControlHidden() then
                     --Setting "Show UI" -> Create UI now and show it
                     if FCOGuildLottery.settingsVars.settings.showUIAfterDiceRoll == true then
                         fcoglUI.Show(true)
                     end
                 end
-                if not fcoglUIwindow:IsControlHidden() then
+                if not windowFrame:IsControlHidden() then
                     --Set the UI tab to "Guild Sales Lottery" and refresh the data
                     fcoglUI:SetTab(FCOGL_TAB_GUILDSALESLOTTERY)
                 end
@@ -1061,6 +1067,14 @@ df("<guild sell rank data missing!")
     return memberName, memberNote, rankIndex, playerStatus, secsSinceLogoff, guildIndex, soldSum
 end
 
+function FCOGuildLottery.NewGuildSalesLottery(guildIndex, daysBefore)
+    if FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier ~= nil then return end
+    --Set the guildIndex and daysBefore to start a new guild sales lottery with function
+    FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex = guildIndex
+    FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore = daysBefore
+    FCOGuildLottery.RollTheDiceForGuildSalesLottery()
+end
+
 function FCOGuildLottery.StartNewGuildSalesLottery(guildIndex, daysBefore, dataWasResetAlready)
     if not IsGuildIndexValid(guildIndex) or daysBefore == nil then
         showNewGSLSlashCommandHelp()
@@ -1073,14 +1087,10 @@ function FCOGuildLottery.StartNewGuildSalesLottery(guildIndex, daysBefore, dataW
     dataWasResetAlready = dataWasResetAlready or false
     if not dataWasResetAlready then
         --Reset and show dialog asking before, if any guild sales lottery is already active
-        FCOGuildLottery.ResetCurrentGuildSalesLotteryData(false, true)
+        FCOGuildLottery.ResetCurrentGuildSalesLotteryData(false, true, guildIndex, daysBefore)
+    else
+        FCOGuildLottery.NewGuildSalesLottery(guildIndex, daysBefore)
     end
-    if FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier ~= nil then return end
-
-    --Set the guildIndex and daysBefore to start a new guild sales lottery with function
-    FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex = guildIndex
-    FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore = daysBefore
-    FCOGuildLottery.RollTheDiceForGuildSalesLottery()
 end
 
 function FCOGuildLottery.RollTheDiceCheck(noChatOutput)

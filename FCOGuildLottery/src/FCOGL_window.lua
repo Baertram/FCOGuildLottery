@@ -733,20 +733,21 @@ function fcoglWindowClass:UpdateUI(state)
 end -- fcoglWindow:UpdateUI(state)
 
 --Change the tabs at the WishList menu
-function fcoglUI.SetTab(index)
-df("SetTab - index: %s", tostring(index))
+function fcoglUI.SetTab(index, override)
+df("SetTab - index: %s, override: %s", tostring(index), tostring(override))
     if not fcoglUIwindow then return end
     --Do not activate active tab
-    if fcoglUI.CurrentTab and fcoglUI.CurrentTab == index then return end
-    --Save the current sort order and key
-    fcoglUI.saveSortGroupHeader(fcoglUI.CurrentTab)
-    --Change to the new tab
-    fcoglUI.CurrentTab = index
-    --Clear the master list of the currently shown ZO_SortFilterList
-    ZO_ScrollList_Clear(fcoglUIwindow.list)
-    fcoglUIwindow.masterList = {}
-    --Reset variable
-    fcoglUI.comingFromSortScrollListSetupFunction = false
-    --Update the UI (hide/show items)
-    fcoglUIwindow:UpdateUI(fcoglUI.CurrentState)
+    if fcoglUI.CurrentTab and (override == true or fcoglUI.CurrentTab ~= index) then
+        --Save the current sort order and key
+        fcoglUI.saveSortGroupHeader(fcoglUI.CurrentTab)
+        --Change to the new tab
+        fcoglUI.CurrentTab = index
+        --Clear the master list of the currently shown ZO_SortFilterList
+        ZO_ScrollList_Clear(fcoglUIwindow.list)
+        fcoglUIwindow.masterList = {}
+        --Reset variable
+        fcoglUI.comingFromSortScrollListSetupFunction = false
+        --Update the UI (hide/show items)
+        fcoglUIwindow:UpdateUI(fcoglUI.CurrentState)
+    end
 end
