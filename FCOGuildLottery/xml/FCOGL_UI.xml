@@ -67,7 +67,41 @@
                 </Label>
 			</Controls>
 		</Control>
-		<!--Virtual backdrops -->
+
+		<Control name="FCOGLRowDiceHistory" mouseEnabled="true" virtual="true">
+			<Dimensions y="30" />
+			<OnMouseEnter>
+				FCOGL_UI_OnMouseEnter(self)
+			</OnMouseEnter>
+			<OnMouseExit>
+				FCOGL_UI_OnMouseExit(self)
+			</OnMouseExit>
+            <OnMouseUp>
+				FCOGL_UI_OnMouseUp(self, button, upInside)
+			</OnMouseUp>
+			<Controls>
+				<Texture name="$(parent)BG" inherits="ZO_ThinListBgStrip" />
+                <Label name="$(parent)No" inherits="FCOGLRowLabel">
+                    <Anchor point="LEFT" />
+                    <Dimensions x="30" y="30" />
+                </Label>
+				<Label name="$(parent)DateTime" inherits="FCOGLRowLabel">
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)No" />
+                    <Dimensions x="135" y="30" />
+                </Label>
+				<Label name="$(parent)Name" inherits="FCOGLRowLabel">
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)DateTime" />
+					<Dimensions x="200" y="30" />
+				</Label>
+				<Label name="$(parent)Price" inherits="FCOGLRowLabel">
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Name" />
+					<Dimensions x="80" y="30" />
+					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-16" />
+				</Label>
+			</Controls>
+		</Control>
+
+		<!--Virtual backdrops - The background of the UI -->
 		<Backdrop name="FCOGL_WindowsBackdrop" inherits="ZO_DarkThinFrame" virtual="true">
 			<Anchor point="TOPLEFT" offsetX="-4" offsetY="-4"/>
             <Anchor point="BOTTOMRIGHT" offsetX="4" offsetY="4"/>
@@ -100,7 +134,7 @@
 					  mouseOver="/esoui/art/journal/journal_tabicon_cadwell_over.dds"
 					  pressed="/esoui/art/journal/journal_tabicon_cadwell_down.dds" />
 			<OnClicked>
-				FCOGL.SetTab(FCOGL_TAB_FCOGL)
+				FCOGL.UI.SetTab(FCOGL_TAB_FCOGL)
 			</OnClicked>
 			<OnMouseEnter>
 				FCOGL.ShowTooltip(self, TOP, "List")
@@ -109,16 +143,16 @@
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-		<Button name="FCOGLButtonHistory" virtual="true">
+		<Button name="FCOGLButtonDiceHistory" virtual="true">
 			<Dimensions x="50" y="50" />
 			<Textures normal="/esoui/art/guild/tabicon_history_up.dds"
 					  mouseOver="/esoui/art/guild/tabicon_history_over.dds"
 					  pressed="/esoui/art/guild/tabicon_history_down.dds" />
 			<OnClicked>
-				FCOGL.SetTab(FCOGL_TAB_HISTORY)
+				FCOGL.UI.ToggleDiceRollHistory()
 			</OnClicked>
 			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, TOP, "History")
+				FCOGL.ShowTooltip(self, TOP, "Toggle dice roll history")
 			</OnMouseEnter>
 			<OnMouseExit>
 				FCOGL.HideTooltip()
@@ -350,6 +384,50 @@
 					<Anchor point="BOTTOMRIGHT" offsetX="-35" offsetY="-32" />
 				</Control>
 
+				<Control name="$(parent)HeadersDiceHistory">
+					<Anchor point="TOPLEFT" offsetX="30" offsetY="51" />
+					<Anchor point="TOPRIGHT" offsetY="51" />
+					<Dimensions y="32" />
+					<Controls>
+						<Control name="$(parent)No" inherits="FCOGLSortHeader">
+							<OnInitialized>
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_NO), "no", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+							</OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)" />
+							<Dimensions x="30" y="32" />
+						</Control>
+						<Control name="$(parent)DateTime" inherits="FCOGLSortHeader">
+                            <OnInitialized>
+                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_DATE), "timestamp", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+                            </OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)No" />
+                            <Dimensions x="135" y="32" />
+                        </Control>
+						<Control name="$(parent)Name" inherits="FCOGLSortHeader">
+							<OnInitialized>
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_MEMBER_NAME), "name", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+							</OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)DateTime" />
+							<Dimensions x="200" y="32" />
+						</Control>
+						<Control name="$(parent)Roll" inherits="FCOGLSortHeader">
+							<OnInitialized>
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_ROLL), "roll", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+							</OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Name" />
+							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$(parent)" offsetX="-16" />
+							<Dimensions x="80" y="32" />
+                        </Control>
+					</Controls>
+				</Control>
+
+				<Control name="$(parent)ListDiceHistory" inherits="ZO_ScrollList">
+					<Anchor point="TOPLEFT" relativeTo="$(parent)HeadersDiceHistory" relativePoint="BOTTOMLEFT" offsetY="3" />
+					<Anchor point="BOTTOMRIGHT" offsetX="-35" offsetY="-32" />
+					<Dimensions x="450" />
+				</Control>
+
+
 				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED">
 					<Anchor point="TOPRIGHT" relativeTo="$(parent)List" relativePoint="BOTTOMRIGHT" offsetY="6" />
 				</Label>
@@ -363,7 +441,7 @@
 					<Anchor point="TOPRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT"
 							offsetX="-140" offsetY="-50" />
 				</Button>
-				<Button name="$(parent)TabHistory" inherits="FCOGLButtonHistory" hidden="true">
+				<Button name="$(parent)TabDiceRollHistory" inherits="FCOGLButtonDiceHistory" hidden="true">
 					<Anchor point="TOPRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT"
 							offsetX="-90" offsetY="-50" />
 				</Button>
