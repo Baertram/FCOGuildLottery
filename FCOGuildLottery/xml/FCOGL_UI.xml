@@ -233,7 +233,7 @@
 			</OnMouseExit>
 		</Button>
 
-		<!-- Frame/Window -->
+		<!-- Frame/Window - Standard UI with border -->
 		<TopLevelControl name="FCOGLFrame" mouseEnabled="true" movable="true" clampedToScreen="true" hidden="true" > <!--inherits="ZO_RightPanelFootPrint"-->
 			<Dimensions x="930" y="690" />
 			<DimensionConstraints minX="400" minY="300" />
@@ -384,50 +384,6 @@
 					<Anchor point="BOTTOMRIGHT" offsetX="-35" offsetY="-32" />
 				</Control>
 
-				<Control name="$(parent)HeadersDiceHistory">
-					<Anchor point="TOPLEFT" offsetX="30" offsetY="51" />
-					<Anchor point="TOPRIGHT" offsetY="51" />
-					<Dimensions y="32" />
-					<Controls>
-						<Control name="$(parent)No" inherits="FCOGLSortHeader">
-							<OnInitialized>
-								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_NO), "no", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
-							</OnInitialized>
-							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)" />
-							<Dimensions x="30" y="32" />
-						</Control>
-						<Control name="$(parent)DateTime" inherits="FCOGLSortHeader">
-                            <OnInitialized>
-                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_DATE), "timestamp", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
-                            </OnInitialized>
-							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)No" />
-                            <Dimensions x="135" y="32" />
-                        </Control>
-						<Control name="$(parent)Name" inherits="FCOGLSortHeader">
-							<OnInitialized>
-								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_MEMBER_NAME), "name", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
-							</OnInitialized>
-							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)DateTime" />
-							<Dimensions x="200" y="32" />
-						</Control>
-						<Control name="$(parent)Roll" inherits="FCOGLSortHeader">
-							<OnInitialized>
-								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_ROLL), "roll", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
-							</OnInitialized>
-							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Name" />
-							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$(parent)" offsetX="-16" />
-							<Dimensions x="80" y="32" />
-                        </Control>
-					</Controls>
-				</Control>
-
-				<Control name="$(parent)ListDiceHistory" inherits="ZO_ScrollList">
-					<Anchor point="TOPLEFT" relativeTo="$(parent)HeadersDiceHistory" relativePoint="BOTTOMLEFT" offsetY="3" />
-					<Anchor point="BOTTOMRIGHT" offsetX="-35" offsetY="-32" />
-					<Dimensions x="450" />
-				</Control>
-
-
 				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED">
 					<Anchor point="TOPRIGHT" relativeTo="$(parent)List" relativePoint="BOTTOMRIGHT" offsetY="6" />
 				</Label>
@@ -469,6 +425,107 @@
 					<Anchor point="TOPLEFT" relativeTo="$(parent)NewGuildSalesLottery" relativePoint="TOPRIGHT"
 							offsetX="10"  offsetY="0" />
 				</Button>
+
+				<!--Background -->
+		    	<Backdrop name="$(parent)BG" alpha="1" inherits="FCOGL_WindowsBackdrop" centerColor="666666">
+		    		<AnchorFill/>
+				</Backdrop>
+			</Controls>
+		</TopLevelControl>
+
+		<!-- FCOGLFrameDiceHistory -->
+		<TopLevelControl name="FCOGLFrameDiceHistory" mouseEnabled="true" movable="false" clampedToScreen="true" hidden="true" > <!--inherits="ZO_RightPanelFootPrint"-->
+			<Dimensions x="400" y="690" />
+			<DimensionConstraints minX="400" minY="300" />
+			<Anchor point="TOPLEFT" relativeTo="FCOGLFrame" relativePoint="TOPRIGHT" offsetX="0" offsetY="0"/>
+			<OnMoveStop>
+			</OnMoveStop>
+			<Controls>
+				<Backdrop name="$(parent)Search" tier="HIGH" inherits="ZO_SingleLineEditBackdrop_Keyboard">
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" offsetX="-38" offsetY="14" />
+					<Dimensions x="150" />
+					<Controls>
+						<EditBox name="$(parent)Box" inherits="ZO_DefaultEditForBackdrop ZO_EditDefaultText"/>
+					</Controls>
+				</Backdrop>
+
+				<Control name="$(parent)SearchDrop" resizeToFitDescendents="true" mouseEnabled="true">
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$(parent)Search" />
+					<OnInitialized>
+						ZO_ComboBox:New(self)
+					</OnInitialized>
+					<OnMouseUp>
+						if button == MOUSE_BUTTON_INDEX_LEFT and upInside then
+							ZO_ComboBox_DropdownClicked(self)
+						end
+					</OnMouseUp>
+					<Controls>
+						<Label name="$(parent)Anchor" inherits="FCOGLSearchLabel">
+							<Anchor point="RIGHT" />
+						</Label>
+						<Label name="$(parent)ColonText" text=":" inherits="FCOGLSearchLabel">
+							<Anchor point="RIGHT" relativeTo="$(parent)Anchor" relativePoint="LEFT" offsetX="-8" />
+						</Label>
+						<Label name="$(parent)SelectedItemText" inherits="FCOGLSearchLabel">
+							<Anchor point="RIGHT" relativeTo="$(parent)ColonText" relativePoint="LEFT" offsetX="-1" />
+						</Label>
+						<Button name="$(parent)OpenDropdown" inherits="ZO_DropdownButton">
+							<Dimensions x="16" y="16" />
+							<Anchor point="RIGHT" relativeTo="$(parent)SelectedItemText" relativePoint="LEFT" offsetX="-3" />
+							<OnClicked>
+								ZO_ComboBox_DropdownClicked(self:GetParent())
+							</OnClicked>
+						</Button>
+					</Controls>
+				</Control>
+
+				<!-- Sort headers -->
+				<Control name="$(parent)Headers">
+					<Anchor point="TOPLEFT" offsetX="30" offsetY="51" />
+					<Anchor point="TOPRIGHT" offsetY="51" />
+					<Dimensions y="32" />
+					<Controls>
+						<Control name="$(parent)No" inherits="FCOGLSortHeader">
+							<OnInitialized>
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_NO), "no", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+							</OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)" />
+							<Dimensions x="30" y="32" />
+						</Control>
+						<Control name="$(parent)DateTime" inherits="FCOGLSortHeader">
+                            <OnInitialized>
+                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_DATE), "timestamp", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+                            </OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)No" />
+                            <Dimensions x="135" y="32" />
+                        </Control>
+						<Control name="$(parent)Name" inherits="FCOGLSortHeader">
+							<OnInitialized>
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_MEMBER_NAME), "name", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+							</OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)DateTime" />
+							<Dimensions x="200" y="32" />
+						</Control>
+						<Control name="$(parent)Roll" inherits="FCOGLSortHeader">
+							<OnInitialized>
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_ROLL), "roll", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+							</OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Name" />
+							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$(parent)" offsetX="-16" />
+							<Dimensions x="80" y="32" />
+                        </Control>
+					</Controls>
+				</Control>
+
+				<Control name="$(parent)List" inherits="ZO_ScrollList">
+					<Anchor point="TOPLEFT" relativeTo="$(parent)HeadersDiceHistory" relativePoint="BOTTOMLEFT" offsetY="3" />
+					<Anchor point="BOTTOMRIGHT" offsetX="-35" offsetY="-32" />
+					<Dimensions x="450" />
+				</Control>
+
+				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED">
+					<Anchor point="TOPRIGHT" relativeTo="$(parent)List" relativePoint="BOTTOMRIGHT" offsetY="6" />
+				</Label>
 
 				<!--Background -->
 		    	<Backdrop name="$(parent)BG" alpha="1" inherits="FCOGL_WindowsBackdrop" centerColor="666666">

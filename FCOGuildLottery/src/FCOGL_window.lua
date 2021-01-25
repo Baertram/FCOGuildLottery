@@ -58,6 +58,7 @@ local function setWindowPosition(windowFrame, diceHistoryVisible)
     windowFrame:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, uiWindowSettings.left, uiWindowSettings.top)
     bg:SetAnchorFill(windowFrame)
 
+    --[[
     local amountHeader = windowFrame:GetNamedChild("HeadersAmount")
     local infoHeader = windowFrame:GetNamedChild("HeadersInfo")
     infoHeader:ClearAnchors()
@@ -72,6 +73,7 @@ local function setWindowPosition(windowFrame, diceHistoryVisible)
     diceRollHistoryHeader:SetAnchor(TOPLEFT, infoHeader, TOPRIGHT, 0, 0)
     --diceRollHistoryList:ClearAnchors()
     --diceRollHistoryList:SetAnchor(TOPLEFT, infoHeader, TOPRIGHT, 0, 0)
+    ]]
 end
 
 
@@ -145,10 +147,10 @@ function fcoglWindowClass:Setup(listType)
         end
         --Search
         self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("SearchDrop"))
-        fcoglUI.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, "name")
+        fcoglUI.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, listType, "name")
         --Guilds
         self.guildsDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("GuildsDrop"))
-        fcoglUI.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, "guilds")
+        fcoglUI.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, listType, "guilds")
 
         --Search box and search functions
         self.searchBox = self.frame:GetNamedChild("SearchBox")
@@ -216,38 +218,35 @@ function fcoglWindowClass:Setup(listType)
             return(ZO_TableOrderingFunction(listEntry1.data, listEntry2.data, self.currentSortKey, self.sortKeys, self.currentSortOrder))
         end
         --Search
-        --self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("SearchDrop"))
-        --fcoglUI.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, "name")
-        --Guilds
-        --self.guildsDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("GuildsDrop"))
-        --fcoglUI.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, "guilds")
+        self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("SearchDrop"))
+        fcoglUI.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, listType, "name")
 
         --Search box and search functions
-        --self.searchBox = self.frame:GetNamedChild("SearchBox")
-        --self.searchBox:SetHandler("OnTextChanged", function() self:RefreshFilters() end)
-        --self.searchBox:SetHandler("OnMouseUp", function(ctrl, mouseButton, upInside)
+        self.searchBox = self.frame:GetNamedChild("SearchBox")
+        self.searchBox:SetHandler("OnTextChanged", function() self:RefreshFilters() end)
+        self.searchBox:SetHandler("OnMouseUp", function(ctrl, mouseButton, upInside)
             --[[
             if mouseButton == MOUSE_BUTTON_INDEX_RIGHT and upInside then
                 self:OnSearchEditBoxContextMenu(self.searchBox)
             end
             ]]
-        --end)
-        --self.search = ZO_StringSearch:New()
-        --self.search:AddProcessor(fcoglUI.sortType, function(stringSearch, data, searchTerm, cache)
-        --    return(self:ProcessItemEntry(stringSearch, data, searchTerm, cache))
-        --end)
+        end)
+        self.search = ZO_StringSearch:New()
+        self.search:AddProcessor(fcoglUI.sortType, function(stringSearch, data, searchTerm, cache)
+            return(self:ProcessItemEntry(stringSearch, data, searchTerm, cache))
+        end)
 
         --Sort headers
         --Dice history headers
-        self.headersDiceHistory = self.frame:GetNamedChild("HeadersDiceHistory")
-        self.headerNo       = self.headersDiceHistory:GetNamedChild("No")
-        self.headerName     = self.headersDiceHistory:GetNamedChild("Name")
-        self.headerDate     = self.headersDiceHistory:GetNamedChild("DateTime")
-        self.headerRoll     = self.headersDiceHistory:GetNamedChild("Roll")
+        self.headers        = self.frame:GetNamedChild("Headers")
+        self.headerNo       = self.headers:GetNamedChild("No")
+        self.headerName     = self.headers:GetNamedChild("Name")
+        self.headerDate     = self.headers:GetNamedChild("DateTime")
+        self.headerRoll     = self.headers:GetNamedChild("Roll")
 
-        self.headersDiceHistory:SetHidden(true)
-        self.listDiceHistory = self.frame:GetNamedChild("ListDiceHistory")
-        self.listDiceHistory:SetHidden(true)
+        self.headers:SetHidden(true)
+        self.list = self.frame:GetNamedChild("List")
+        self.list:SetHidden(true)
     end
 
     self:RefreshData()
@@ -283,10 +282,6 @@ function fcoglWindowClass:SetupItemRow(control, data, listType)
         --local updateSortHeaderDimensionsAndAnchors = false
         local rankColumn = control:GetNamedChild("Rank")
         local nameColumn = control:GetNamedChild("Name")
-        nameColumn.normalColor = ZO_DEFAULT_TEXT
-        if not data.columnWidth then data.columnWidth = 200 end
-        nameColumn:SetDimensions(data.columnWidth, 30)
-        nameColumn:SetText(data.name)
         local priceColumn = control:GetNamedChild("Price")
         local taxColumn = control:GetNamedChild("Tax")
         --local dateColumn = control:GetNamedChild("DateTime")
@@ -304,10 +299,14 @@ function fcoglWindowClass:SetupItemRow(control, data, listType)
             rankColumn:ClearAnchors()
             rankColumn:SetAnchor(LEFT, control, nil, 0, 0)
             rankColumn:SetText(data.rank)
-            nameColumn:SetHidden(false)
             nameColumn:ClearAnchors()
+            nameColumn.normalColor = ZO_DEFAULT_TEXT
+            if not data.columnWidth then data.columnWidth = 200 end
+            nameColumn:SetDimensions(data.columnWidth, 30)
+            nameColumn:SetText(data.name)
             nameColumn:SetAnchor(LEFT, rankColumn, RIGHT, 0, 0)
             nameColumn:SetText(data.name)
+            nameColumn:SetHidden(false)
             priceColumn:SetHidden(false)
             priceColumn:ClearAnchors()
             priceColumn:SetAnchor(LEFT, nameColumn, RIGHT, 0, 0)
@@ -332,52 +331,33 @@ function fcoglWindowClass:SetupItemRow(control, data, listType)
         --local clientLang = fcoglUI.clientLang or fcoglUI.fallbackSetLang
         control.data = data
         --local updateSortHeaderDimensionsAndAnchors = false
-        local rankColumn = control:GetNamedChild("Rank")
+        local noColumn = control:GetNamedChild("No")
+        local dateColumn = control:GetNamedChild("DateTime")
         local nameColumn = control:GetNamedChild("Name")
+        local rollColumn = control:GetNamedChild("Roll")
+        ------------------------------------------------------------------------------------------------------------------------
+        noColumn:SetHidden(false)
+        noColumn:ClearAnchors()
+        noColumn:SetAnchor(LEFT, control, nil, 0, 0)
+        noColumn:SetText(data.no)
+        local dateTimeStamp = data.timestamp
+        local dateTimeStr = FCOGuildLottery.getDateTimeFormatted(dateTimeStamp)
+        dateColumn:ClearAnchors()
+        dateColumn:SetAnchor(LEFT, noColumn, RIGHT, 0, 0)
+        dateColumn:SetText(dateTimeStr)
+        dateColumn:SetHidden(false)
+        nameColumn:ClearAnchors()
         nameColumn.normalColor = ZO_DEFAULT_TEXT
         if not data.columnWidth then data.columnWidth = 200 end
         nameColumn:SetDimensions(data.columnWidth, 30)
+        nameColumn:SetAnchor(LEFT, dateColumn, RIGHT, 0, 0)
         nameColumn:SetText(data.name)
-        local priceColumn = control:GetNamedChild("Price")
-        local taxColumn = control:GetNamedChild("Tax")
-        --local dateColumn = control:GetNamedChild("DateTime")
-        local amountColumn = control:GetNamedChild("Amount")
-        local infoColumn = control:GetNamedChild("Info")
-        ------------------------------------------------------------------------------------------------------------------------
-        if fcoglUI.CurrentTab == FCOGL_TAB_GUILDSALESLOTTERY then
-            --local dateTimeStamp = data.timestamp
-            --local dateTimeStr = fcoglUI.getDateTimeFormatted(dateTimeStamp)
-            --dateColumn:ClearAnchors()
-            --dateColumn:SetAnchor(LEFT, control, nil, 0, 0)
-            --dateColumn:SetText(dateTimeStr)
-            --dateColumn:SetHidden(false)
-            rankColumn:SetHidden(false)
-            rankColumn:ClearAnchors()
-            rankColumn:SetAnchor(LEFT, control, nil, 0, 0)
-            rankColumn:SetText(data.rank)
-            nameColumn:SetHidden(false)
-            nameColumn:ClearAnchors()
-            nameColumn:SetAnchor(LEFT, rankColumn, RIGHT, 0, 0)
-            nameColumn:SetText(data.name)
-            priceColumn:SetHidden(false)
-            priceColumn:ClearAnchors()
-            priceColumn:SetAnchor(LEFT, nameColumn, RIGHT, 0, 0)
-            priceColumn:SetText(data.price)
-            taxColumn:SetHidden(false)
-            taxColumn:ClearAnchors()
-            taxColumn:SetAnchor(LEFT, priceColumn, RIGHT, 0, 0)
-            taxColumn:SetText(data.tax)
-            amountColumn:SetHidden(false)
-            amountColumn:ClearAnchors()
-            amountColumn:SetAnchor(LEFT, taxColumn, RIGHT, 0, 0)
-            amountColumn:SetText(data.amount)
-            infoColumn:SetHidden(false)
-            infoColumn:ClearAnchors()
-            infoColumn:SetAnchor(LEFT, amountColumn, RIGHT, 0, 0)
-            infoColumn:SetAnchor(RIGHT, control, RIGHT, 0, 0)
-            infoColumn:SetText(data.info)
-        end
-
+        nameColumn:SetHidden(false)
+        rollColumn:SetHidden(false)
+        rollColumn:ClearAnchors()
+        rollColumn:SetAnchor(LEFT, nameColumn, RIGHT, 0, 0)
+        rollColumn:SetAnchor(RIGHT, control, RIGHT, 0, 0)
+        rollColumn:SetText(data.roll)
     end
 
     --Set the row to the list now
@@ -570,25 +550,35 @@ end
 ------------------------------------------------
 --- Combo Box Initializers
 ------------------------------------------------
-function fcoglUI.initializeSearchDropdown(window, currentTab, searchBoxType)
+function fcoglUI.initializeSearchDropdown(window, currentTab, currentListType, searchBoxType)
     if window == nil then return false end
     currentTab = currentTab or fcoglUI.CurrentTab or FCOGL_TAB_GUILDSALESLOTTERY
+    currentListType = currentListType or fcoglUI.CurrentListType or FCOGL_LISTTYPE_GUILD_SALES_LOTTERY
     searchBoxType = searchBoxType or "name"
     local currentTab2SearchDropValues = {
         [FCOGL_TAB_GUILDSALESLOTTERY]   = {
-            ["name"] = {dropdown=window.searchDrop,  prefix=FCOGL_SEARCHDROP_PREFIX,  entryCount=FCOGL_SEARCH_TYPE_ITERATION_END,
-                        exclude = {
-                            [FCOGL_SEARCH_TYPE_NAME]     = false,
-                        }, --exclude the search entries from the set search
+            [FCOGL_LISTTYPE_GUILD_SALES_LOTTERY] = {
+                ["name"] = {dropdown=window.searchDrop,  prefix=FCOGL_SEARCHDROP_PREFIX,  entryCount=FCOGL_SEARCH_TYPE_ITERATION_END,
+                            exclude = {
+                                [FCOGL_SEARCH_TYPE_NAME]     = false,
+                            }, --exclude the search entries from the set search
+                },
+                ["guilds"] = {dropdown=window.guildsDrop,  prefix=FCOGL_GUILDSDROP_PREFIX,  entryCount=#FCOGuildLottery.guildsData,
+                              exclude = {
+                                  [FCOGL_SEARCH_TYPE_NAME]     = false,
+                              }, --exclude the search entries from the set search
+                },
             },
-            ["guilds"] = {dropdown=window.guildsDrop,  prefix=FCOGL_GUILDSDROP_PREFIX,  entryCount=#FCOGuildLottery.guildsData,
-                        exclude = {
-                            [FCOGL_SEARCH_TYPE_NAME]     = false,
-                        }, --exclude the search entries from the set search
+            [FCOGL_LISTTYPE_ROLLED_DICE_HISTORY] = {
+                ["name"] = {dropdown=window.searchDrop,  prefix=FCOGL_SEARCHDROP_PREFIX,  entryCount=FCOGL_SEARCH_TYPE_ITERATION_END,
+                            exclude = {
+                                [FCOGL_SEARCH_TYPE_NAME]     = false,
+                            }, --exclude the search entries from the set search
+                },
             },
         },
     }
-    local searchDropAtTab = currentTab2SearchDropValues[currentTab]
+    local searchDropAtTab = currentTab2SearchDropValues[currentTab] and currentTab2SearchDropValues[currentTab][currentListType]
     local searchDropData = searchDropAtTab[searchBoxType]
     if searchDropData == nil then return false end
     --d(">searchDropData: " .. tostring(searchDropData.dropdown) ..", " ..tostring(searchDropData.prefix) .. ", " .. tostring(searchDropData.entryCount))
@@ -758,10 +748,11 @@ function fcoglUI.createWindow()
         --The UI with the frame
         FCOGuildLottery.UI.window = fcoglWindowClass:New(FCOGLFrame, FCOGL_LISTTYPE_GUILD_SALES_LOTTERY)
         fcoglUIwindow = FCOGuildLottery.UI.window
-
+    end
+    if (not FCOGuildLottery.UI.diceHistoryWindow) then
         --The rolled dice history inside the frame
-        fcoglUIwindow.diceHistoryWindow = fcoglWindowClass:New(FCOGLFrame, FCOGL_LISTTYPE_ROLLED_DICE_HISTORY)
-        fcoglUIDiceHistoryWindow = fcoglUIwindow.diceHistoryWindow
+        FCOGuildLottery.UI.diceHistoryWindow = fcoglWindowClass:New(FCOGLFrameDiceHistory, FCOGL_LISTTYPE_ROLLED_DICE_HISTORY)
+        fcoglUIDiceHistoryWindow = FCOGuildLottery.UI.diceHistoryWindow
     end
 end
 
@@ -927,17 +918,17 @@ end
 function fcoglUI:ToggleDiceRollHistory()
     local frameControl = fcoglUIwindow and fcoglUIwindow.frame
     if frameControl == nil then return end
-    local diceRollHistoryList = frameControl:GetNamedChild("ListDiceHistory")
-    local diceRollHistoryHeader = frameControl:GetNamedChild("HeadersDiceHistory")
-    local isHidden = diceRollHistoryList:IsControlHidden()
+    local isHidden = fcoglUIDiceHistoryWindow.control:IsControlHidden()
     local newState = not isHidden
+
+    fcoglUIDiceHistoryWindow.control:SetHidden(newState)
     --(Un)hide the scroll list
-    diceRollHistoryList:SetHidden(newState)
-    diceRollHistoryHeader:SetHidden(newState)
+    fcoglUIDiceHistoryWindow.list:SetHidden(newState)
+    fcoglUIDiceHistoryWindow.sortHeaderGroup.headerContainer:SetHidden(newState)
     --Update the texture at the toggle button
     local tabDiceRollHistoryButton = frameControl:GetNamedChild("TabDiceRollHistory")
     tabDiceRollHistoryButton:SetState(buttonStateVal[isHidden])
 
     --Change the frame's size
-    setWindowPosition(frameControl, isHidden)
+    --setWindowPosition(frameControl, isHidden)
 end

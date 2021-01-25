@@ -70,10 +70,16 @@ function FCOGuildLottery.getSettings()
             left    = 300,
             top     = 150,
             sortKeys = {
-              [FCOGL_TAB_GUILDSALESLOTTERY] = "name",
+              [FCOGL_TAB_GUILDSALESLOTTERY] = {
+                  [FCOGL_LISTTYPE_GUILD_SALES_LOTTERY] = "name",
+                  [FCOGL_LISTTYPE_ROLLED_DICE_HISTORY] = "name",
+              },
             },
             sortOrder = {
-              [FCOGL_TAB_GUILDSALESLOTTERY] = ZO_SORT_ORDER_DOWN,
+              [FCOGL_TAB_GUILDSALESLOTTERY] = {
+                  [FCOGL_LISTTYPE_GUILD_SALES_LOTTERY] = ZO_SORT_ORDER_DOWN,
+                  [FCOGL_LISTTYPE_ROLLED_DICE_HISTORY] = ZO_SORT_ORDER_DOWN,
+              },
             },
         },
         showUIAfterDiceRoll = false,
