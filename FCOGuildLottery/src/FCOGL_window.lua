@@ -29,9 +29,9 @@ fcoglUI.sortType = 1
 fcoglUI.selectedGuildDataBeforeUpdate = nil
 fcoglUI.searchBoxLastSelected = {}
 
-local buttonStateVal = {
-    [true]  = 1,
-    [false] = 0,
+local buttonNewStateVal = {
+    [true]  = 0,
+    [false] = 1,
 }
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -41,15 +41,11 @@ local buttonStateVal = {
 FCOGuildLottery.UI.windowClass = ZO_SortFilterList:Subclass()
 local fcoglWindowClass = FCOGuildLottery.UI.windowClass
 
-local function setWindowPosition(windowFrame, diceHistoryVisible)
+local function setWindowPosition(windowFrame)
     if not windowFrame or (windowFrame and not windowFrame.SetAnchor) then return end
-    diceHistoryVisible = diceHistoryVisible or false
     local settings = FCOGuildLottery.settingsVars.settings
     local uiWindowSettings = settings.UIwindow
     local width, height = uiWindowSettings.width, uiWindowSettings.height
-    if diceHistoryVisible == true then
-        width = uiWindowSettings.width + 450
-    end
 
     local bg = windowFrame:GetNamedChild("BG")
     bg:ClearAnchors()
@@ -57,23 +53,6 @@ local function setWindowPosition(windowFrame, diceHistoryVisible)
     windowFrame:SetDimensions(width, height)
     windowFrame:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, uiWindowSettings.left, uiWindowSettings.top)
     bg:SetAnchorFill(windowFrame)
-
-    --[[
-    local amountHeader = windowFrame:GetNamedChild("HeadersAmount")
-    local infoHeader = windowFrame:GetNamedChild("HeadersInfo")
-    infoHeader:ClearAnchors()
-    infoHeader:SetAnchor(TOPLEFT, amountHeader, TOPRIGHT, 0, 0)
-    if diceHistoryVisible == true then
-        infoHeader:SetDimensions(300, 32)
-    else
-        infoHeader:SetAnchor(TOPRIGHT, infoHeader:GetParent(), TOPRIGHT, -16, 0)
-    end
-    local diceRollHistoryHeader = windowFrame:GetNamedChild("HeadersDiceHistory")
-    diceRollHistoryHeader:ClearAnchors()
-    diceRollHistoryHeader:SetAnchor(TOPLEFT, infoHeader, TOPRIGHT, 0, 0)
-    --diceRollHistoryList:ClearAnchors()
-    --diceRollHistoryList:SetAnchor(TOPLEFT, infoHeader, TOPRIGHT, 0, 0)
-    ]]
 end
 
 
@@ -853,7 +832,6 @@ function fcoglWindowClass:UpdateUI(state)
             frameControl:GetNamedChild("TabList"):SetHidden(true)
             frameControl:GetNamedChild("TabDiceRollHistory"):SetEnabled(true)
             frameControl:GetNamedChild("TabDiceRollHistory"):SetHidden(false)
-            frameControl:GetNamedChild("TabDiceRollHistory"):SetState(0)
             --Unhide the current tab
 
             --Unhide buttons at the tab
@@ -884,6 +862,9 @@ function fcoglWindowClass:UpdateUI(state)
 
             self.searchBox:Clear()
 
+            --Hide/Unhide the dice history frame
+            fcoglUI:ToggleDiceRollHistory(FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden)
+
             --Reset the sortGroupHeader
             resetSortGroupHeader(fcoglUI.CurrentTab)
 
@@ -907,6 +888,7 @@ df("SetTab - index: %s, override: %s", tostring(index), tostring(override))
         --Clear the master list of the currently shown ZO_SortFilterList
         ZO_ScrollList_Clear(fcoglUIwindow.list)
         fcoglUIwindow.masterList = {}
+        fcoglUIDiceHistoryWindow.masterList = {}
         --Reset variable
         fcoglUI.comingFromSortScrollListSetupFunction = false
         --Update the UI (hide/show items)
@@ -915,20 +897,30 @@ df("SetTab - index: %s, override: %s", tostring(index), tostring(override))
 end
 
 --Toggle the dice roll history "attached" window part at the right
-function fcoglUI:ToggleDiceRollHistory()
+function fcoglUI:ToggleDiceRollHistory(setHidden)
     local frameControl = fcoglUIwindow and fcoglUIwindow.frame
     if frameControl == nil then return end
-    local isHidden = fcoglUIDiceHistoryWindow.control:IsControlHidden()
-    local newState = not isHidden
+    local frameDiceHistoryControl = fcoglUIDiceHistoryWindow and fcoglUIDiceHistoryWindow.control
+    if frameDiceHistoryControl == nil then return end
+    local isHidden = frameDiceHistoryControl:IsControlHidden()
+    local newState = (setHidden and setHidden) or (not isHidden)
 
-    fcoglUIDiceHistoryWindow.control:SetHidden(newState)
+    frameDiceHistoryControl:SetHidden(newState)
     --(Un)hide the scroll list
     fcoglUIDiceHistoryWindow.list:SetHidden(newState)
-    fcoglUIDiceHistoryWindow.sortHeaderGroup.headerContainer:SetHidden(newState)
+
+    --Change the sort headers
+    local diceRollHistoryHeader = frameDiceHistoryControl:GetNamedChild("Headers")
+    --diceRollHistoryHeader:ClearAnchors()
+    --diceRollHistoryHeader:SetDimensions(445, 30)
+    --diceRollHistoryHeader:SetAnchor(TOPLEFT, frameDiceHistoryControl, TOPLEFT, 30, 51)
+    --diceRollHistoryHeader:SetAnchor(TOPRIGHT, frameDiceHistoryControl, TOPRIGHT, 0, 51)
+    diceRollHistoryHeader:SetHidden(newState)
+
     --Update the texture at the toggle button
     local tabDiceRollHistoryButton = frameControl:GetNamedChild("TabDiceRollHistory")
-    tabDiceRollHistoryButton:SetState(buttonStateVal[isHidden])
-
-    --Change the frame's size
-    --setWindowPosition(frameControl, isHidden)
+    local newStateVal = buttonNewStateVal[newState]
+    tabDiceRollHistoryButton:SetState(newStateVal)
+    --Save the current state to the SavedVariables
+    FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden = newState
 end

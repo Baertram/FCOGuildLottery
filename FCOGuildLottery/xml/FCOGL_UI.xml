@@ -435,11 +435,9 @@
 
 		<!-- FCOGLFrameDiceHistory -->
 		<TopLevelControl name="FCOGLFrameDiceHistory" mouseEnabled="true" movable="false" clampedToScreen="true" hidden="true" > <!--inherits="ZO_RightPanelFootPrint"-->
-			<Dimensions x="400" y="690" />
-			<DimensionConstraints minX="400" minY="300" />
+			<Dimensions x="450" y="690" />
+			<DimensionConstraints minX="450" minY="300" />
 			<Anchor point="TOPLEFT" relativeTo="FCOGLFrame" relativePoint="TOPRIGHT" offsetX="0" offsetY="0"/>
-			<OnMoveStop>
-			</OnMoveStop>
 			<Controls>
 				<Backdrop name="$(parent)Search" tier="HIGH" inherits="ZO_SingleLineEditBackdrop_Keyboard">
 					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" offsetX="-38" offsetY="14" />
@@ -481,8 +479,8 @@
 
 				<!-- Sort headers -->
 				<Control name="$(parent)Headers">
+					<!--<Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPLEFT" offsetX="30" offsetY="51" />-->
 					<Anchor point="TOPLEFT" offsetX="30" offsetY="51" />
-					<Anchor point="TOPRIGHT" offsetY="51" />
 					<Dimensions y="32" />
 					<Controls>
 						<Control name="$(parent)No" inherits="FCOGLSortHeader">
@@ -518,7 +516,7 @@
 				</Control>
 
 				<Control name="$(parent)List" inherits="ZO_ScrollList">
-					<Anchor point="TOPLEFT" relativeTo="$(parent)HeadersDiceHistory" relativePoint="BOTTOMLEFT" offsetY="3" />
+					<Anchor point="TOPLEFT" relativeTo="$(parent)Headers" relativePoint="BOTTOMLEFT" offsetY="3" />
 					<Anchor point="BOTTOMRIGHT" offsetX="-35" offsetY="-32" />
 					<Dimensions x="450" />
 				</Control>

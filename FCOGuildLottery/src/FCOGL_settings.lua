@@ -82,6 +82,9 @@ function FCOGuildLottery.getSettings()
               },
             },
         },
+        UIDiceHistoryWindow = {
+            isHidden = true,
+        },
         showUIAfterDiceRoll = false,
 
     }
