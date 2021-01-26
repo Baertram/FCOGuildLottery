@@ -33,11 +33,20 @@ local buttonNewStateVal = {
     [true]  = 0,
     [false] = 1,
 }
+local diceHistoryLinesAdded = 0
+
+local SCROLLLIST_DATATYPE_GUILDSALESRANKING     = fcoglUI.SCROLLLIST_DATATYPE_GUILDSALESRANKING
+local SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY   = fcoglUI.SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY
 
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
+local function isGuildSalesLotteryActive()
+    return (FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier ~= nil and
+            FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId ~= nil) or false
+end
+
+
 --FCOGuildLottery window - The UI
-
 FCOGuildLottery.UI.windowClass = ZO_SortFilterList:Subclass()
 local fcoglWindowClass = FCOGuildLottery.UI.windowClass
 
@@ -98,12 +107,13 @@ function fcoglWindowClass:Setup(listType)
     fcoglUI.comingFromSortScrollListSetupFunction = true
     fcoglUI.CurrentTab = FCOGL_TAB_GUILDSALESLOTTERY
 
+    self.listType = listType
 
     --The guild sales lottery list
     if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
         --Scroll UI
         ZO_ScrollList_AddDataType(self.list, fcoglUI.SCROLLLIST_DATATYPE_GUILDSALESRANKING, "FCOGLRowGuildSales", 30, function(control, data)
-            self:SetupItemRow(control, data)
+            self:SetupItemRow(control, data, listType)
         end)
         ZO_ScrollList_EnableHighlight(self.list, "ZO_ThinListHighlight")
         self:SetAlternateRowBackgrounds(true)
@@ -237,22 +247,53 @@ function fcoglWindowClass:Setup(listType)
     self:RefreshData()
 end
 
+function fcoglWindowClass:GetListType()
+--d("GetListType - listType: " ..tostring(self.listType))
+    return self.listType
+end
+
 function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
     calledFromFilterFunction = calledFromFilterFunction or false
-    df("list:BuildMasterList-calledFromFilterFunction: %s", tostring(calledFromFilterFunction))
+    local listType = self:GetListType()
+    d("list:BuildMasterList-calledFromFilterFunction: %s, currentTab: %s, listType: %s", tostring(calledFromFilterFunction), tostring(fcoglUI.CurrentTab), tostring(listType))
+    if listType == nil then return end
 
     if fcoglUI.CurrentTab == FCOGL_TAB_GUILDSALESLOTTERY then
-        if FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier == nil or
-           FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId == nil then return end
-        self.masterList = {}
+        --Guild sales lottery is active?
 
-        local rankingData = FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellRank
-        if rankingData == nil or #rankingData == 0 then return false end
-        for i = 1, #rankingData do
-            local item = rankingData[i]
-            table.insert(self.masterList, fcoglUI.CreateGuildSalesRankingEntry(item))
+        local guildSalesLotteryActive = isGuildSalesLotteryActive()
+
+        if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
+            if guildSalesLotteryActive == true then
+                self.masterList = {}
+
+                local rankingData = FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellRank
+                if rankingData == nil or #rankingData == 0 then return false end
+                for i = 1, #rankingData do
+                    local item = rankingData[i]
+                    table.insert(self.masterList, fcoglUI.CreateGuildSalesRankingEntry(item))
+                end
+                --self:updateSortHeaderAnchorsAndPositions(fcoglUI.CurrentTab, settings.maxNameColumnWidth, 32)
+            end
         end
-        --self:updateSortHeaderAnchorsAndPositions(fcoglUI.CurrentTab, settings.maxNameColumnWidth, 32)
+
+        --Dice history is shown?
+        if listType == FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
+            self.masterList = {}
+
+            local tableWithLastDiceThrows
+            if guildSalesLotteryActive == true then
+                tableWithLastDiceThrows = FCOGuildLottery.diceRollGuildLotteryHistory[FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId][FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier]
+            else
+                --No guild sales lottery, just normal dice throws
+                tableWithLastDiceThrows = FCOGuildLottery.diceRollHistory
+            end
+            if tableWithLastDiceThrows == nil or NonContiguousCount(tableWithLastDiceThrows) == 0 then return false end
+            diceHistoryLinesAdded = 0
+            for _, diceThrowData in pairs(tableWithLastDiceThrows) do
+                table.insert(self.masterList, fcoglUI.CreateDiceThrowHistoryEntry(diceThrowData))
+            end
+        end
     end
 end
 
@@ -321,10 +362,10 @@ function fcoglWindowClass:SetupItemRow(control, data, listType)
         local nameColumn = control:GetNamedChild("Name")
         local rollColumn = control:GetNamedChild("Roll")
         ------------------------------------------------------------------------------------------------------------------------
-        noColumn:SetHidden(false)
         noColumn:ClearAnchors()
         noColumn:SetAnchor(LEFT, control, nil, 0, 0)
         noColumn:SetText(data.no)
+        noColumn:SetHidden(false)
         local dateTimeStamp = data.timestamp
         local dateTimeStr = FCOGuildLottery.getDateTimeFormatted(dateTimeStamp)
         dateColumn:ClearAnchors()
@@ -338,11 +379,11 @@ function fcoglWindowClass:SetupItemRow(control, data, listType)
         nameColumn:SetAnchor(LEFT, dateColumn, RIGHT, 0, 0)
         nameColumn:SetText(data.name)
         nameColumn:SetHidden(false)
-        rollColumn:SetHidden(false)
         rollColumn:ClearAnchors()
         rollColumn:SetAnchor(LEFT, nameColumn, RIGHT, 0, 0)
         rollColumn:SetAnchor(RIGHT, control, RIGHT, 0, 0)
         rollColumn:SetText(data.roll)
+        rollColumn:SetHidden(false)
     end
 
     --Set the row to the list now
@@ -350,9 +391,12 @@ function fcoglWindowClass:SetupItemRow(control, data, listType)
 end
 
 function fcoglWindowClass:FilterScrollList()
---d("[fcoglWindow:FilterScrollList]")
-	local scrollData = ZO_ScrollList_GetDataList(self.list)
-	ZO_ClearNumericallyIndexedTable(scrollData)
+    --d("[fcoglWindow:FilterScrollList]")
+    local scrollData = ZO_ScrollList_GetDataList(self.list)
+    ZO_ClearNumericallyIndexedTable(scrollData)
+
+    local listType = self:GetListType()
+    if not listType then return end
 
     --Get the search method chosen at the search dropdown
     --self.searchType = 1
@@ -363,25 +407,38 @@ function fcoglWindowClass:FilterScrollList()
     local function checkIfMasterListRebuildNeeded(selfVar)
         --If not coming from setup function
         if not fcoglUI.comingFromSortScrollListSetupFunction then
---d("--->>>checkIfMasterListRebuildNeeded: true")
+            --d("--->>>checkIfMasterListRebuildNeeded: true")
             selfVar:BuildMasterList(true)
         end
     end
-
-------------------------------------------------------------------------------------------------------------------------
+    ------------------------------------------------------------------------------------------------------------------------
     --Rebuild the masterlist so the total list and counts are correct!
     checkIfMasterListRebuildNeeded(self)
     if fcoglUI.CurrentTab == FCOGL_TAB_GUILDSALESLOTTERY then
-        for i = 1, #self.masterList do
-            --Get the data of each set item
-            local data = self.masterList[i]
-            --Search for text/set bonuses
-            if searchInput == "" or self:CheckForMatch(data, searchInput) then
-                table.insert(scrollData, ZO_ScrollList_CreateDataEntry(fcoglUI.SCROLLLIST_DATATYPE_GUILDSALESRANKING, data))
+        if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
+            for i = 1, #self.masterList do
+                --Get the data of each set item
+                local data = self.masterList[i]
+                --Search for text/set bonuses
+                if searchInput == "" or self:CheckForMatch(data, searchInput) then
+                    table.insert(scrollData, ZO_ScrollList_CreateDataEntry(fcoglUI.SCROLLLIST_DATATYPE_GUILDSALESRANKING, data))
+                end
+            end
+
+        elseif listType == FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
+
+            for i = 1, #self.masterList do
+                --Get the data of each set item
+                local data = self.masterList[i]
+                --Search for text/set bonuses
+                if searchInput == "" or self:CheckForMatch(data, searchInput) then
+                    table.insert(scrollData, ZO_ScrollList_CreateDataEntry(fcoglUI.SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY, data))
+                end
             end
         end
+
     end
-------------------------------------------------------------------------------------------------------------------------
+    ------------------------------------------------------------------------------------------------------------------------
     --Update the counter
     self:UpdateCounter(scrollData)
 end
@@ -818,7 +875,7 @@ function fcoglUI.CreateGuildSalesRankingEntry(item)
         --amountSum
     ]]
     local guildSalesRankingLine = {
-        type =      FCOGL_SEARCH_TYPE_NAME, -- for the search method to work -> Find the processor in zo_stringsearch:Process()
+        type =      SCROLLLIST_DATATYPE_GUILDSALESRANKING, -- for the search method to work -> Find the processor in zo_stringsearch:Process()
         rank =      item.rank,
         name =      item.memberName,
         price =     item.soldSum,
@@ -829,6 +886,28 @@ function fcoglUI.CreateGuildSalesRankingEntry(item)
     return guildSalesRankingLine
 end
 
+function fcoglUI.CreateDiceThrowHistoryEntry(diceRolledData)
+    --[[
+        --Columns of "diceRolledData":
+        --characterId
+        --diceSides
+        --displayName
+        --roll
+        --timestamp
+    ]]
+    diceHistoryLinesAdded = diceHistoryLinesAdded + 1
+    local diceRolledHistoryLine = {
+        type =      SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY, -- for the search method to work -> Find the processor in zo_stringsearch:Process()
+        no =        diceHistoryLinesAdded,
+        character = diceRolledData.characterId,
+        name =      diceRolledData.displayName,
+        nameText =  string.format("%s (%s)", diceRolledData.displayName, FCOGuildLottery.GetCharacterName(diceRolledData.characterId)),
+        roll =      diceRolledData.roll,
+        rollText =  string.format("%s%s (%s)", GetString(FCOGL_DICE_PREFIX), tostring(diceRolledData.diceSides), tostring(diceRolledData.roll)),
+        timestamp = diceRolledData.timestamp,
+    }
+    return diceRolledHistoryLine
+end
 
 function fcoglUI.createWindow()
     if (not FCOGuildLottery.UI.window) then
@@ -881,24 +960,6 @@ function fcoglUI.OnWindowMoveStop()
     settings.UIwindow.top   = frameControl:GetTop()
 end
 
-local function resetSortGroupHeader(currentTab)
---d("[WL.resetSortGroupHeader]")
-    local UIwindow = fcoglUIwindow
-    if UIwindow.sortHeaderGroup then
-        local settings = FCOGuildLottery.settingsVars.settings
-        local sortHeaderKey = settings.UIwindow.sortKeys[currentTab] or "name"
-        local sortOrder = settings.UIwindow.sortOrder[currentTab]
-
-        UIwindow.currentSortKey = sortHeaderKey
-        UIwindow.currentSortOrder = sortOrder
-        UIwindow.sortHeaderGroup:SelectAndResetSortForKey(sortHeaderKey)
-        --Select the sort header again to invert the sort order, if last sort order was inverted
-        if sortOrder == ZO_SORT_ORDER_DOWN then
-            UIwindow.sortHeaderGroup:SelectHeaderByKey(sortHeaderKey)
-        end
-    end
-end
-
 function fcoglUI.saveSortGroupHeader(currentTab)
 --d("[WL.saveSortGroupHeader]")
     if fcoglUIwindow then
@@ -934,19 +995,48 @@ function fcoglWindowClass:checkNewGuildSalesLotteryButtonEnabled()
         not FCOGuildLottery.IsGuildIndexValid(guildIndex) then
         isEnabled = false
     end
-    self.frame:GetNamedChild("NewGuildSalesLottery"):SetEnabled(isEnabled)
+    local newGuildSalesLotteryButton = self.frame:GetNamedChild("NewGuildSalesLottery")
+    local reloadGuildSalesLotteryButton = self.frame:GetNamedChild("ReloadGuildSalesLottery")
+    newGuildSalesLotteryButton:SetEnabled(isEnabled)
+    newGuildSalesLotteryButton:SetMouseEnabled(isEnabled)
+    reloadGuildSalesLotteryButton:SetEnabled(isEnabled)
+    reloadGuildSalesLotteryButton:SetMouseEnabled(isEnabled)
     return isEnabled
 end
 
+function fcoglWindowClass:resetSortGroupHeader(currentTab, listType)
+    --d("[fcoglWindowClass:resetSortGroupHeader]")
+    currentTab = currentTab or fcoglUI.CurrentTab
+    listType = listType or self:GetListType()
+    if not currentTab or not listType then return end
+    if self.sortHeaderGroup ~= nil then
+        local settings = FCOGuildLottery.settingsVars.settings
+        local settingsUIWindow = settings.UIwindow
+        local sortHeaderKey = settingsUIWindow.sortKeys[currentTab][listType] or "name"
+        local sortOrder = settingsUIWindow.sortOrder[currentTab][listType]
+
+        self.currentSortKey = sortHeaderKey
+        self.currentSortOrder = sortOrder
+        self.sortHeaderGroup:SelectAndResetSortForKey(sortHeaderKey)
+        --Select the sort header again to invert the sort order, if last sort order was inverted
+        if sortOrder == ZO_SORT_ORDER_DOWN then
+            self.sortHeaderGroup:SelectHeaderByKey(sortHeaderKey)
+        end
+    end
+end
+
 function fcoglWindowClass:UpdateUI(state)
-	fcoglUI.CurrentState = state
---d("[fcoglWindow:UpdateUI] state: " ..tostring(state) .. ", currentTab: " ..tostring(fcoglUI.CurrentTab))
+    fcoglUI.CurrentState = state
+    --d("[fcoglWindow:UpdateUI] state: " ..tostring(state) .. ", currentTab: " ..tostring(fcoglUI.CurrentTab))
+
+    local listType = self:GetListType()
+    if listType == nil then return end
 
     local frameControl = self.frame
     ------------------------------------------------------------------------------------------------------------------------
     --SEARCH tab
-	if fcoglUI.CurrentTab == FCOGL_TAB_GUILDSALESLOTTERY then
---......................................................................................................................
+    if fcoglUI.CurrentTab == FCOGL_TAB_GUILDSALESLOTTERY then
+        --......................................................................................................................
         if fcoglUI.CurrentState == FCOGL_TAB_STATE_LOADED then
             --WLW_UpdateSceneFragmentTitle(WISHLIST_SCENE_NAME, TITLE_FRAGMENT, "Label", GetString(WISHLIST_TITLE) ..  " - " .. zo_strformat(GetString(WISHLIST_SETS_LOADED), 0))
             --updateSceneFragmentTitle(WISHLIST_SCENE_NAME, TITLE_FRAGMENT, "Label", GetString(WISHLIST_TITLE) .. " - " .. GetString(WISHLIST_BUTTON_SEARCH_TT):upper())
@@ -958,45 +1048,53 @@ function fcoglWindowClass:UpdateUI(state)
             frameControl:GetNamedChild("TabDiceRollHistory"):SetHidden(false)
             --Unhide the current tab
 
-            --Unhide buttons at the tab
-            self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetEnabled(true)
-            self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetHidden(false)
-            self.frame:GetNamedChild("RollTheDice"):SetEnabled(true)
-            self.frame:GetNamedChild("RollTheDice"):SetHidden(false)
-d(">UpdateUI")
-            self:checkNewGuildSalesLotteryButtonEnabled()
-            self.frame:GetNamedChild("NewGuildSalesLottery"):SetHidden(false)
+            if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
+                --Unhide buttons at the tab
+                self.frame:GetNamedChild("RollTheDice"):SetEnabled(true)
+                self.frame:GetNamedChild("RollTheDice"):SetHidden(false)
+                d(">UpdateUI")
+                self:checkNewGuildSalesLotteryButtonEnabled()
+                self.frame:GetNamedChild("NewGuildSalesLottery"):SetHidden(false)
+                self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetHidden(false)
+
+                self.frame:GetNamedChild("GuildsDrop"):SetHidden(false)
+
+                --Hide/Unhide the dice history frame
+                fcoglUI:ToggleDiceRollHistory(FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden)
+
+                --Unhide the scroll list
+                self.frame:GetNamedChild("List"):SetHidden(false)
+                --Unhide the scroll list headers
+                self.frame:GetNamedChild("Headers"):SetHidden(false)
+
+                self.headerRank:SetHidden(false)
+                --self.headerDate:SetHidden(false)
+                self.headerName:SetHidden(false)
+                --self.headerItem:SetHidden(false)
+                self.headerPrice:SetHidden(false)
+                self.headerTax:SetHidden(false)
+                self.headerAmount:SetHidden(false)
+                self.headerInfo:SetHidden(false)
+
+            --elseif listType == FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
+
+            end
+
+            --For both list types
             --Unhide the search
             self.searchBox:SetHidden(false)
             self.frame:GetNamedChild("Search"):SetHidden(false)
             --Unhide the dropdown boxes
             self.frame:GetNamedChild("SearchDrop"):SetHidden(false)
-            self.frame:GetNamedChild("GuildsDrop"):SetHidden(false)
-            --Unhide the scroll list
-            self.frame:GetNamedChild("List"):SetHidden(false)
-            --Unhide the scroll list headers
-            self.frame:GetNamedChild("Headers"):SetHidden(false)
-            self.headerRank:SetHidden(false)
-            --self.headerDate:SetHidden(false)
-            self.headerName:SetHidden(false)
-            --self.headerItem:SetHidden(false)
-            self.headerPrice:SetHidden(false)
-            self.headerTax:SetHidden(false)
-            self.headerAmount:SetHidden(false)
-            self.headerInfo:SetHidden(false)
-
             self.searchBox:Clear()
 
-            --Hide/Unhide the dice history frame
-            fcoglUI:ToggleDiceRollHistory(FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden)
-
             --Reset the sortGroupHeader
-            resetSortGroupHeader(fcoglUI.CurrentTab)
+            self:resetSortGroupHeader(fcoglUI.CurrentTab, listType)
 
             self:RefreshData()
         end
-------------------------------------------------------------------------------------------------------------------------
-	end
+        ------------------------------------------------------------------------------------------------------------------------
+    end
     self:updateSortHeaderAnchorsAndPositions(fcoglUI.CurrentTab, 200, 32)
 end -- fcoglWindow:UpdateUI(state)
 
@@ -1012,9 +1110,7 @@ function fcoglUI.SetTab(index, override)
         fcoglUI.CurrentTab = index
         --Clear the master list of the currently shown ZO_SortFilterList
         ZO_ScrollList_Clear(fcoglUIwindow.list)
-        ZO_ScrollList_Clear(fcoglUIDiceHistoryWindow.list)
         fcoglUIwindow.masterList = {}
-        fcoglUIDiceHistoryWindow.masterList = {}
         --Reset variable
         fcoglUI.comingFromSortScrollListSetupFunction = false
         --Update the UI (hide/show items)
@@ -1051,4 +1147,12 @@ function fcoglUI:ToggleDiceRollHistory(setHidden)
     --Save the current state to the SavedVariables
 --d(">Updating to: " ..tostring(newState))
     FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden = newState
+
+    --Dice history is shown? Update the list (masterlist) via the Refresh function from UpdateUI
+    -->Will call BuildMasterlist then
+    --Clear the list here first!
+    if newState == false then
+        ZO_ScrollList_Clear(fcoglUIDiceHistoryWindow.list)
+        fcoglUIDiceHistoryWindow.masterList = {}
+    end
 end

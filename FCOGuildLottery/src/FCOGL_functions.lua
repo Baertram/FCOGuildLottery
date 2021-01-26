@@ -1239,7 +1239,7 @@ end
 
 function FCOGuildLottery.ShowTooltip(ctrl, tooltipPosition, tooltipText, zoStrFormatReplaceText1, zoStrFormatReplaceTex2, zoStrFormatReplaceText3)
 --d("[WL]ShowTooltip - ctrl: " ..tostring(ctrl:GetName()) .. ", text: " .. tostring(tooltipText))
-    if ctrl == nil or tooltipText == nil or tooltipText == "" then return false end
+    if ctrl == nil or (ctrl.IsMouseEnabled and not ctrl:IsMouseEnabled()) or tooltipText == nil or tooltipText == "" then return false end
 	local tooltipPositions = {
         [TOP]       = true,
         [RIGHT]     = true,
@@ -1282,3 +1282,32 @@ function FCOGuildLottery.getDateTimeFormatted(dateTimeStamp)
     return dateTimeStr
 end
 
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+--Character & account functions
+local function buildCharacterData(keyIsCharName)
+    keyIsCharName = keyIsCharName or false
+    local charactersOfAccount
+    --Check all the characters of the account
+    for i = 1, GetNumCharacters() do
+        local name, _, _, _, _, _, characterId = GetCharacterInfo(i)
+        local charName = ZO_CachedStrFormat(SI_UNIT_NAME, name)
+        if characterId ~= nil and charName ~= "" then
+            if charactersOfAccount == nil then charactersOfAccount = {} end
+            if keyIsCharName == true then
+                charactersOfAccount[charName]   = characterId
+            else
+                charactersOfAccount[characterId] = charName
+            end
+        end
+    end
+    return charactersOfAccount
+end
+
+function FCOGuildLottery.GetCharacterName(characterId)
+    if FCOGuildLottery.characterData == nil then
+        FCOGuildLottery.characterData = buildCharacterData(false)
+    end
+    local characterName = FCOGuildLottery.characterData[characterId]
+    return characterName
+end

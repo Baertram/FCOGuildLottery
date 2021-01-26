@@ -14,7 +14,7 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_HEADER_TAX                            = "Tax",
     FCOGL_HEADER_INFO                           = "Info",
     FCOGL_HEADER_NO                             = "#",
-    FCOGL_HEADER_ROLL                           = "Roll",
+    FCOGL_HEADER_ROLL                           = "Dice (Roll)",
     FCOGL_HEADER_MEMBER_NAME                    = "Member name",
 
     FCOGL_NO_GUILD                              = "-> No guild <-",

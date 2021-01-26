@@ -7,7 +7,7 @@ FCOGuildLottery.clientLang = GetCVar("language.2")
 FCOGuildLottery.addonVars = {}
 local addonVars = FCOGuildLottery.addonVars
 addonVars.addonVersion		        = 0.1
-addonVars.addonSavedVarsVersion	    = "0.01"
+addonVars.addonSavedVarsVersion	    = "0.02"
 addonVars.addonName				    = "FCOGuildLottery"
 addonVars.addonNameShort		    = "FCOGL"
 addonVars.addonNameMenu  		    = "FCO GuildLottery"
@@ -32,7 +32,7 @@ FCOGuildLottery.currentlyUsedDiceRollType = FCOGL_DICE_ROLL_TYPE_NO_GUILD
 
 FCOGL_DICE_SIDES_NO_CHECK = -99999 --Do not do any checks against diceSide
 FCOGL_DICE_SIDES_DEFAULT = 6  --Standard D6/W6 (dice with 6 sides)
-FCOGL_MAX_DICE_SIDES = MAX_GUILD_MEMBERS --500 as of 2021-01-09
+FCOGL_MAX_DICE_SIDES = 999 --999 as of 2021-01-26
 FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS = 7 -- 1 week
 
 ------------------------------------------------------------------------------------------------------------------------

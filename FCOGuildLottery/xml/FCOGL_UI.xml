@@ -29,7 +29,7 @@
 			<Controls>
 				<Texture name="$(parent)BG" inherits="ZO_ThinListBgStrip" />
                 <Label name="$(parent)Rank" inherits="FCOGLRowLabel">
-                    <Anchor point="LEFT" />
+                    <Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" />
                     <Dimensions x="50" y="30" />
                 </Label>
                 <!--
@@ -62,7 +62,7 @@
 				</Label>
                 <Label name="$(parent)Info" inherits="FCOGLRowLabel">
                     <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Amount" />
-                    <Dimensions x="300" y="30" />
+                    <Dimensions x="100" y="30" />
 					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-16" />
                 </Label>
 			</Controls>
@@ -82,7 +82,7 @@
 			<Controls>
 				<Texture name="$(parent)BG" inherits="ZO_ThinListBgStrip" />
                 <Label name="$(parent)No" inherits="FCOGLRowLabel">
-                    <Anchor point="LEFT" />
+                    <Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" />
                     <Dimensions x="30" y="30" />
                 </Label>
 				<Label name="$(parent)DateTime" inherits="FCOGLRowLabel">
@@ -93,7 +93,7 @@
 					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)DateTime" />
 					<Dimensions x="200" y="30" />
 				</Label>
-				<Label name="$(parent)Price" inherits="FCOGLRowLabel">
+				<Label name="$(parent)Roll" inherits="FCOGLRowLabel">
 					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Name" />
 					<Dimensions x="80" y="30" />
 					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-16" />
@@ -177,7 +177,9 @@
 			<Dimensions x="50" y="50" />
 			<Textures normal="/esoui/art/guild/tabicon_history_up.dds"
 					  mouseOver="/esoui/art/guild/tabicon_history_over.dds"
-					  pressed="/esoui/art/guild/tabicon_history_down.dds" />
+					  pressed="/esoui/art/guild/tabicon_history_down.dds"
+					  disabled="/esoui/art/guild/tabicon_history_disabled.dds"
+			/>
 			<OnClicked>
 				FCOGL.UI.ToggleDiceRollHistory()
 			</OnClicked>
@@ -190,9 +192,10 @@
 		</Button>
 		<Button name="FCOGLButtonSettings" virtual="true">
 			<Dimensions x="28" y="28" />
-			<Textures normal="esoui/art/chatwindow/chat_options_up.dds"
-					  pressed="esoui/art/chatwindow/chat_options_down.dds"
-					  mouseOver="esoui/art/chatwindow/chat_options_over.dds"/>
+			<Textures normal="/esoui/art/chatwindow/chat_options_up.dds"
+					  pressed="/esoui/art/chatwindow/chat_options_down.dds"
+					  mouseOver="/esoui/art/chatwindow/chat_options_over.dds"
+					  disabled="/esoui/art/chatwindow/chat_options_up.dds"/>
 			<OnClicked>
 				FCOGL.ShowLAMSettings()
 			</OnClicked>
@@ -205,9 +208,10 @@
 		</Button>
 		<Button name="FCOGLButtonClose" virtual="true">
 			<Dimensions x="20" y="20" />
-			<Textures normal="esoui/art/buttons/decline_up.dds"
-					  pressed="esoui/art/buttons/decline_down.dds"
-					  mouseOver="esoui/art/buttons/decline_over.dds" />
+			<Textures normal="/esoui/art/buttons/closebutton_up.dds"
+					  pressed="/esoui/art/buttons/closebutton_down.dds"
+					  mouseOver="/esoui/art/buttons/closebutton_mouseOver.dds"
+					  disabled="/esoui/art/buttons/closebutton_disabled.dds" />
 			<OnClicked>
 				FCOGL.UI.Show(false)
 			</OnClicked>
@@ -222,7 +226,8 @@
 			<Dimensions x="30" y="30" />
 			<Textures normal="/esoui/art/help/help_tabicon_feedback_up.dds"
 					  mouseOver="/esoui/art/help/help_tabicon_feedback_over.dds"
-                      pressed="/esoui/art/help/help_tabicon_feedback_down.dds" />
+                      pressed="/esoui/art/help/help_tabicon_feedback_down.dds"
+                      disabled="/esoui/art/hud/gamepad/gp_radialicon_trade_disabled.dds" />
 			<OnClicked>
 			</OnClicked>
 			<OnMouseEnter>
@@ -234,11 +239,10 @@
 		</Button>
 		<Button name="FCOGLButtonNewGuildSalesLottery" virtual="true">
 			<Dimensions x="30" y="30" />
-			<Textures normal="/esoui/art/tutorial/tutorial_idexicon_gettingstarted_up.dds"
-					  mouseOver="/esoui/art/tutorial/tutorial_idexicon_gettingstarted_over.dds"
-                      pressed="/esoui/art/tutorial/tutorial_idexicon_gettingstarted_down.dds"
-					  disabled="/esoui/art/tutorial/tutorial_idexicon_gettingstarted_up.dds"
-			/>
+			<Textures normal="/esoui/art/buttons/large_rightarrow_up.dds"
+					  mouseOver="/esoui/art/buttons/large_rightarrow_over.dds"
+                      pressed="/esoui/art/buttons/large_rightarrow_down.dds"
+					  disabled="/esoui/art/buttons/large_rightarrow_disabled.dds"/>
 			<OnClicked>
 				FCOGL.StartNewGuildSalesLottery(FCOGLFrameGuildsDrop.m_comboBox.m_selectedItemData.index, FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS, false)
 			</OnClicked>
@@ -253,7 +257,8 @@
 			<Dimensions x="30" y="30" />
 			<Textures normal="/esoui/art/lfg/gamepad/gp_lfg_menuicon_random.dds"
 					  mouseOver="/esoui/art/lfg/gamepad/gp_lfg_menuicon_random.dds"
-                      pressed="/esoui/art/lfg/gamepad/gp_lfg_menuicon_random.dds" />
+                      pressed="/esoui/art/guild/guildheraldry_indexicon_background_disabled.dds"
+					  disabled = "/esoui/art/loot/dice_disabled.dds" />
 			<OnClicked>
 				FCOGL.RollTheDiceCheck()
 			</OnClicked>
@@ -267,7 +272,7 @@
 
 		<!-- Frame/Window - Standard UI with border -->
 		<TopLevelControl name="FCOGLFrame" mouseEnabled="true" movable="true" clampedToScreen="true" hidden="true" > <!--inherits="ZO_RightPanelFootPrint"-->
-			<Dimensions x="930" y="690" />
+			<Dimensions x="730" y="690" />
 			<DimensionConstraints minX="400" minY="300" />
 			<Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER" offsetX="300" offsetY="-100"/>
 			<OnMoveStop>
@@ -276,7 +281,7 @@
 			<Controls>
 				<Backdrop name="$(parent)Search" tier="HIGH" inherits="ZO_SingleLineEditBackdrop_Keyboard">
 					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" offsetX="-38" offsetY="14" />
-					<Dimensions x="250" />
+					<Dimensions x="200" />
 					<Controls>
 						<EditBox name="$(parent)Box" inherits="ZO_DefaultEditForBackdrop ZO_EditDefaultText"/>
 					</Controls>
@@ -406,7 +411,7 @@
                             </OnInitialized>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Amount" />
 							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$(parent)" offsetX="-16" />
-                            <Dimensions x="300" y="32" />
+                            <Dimensions x="100" y="32" />
                         </Control>
 					</Controls>
 				</Control>
@@ -497,8 +502,8 @@
 
 		<!-- FCOGLFrameDiceHistory -->
 		<TopLevelControl name="FCOGLFrameDiceHistory" mouseEnabled="true" movable="false" clampedToScreen="true" hidden="true" > <!--inherits="ZO_RightPanelFootPrint"-->
-			<Dimensions x="450" y="690" />
-			<DimensionConstraints minX="450" minY="300" />
+			<Dimensions x="500" y="690" />
+			<DimensionConstraints minX="500" minY="300" />
 			<Anchor point="TOPLEFT" relativeTo="FCOGLFrame" relativePoint="TOPRIGHT" offsetX="0" offsetY="0"/>
 			<Controls>
 				<Backdrop name="$(parent)Search" tier="HIGH" inherits="ZO_SingleLineEditBackdrop_Keyboard">
@@ -572,7 +577,7 @@
 							</OnInitialized>
 							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Name" />
 							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$(parent)" offsetX="-16" />
-							<Dimensions x="80" y="32" />
+							<Dimensions x="100" y="32" />
                         </Control>
 					</Controls>
 				</Control>
@@ -580,7 +585,6 @@
 				<Control name="$(parent)List" inherits="ZO_ScrollList">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)Headers" relativePoint="BOTTOMLEFT" offsetY="3" />
 					<Anchor point="BOTTOMRIGHT" offsetX="-35" offsetY="-32" />
-					<Dimensions x="450" />
 				</Control>
 
 				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED">
