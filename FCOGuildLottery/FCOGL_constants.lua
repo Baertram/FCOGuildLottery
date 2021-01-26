@@ -42,6 +42,7 @@ FCOGuildLottery.lang = {}
 FCOGuildLottery.constStr = {}
 FCOGuildLottery.constStr.guildLotteryLastNDays = "GuildSellsLast%sDays_%s" --1st: days, 2nd: guildName
 
+FCOGuildLottery.noGuildIndex = MAX_GUILDS + 1 -- The index of the first non-guild entry in the guilds dropdown box
 ------------------------------------------------------------------------------------------------------------------------
 --Library variables
 --LibHistoire

@@ -167,8 +167,19 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
 --Slash command functions
-local function showNewGSLSlashCommandHelp()
-    local newGSLChatErrorMessage = "Please use the slash command /newgsl <guildIndex> <daysBeforeCurrent> to start a new guild sales lottery.\nReplace <guildIndex> with the index 81 to 5) of your guilds, and optinally replace <daysBeforeCurrent> with the count of days you want to check the guild sales history for.\nIf this 2nd parameter is left empty " ..tostring(FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS) .. " days will be used as default value.\n\nAfter starting a new guild sales lottery via /newgsl you can use /gsl to throw the next dice."
+local function showNewGSLSlashCommandHelp(noGuildSelected)
+    noGuildSelected = noGuildSelected or false
+    local newGSLChatErrorMessage
+    local uiWindow = FCOGuildLottery.UI and FCOGuildLottery.UI.window and FCOGuildLottery.UI.window.control
+    if uiWindow ~= nil and uiWindow:IsControlHidden() == false then
+        if noGuildSelected == true then
+            newGSLChatErrorMessage = "Please select a guild from the guilds dropdown box!\nElse you are only able to use the dice button to throw a random dice throw with the sides you have defined with the editbox next to the button."
+        else
+            newGSLChatErrorMessage = "The selected guild does not seem be valid. Please select the guild from the guilds dropdown box."
+        end
+    else
+        newGSLChatErrorMessage = "Please use the slash command /newgsl <guildIndex> <daysBeforeCurrent> to start a new guild sales lottery.\nReplace <guildIndex> with the index 81 to 5) of your guilds, and optinally replace <daysBeforeCurrent> with the count of days you want to check the guild sales history for.\nIf this 2nd parameter is left empty " ..tostring(FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS) .. " days will be used as default value.\n\nAfter starting a new guild sales lottery via /newgsl you can use /gsl to throw the next dice."
+    end
     dfa(newGSLChatErrorMessage)
 end
 
@@ -1098,7 +1109,7 @@ end
 
 function FCOGuildLottery.StartNewGuildSalesLottery(guildIndex, daysBefore, dataWasResetAlready)
     if not IsGuildIndexValid(guildIndex) or daysBefore == nil then
-        showNewGSLSlashCommandHelp()
+        showNewGSLSlashCommandHelp((FCOGuildLottery.noGuildIndex ~= nil and guildIndex == FCOGuildLottery.noGuildIndex) or false)
         return
     end
     if checkAndShowNoTraderMessage(guildIndex) == true then

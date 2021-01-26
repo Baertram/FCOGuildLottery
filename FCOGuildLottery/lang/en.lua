@@ -15,7 +15,11 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_HEADER_INFO                           = "Info",
     FCOGL_HEADER_NO                             = "#",
     FCOGL_HEADER_ROLL                           = "Roll",
-    FCOGL_HEADER_MEMBER_NAME                    = "Member name"
+    FCOGL_HEADER_MEMBER_NAME                    = "Member name",
+
+    FCOGL_NO_GUILD                              = "> No guild!",
+
+    FCOGL_DICE_SIDES                            = "# of sides of the dice",
 }
 local langEn = FCOGuildLottery.lang["en"]
 

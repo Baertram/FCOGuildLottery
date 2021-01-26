@@ -156,6 +156,9 @@ function fcoglWindowClass:Setup(listType)
         self.headerAmount   = self.headers:GetNamedChild("Amount")
         self.headerInfo     = self.headers:GetNamedChild("Info")
 
+        self.editBoxDiceSides = self.frame:GetNamedChild("EditDiceSidesBox")
+        self.editBoxDiceSides:SetTextType(TEXT_TYPE_NUMERIC)
+
         --Add the FCOGL scene
     --fcoglUI.scene = ZO_Scene:New(fcoglUI.SCENE_NAME, SCENE_MANAGER)
     --fcoglUI.scene:AddFragment(ZO_SetTitleFragment:New(FCOGL_TITLE))
@@ -542,7 +545,7 @@ function fcoglUI.initializeSearchDropdown(window, currentTab, currentListType, s
                                 [FCOGL_SEARCH_TYPE_NAME]     = false,
                             }, --exclude the search entries from the set search
                 },
-                ["guilds"] = {dropdown=window.guildsDrop,  prefix=FCOGL_GUILDSDROP_PREFIX,  entryCount=#FCOGuildLottery.guildsData,
+                ["guilds"] = {dropdown=window.guildsDrop,  prefix=FCOGL_GUILDSDROP_PREFIX,  entryCount=#FCOGuildLottery.guildsData + 1, --5 guilds + 1 non-guild entry
                               exclude = {
                                   [FCOGL_SEARCH_TYPE_NAME]     = false,
                               }, --exclude the search entries from the set search
@@ -611,6 +614,20 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
                     entry.id         = guildId
                     entry.name       = guildsData.name
                     entry.gotTrader  = guildsData.gotTrader
+                else
+                    --Last entry: Non-guild
+                    if i == FCOGuildLottery.noGuildIndex then
+                        local noGuildName = GetString(FCOGL_NO_GUILD)
+                        entry = ZO_ComboBox:CreateItemEntry(noGuildName, callback)
+                        --guildId = nil
+                        if currentGuildId == nil then
+                            itemToSelect = i
+                        end
+                        entry.index      = i
+                        entry.id         = -1
+                        entry.name       = noGuildName
+                        --entry.gotTrader  = nil
+                    end
                 end
 
             --Search type combo box
@@ -692,7 +709,26 @@ function FCOGL_UI_OnMouseUp( rowControlUp, button, upInside )
     end
 end
 
-
+function FCOGL_UI_OnTextChanged( editBox, isNumeric, defaultVar, updateVar )
+    isNumeric = isNumeric or false
+    local text = editBox:GetText()
+    local newValue
+    if isNumeric == true then
+        local numberText = tonumber(text)
+        if text == "" or text == "0" or numberText ~= nil and numberText == 0 then
+            newValue = tostring(defaultVar) or "1"
+            editBox:SetText(newValue)
+        end
+    end
+    text = newValue or text
+    if updateVar ~= nil and text ~= nil then
+        if isNumeric == true then
+            updateVar = tonumber(text)
+        else
+            updateVar = tostring(text)
+        end
+    end
+end
 
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
@@ -887,6 +923,7 @@ df("SetTab - index: %s, override: %s", tostring(index), tostring(override))
         fcoglUI.CurrentTab = index
         --Clear the master list of the currently shown ZO_SortFilterList
         ZO_ScrollList_Clear(fcoglUIwindow.list)
+        ZO_ScrollList_Clear(fcoglUIDiceHistoryWindow.list)
         fcoglUIwindow.masterList = {}
         fcoglUIDiceHistoryWindow.masterList = {}
         --Reset variable
