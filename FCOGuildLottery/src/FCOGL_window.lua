@@ -157,7 +157,10 @@ function fcoglWindowClass:Setup(listType)
         self.headerInfo     = self.headers:GetNamedChild("Info")
 
         self.editBoxDiceSides = self.frame:GetNamedChild("EditDiceSidesBox")
-        self.editBoxDiceSides:SetTextType(TEXT_TYPE_NUMERIC)
+        self.editBoxDiceSides:SetTextType(TEXT_TYPE_NUMERIC_UNSIGNED_INT)
+        FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
+        self.editBoxDiceSides:SetText(tostring(FCOGuildLottery.settingsVars.settings.defaultDiceSides))
+        FCOGuildLottery.prevVars.doNotRunOnTextChanged = false
 
         --Add the FCOGL scene
     --fcoglUI.scene = ZO_Scene:New(fcoglUI.SCENE_NAME, SCENE_MANAGER)
@@ -709,23 +712,81 @@ function FCOGL_UI_OnMouseUp( rowControlUp, button, upInside )
     end
 end
 
-function FCOGL_UI_OnTextChanged( editBox, isNumeric, defaultVar, updateVar )
+function FCOGL_UI_OnTextChanged( editBox, isNumeric, isDefaultDiceNumber, checkEmpty )
+    if FCOGuildLottery.prevVars.doNotRunOnTextChanged == true then
+        FCOGuildLottery.prevVars.doNotRunOnTextChanged = false
+        return
+    end
     isNumeric = isNumeric or false
+    isDefaultDiceNumber = isDefaultDiceNumber or false
+    checkEmpty = checkEmpty or false
+    local defaultVar
+    if isDefaultDiceNumber == true then
+        defaultVar = FCOGL_DICE_SIDES_DEFAULT
+    end
     local text = editBox:GetText()
     local newValue
     if isNumeric == true then
         local numberText = tonumber(text)
-        if text == "" or text == "0" or numberText ~= nil and numberText == 0 then
+        if text == "" and checkEmpty == true then
             newValue = tostring(defaultVar) or "1"
+        elseif text == "0" or numberText ~= nil and numberText == 0 then
+            newValue = tostring(defaultVar) or "1"
+        end
+        if newValue ~= nil then
             editBox:SetText(newValue)
         end
     end
     text = newValue or text
-    if updateVar ~= nil and text ~= nil then
-        if isNumeric == true then
-            updateVar = tonumber(text)
+    if text ~= nil then
+        if isNumeric == true and text ~= "" then
+            if isDefaultDiceNumber == true then
+                FCOGuildLottery.settingsVars.settings.defaultDiceSides = tonumber(text)
+            end
+        --else
+            --updateVar = tostring(text)
+        end
+    end
+end
+
+function FCOGL_UI_OnArrowKey( editBox, isNumeric, isDefaultDiceNumber, doIncrease )
+    isNumeric = isNumeric or false
+    isDefaultDiceNumber = isDefaultDiceNumber or false
+    if not isNumeric == true then return end
+    local defaultVar
+    if isDefaultDiceNumber == true then
+        defaultVar = FCOGL_DICE_SIDES_DEFAULT
+    end
+    local text = editBox:GetText()
+    local newValue
+    local numberText = tonumber(text)
+    if text == "" then
+        newValue = tostring(defaultVar)
+    elseif text == "0" or numberText ~= nil and numberText == 0 then
+        if doIncrease == true then
+            newValue = "1"
         else
-            updateVar = tostring(text)
+            newValue = "1"
+        end
+    else
+        if doIncrease == true then
+            newValue = tostring(numberText + 1)
+        else
+            newValue = tostring(numberText - 1)
+        end
+    end
+    if newValue ~= nil then
+        editBox:SetText(newValue)
+    end
+    text = newValue or text
+    if text ~= nil then
+        FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
+        if text ~= "" then
+            if isDefaultDiceNumber == true then
+                FCOGuildLottery.settingsVars.settings.defaultDiceSides = tonumber(text)
+            end
+        --else
+            --updateVar = tostring(text)
         end
     end
 end
@@ -786,6 +847,11 @@ local function showUIWindow(doShow)
         if doShow == true then
             setWindowPosition(windowFrame)
             fcoglUIwindow:UpdateUI(FCOGL_TAB_STATE_LOADED)
+        else
+            local windowDiceRollFrame = fcoglUIDiceHistoryWindow.frame
+            if windowDiceRollFrame:IsHidden() then return end
+            windowDiceRollFrame:SetHidden(true)
+            FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden = true
         end
     end
 end
@@ -935,12 +1001,13 @@ end
 
 --Toggle the dice roll history "attached" window part at the right
 function fcoglUI:ToggleDiceRollHistory(setHidden)
+--d(">ToggleDiceRollHistory - setHidden: " ..tostring(setHidden))
     local frameControl = fcoglUIwindow and fcoglUIwindow.frame
-    if frameControl == nil then return end
+    if frameControl == nil or frameControl:IsControlHidden() then return end
     local frameDiceHistoryControl = fcoglUIDiceHistoryWindow and fcoglUIDiceHistoryWindow.control
     if frameDiceHistoryControl == nil then return end
     local isHidden = frameDiceHistoryControl:IsControlHidden()
-    local newState = (setHidden and setHidden) or (not isHidden)
+    local newState = (setHidden ~= nil and setHidden) or (not isHidden)
 
     frameDiceHistoryControl:SetHidden(newState)
     --(Un)hide the scroll list
@@ -959,5 +1026,6 @@ function fcoglUI:ToggleDiceRollHistory(setHidden)
     local newStateVal = buttonNewStateVal[newState]
     tabDiceRollHistoryButton:SetState(newStateVal)
     --Save the current state to the SavedVariables
+--d(">Updating to: " ..tostring(newState))
     FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden = newState
 end

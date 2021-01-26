@@ -446,8 +446,20 @@
 					<Controls>
 						<EditBox name="$(parent)Box" inherits="FCOGLEditForBackdrop FCOGLEditDefaultText" maxInputCharacters="3">
 								<OnTextChanged>
-									FCOGL_UI_OnTextChanged(self, true, FCOGL.settingsVars.settings.defaultDiceSides, FCOGL.settingsVars.settings.defaultDiceSides)
+									FCOGL_UI_OnTextChanged(self, true, true, false)
 								</OnTextChanged>
+								<OnFocusLost>
+									FCOGL_UI_OnTextChanged(self, true, true, true)
+								</OnFocusLost>
+							    <OnEnter>
+									FCOGL_UI_OnTextChanged(self, true, true, true)
+								</OnEnter>
+								<OnUpArrow>
+									FCOGL_UI_OnArrowKey(self, true, true, true)
+								</OnUpArrow>
+								<OnDownArrow>
+									FCOGL_UI_OnArrowKey(self, true, true, false)
+								</OnDownArrow>
 						</EditBox>
 					</Controls>
 					<OnMouseEnter>

@@ -126,3 +126,7 @@ FCOGuildLottery.UI.SCENE_NAME = "FCOGuildLottery_UI_Scene"
 FCOGuildLottery.UI.SCROLLLIST_DATATYPE_GUILDSALESRANKING    = 1
 FCOGuildLottery.UI.SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY  = 2
 
+--Preventer variables
+FCOGuildLottery.prevVars = {
+    doNotRunOnTextChanged = false
+}
