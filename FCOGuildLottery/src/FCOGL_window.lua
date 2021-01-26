@@ -666,7 +666,7 @@ function fcoglWindowClass:GetSearchBoxLastSelected(UITab, searchBoxType)
 end
 
 ------------------------------------------------
---- FCOGL Row
+--- FCOGL window global functions XML
 ------------------------------------------------
 function FCOGL_UI_OnMouseEnter( rowControlEnter )
 	fcoglUIwindow:Row_OnMouseEnter(rowControlEnter)
@@ -771,8 +771,14 @@ function FCOGL_UI_OnArrowKey( editBox, isNumeric, isDefaultDiceNumber, doIncreas
     else
         if doIncrease == true then
             newValue = tostring(numberText + 1)
+            if newValue > "999"" then newValue = "999"" end
         else
             newValue = tostring(numberText - 1)
+            if newValue <= "0" then
+                if isDefaultDiceNumber == true then
+                    newValue = tostring(defaultVar)
+                end
+            end
         end
     end
     if newValue ~= nil then
@@ -851,7 +857,6 @@ local function showUIWindow(doShow)
             local windowDiceRollFrame = fcoglUIDiceHistoryWindow.frame
             if windowDiceRollFrame:IsHidden() then return end
             windowDiceRollFrame:SetHidden(true)
-            FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden = true
         end
     end
 end
