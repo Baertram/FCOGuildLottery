@@ -136,16 +136,23 @@
 		<!-- Virtual Buttons -->
 		<Button name="FCOGLButtonGuildSales" virtual="true">
 			<Dimensions x="50" y="50" />
+			<!--
 			<Textures normal="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_up.dds"
 					  mouseOver="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_over.dds"
 					  pressed="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_down.dds"
+					  disabled="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_disabled.dds"
+			/>
+			-->
+			<Textures normal="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_up.dds"
+					  mouseOver="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_up.dds"
+					  pressed="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_up.dds"
 					  disabled="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_disabled.dds"
 			/>
 			<OnClicked>
 				FCOGL.UI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY)
 			</OnClicked>
 			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, TOP, "Guild sales")
+				FCOGL.ShowTooltip(self, TOP, GetString(FCOGL_GUILD_SALES_LOTTERY))
 			</OnMouseEnter>
 			<OnMouseExit>
 				FCOGL.HideTooltip()
@@ -175,7 +182,7 @@
 				FCOGL.UI.ToggleDiceRollHistory()
 			</OnClicked>
 			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, TOP, "Toggle dice roll history")
+				FCOGL.ShowTooltip(self, TOP, GetString(FCOGL_TOGGLE_DICE_ROLL_HISTORY))
 			</OnMouseEnter>
 			<OnMouseExit>
 				FCOGL.HideTooltip()
@@ -190,7 +197,7 @@
 				FCOGL.ShowLAMSettings()
 			</OnClicked>
 			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, TOP, "Open settings")
+				FCOGL.ShowTooltip(self, TOP, GetString(FCOGL_SETTINGS))
 			</OnMouseEnter>
 			<OnMouseExit>
 				FCOGL.HideTooltip()
@@ -205,7 +212,7 @@
 				FCOGL.UI.Show(false)
 			</OnClicked>
 			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, TOP, "Close")
+				FCOGL.ShowTooltip(self, TOP, GetString(FCOGL_CLOSE))
 			</OnMouseEnter>
 			<OnMouseExit>
 				FCOGL.HideTooltip()
@@ -219,7 +226,7 @@
 			<OnClicked>
 			</OnClicked>
 			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, RIGHT, "Refresh")
+				FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_REFRESH))
 			</OnMouseEnter>
 			<OnMouseExit>
 				FCOGL.HideTooltip()
@@ -229,12 +236,14 @@
 			<Dimensions x="30" y="30" />
 			<Textures normal="/esoui/art/tutorial/tutorial_idexicon_gettingstarted_up.dds"
 					  mouseOver="/esoui/art/tutorial/tutorial_idexicon_gettingstarted_over.dds"
-                      pressed="/esoui/art/tutorial/tutorial_idexicon_gettingstarted_down.dds" />
+                      pressed="/esoui/art/tutorial/tutorial_idexicon_gettingstarted_down.dds"
+					  disabled="/esoui/art/tutorial/tutorial_idexicon_gettingstarted_up.dds"
+			/>
 			<OnClicked>
 				FCOGL.StartNewGuildSalesLottery(FCOGLFrameGuildsDrop.m_comboBox.m_selectedItemData.index, FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS, false)
 			</OnClicked>
 			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, RIGHT, "Start new guild sales lottery")
+				FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_START_NEW_GUILD_SALES_LOTTERY))
 			</OnMouseEnter>
 			<OnMouseExit>
 				FCOGL.HideTooltip()
@@ -249,7 +258,7 @@
 				FCOGL.RollTheDiceCheck()
 			</OnClicked>
 			<OnMouseEnter>
-				FCOGL.ShowTooltip(self, RIGHT, "Roll the dice")
+				FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_ROLL_THE_DICE))
 			</OnMouseEnter>
 			<OnMouseExit>
 				FCOGL.HideTooltip()
@@ -460,14 +469,14 @@
 								<OnDownArrow>
 									FCOGL_UI_OnArrowKey(self, true, true, false)
 								</OnDownArrow>
+								<OnMouseEnter>
+									FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_DICE_SIDES))
+								</OnMouseEnter>
+								<OnMouseExit>
+									FCOGL.HideTooltip()
+								</OnMouseExit>
 						</EditBox>
 					</Controls>
-					<OnMouseEnter>
-						FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_DICE_SIDES))
-					</OnMouseEnter>
-					<OnMouseExit>
-						FCOGL.HideTooltip()
-					</OnMouseExit>
 				</Backdrop>
 
 				<Button name="$(parent)NewGuildSalesLottery" inherits="FCOGLButtonNewGuildSalesLottery">

@@ -17,9 +17,16 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_HEADER_ROLL                           = "Roll",
     FCOGL_HEADER_MEMBER_NAME                    = "Member name",
 
-    FCOGL_NO_GUILD                              = "> No guild!",
+    FCOGL_NO_GUILD                              = "-> No guild <-",
 
     FCOGL_DICE_SIDES                            = "# of sides of the dice",
+    FCOGL_START_NEW_GUILD_SALES_LOTTERY         = "Start new guild sales lottery",
+    FCOGL_ROLL_THE_DICE                         = "Roll the dice",
+    FCOGL_REFRESH                               = "Refresh",
+    FCOGL_SETTINGS                              = "Open settings",
+    FCOGL_CLOSE                                 = "Close",
+    FCOGL_TOGGLE_DICE_ROLL_HISTORY              = "Toggle dice roll history",
+    FCOGL_GUILD_SALES_LOTTERY                   = "Guild sales lottery",
 }
 local langEn = FCOGuildLottery.lang["en"]
 

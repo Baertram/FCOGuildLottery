@@ -579,6 +579,9 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
 
     local callback = function( _, _, entry, _ ) --comboBox, entryText, entry, selectionChanged )
         self:SetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType, entry.selectedIndex)
+        if entry.isGuild ~= nil and entry.isGuild == true then
+            fcoglUIwindow:UpdateUI(fcoglUI.CurrentState)
+        end
         self:RefreshFilters()
     end
 
@@ -617,6 +620,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
                     entry.id         = guildId
                     entry.name       = guildsData.name
                     entry.gotTrader  = guildsData.gotTrader
+                    entry.isGuild    = true
                 else
                     --Last entry: Non-guild
                     if i == FCOGuildLottery.noGuildIndex then
@@ -630,6 +634,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
                         entry.id         = -1
                         entry.name       = noGuildName
                         --entry.gotTrader  = nil
+                        entry.isGuild = true
                     end
                 end
 
@@ -921,6 +926,18 @@ function fcoglWindowClass:updateSortHeaderAnchorsAndPositions(wlTab, nameHeaderW
     end
 end
 
+function fcoglWindowClass:checkNewGuildSalesLotteryButtonEnabled()
+    local isEnabled = true
+    --No guildId selected?
+    local guildIndex = self.guildsDrop:GetSelectedItemData().index
+    if guildIndex == nil or guildIndex == FCOGuildLottery.noGuildIndex or
+        not FCOGuildLottery.IsGuildIndexValid(guildIndex) then
+        isEnabled = false
+    end
+    self.frame:GetNamedChild("NewGuildSalesLottery"):SetEnabled(isEnabled)
+    return isEnabled
+end
+
 function fcoglWindowClass:UpdateUI(state)
 	fcoglUI.CurrentState = state
 --d("[fcoglWindow:UpdateUI] state: " ..tostring(state) .. ", currentTab: " ..tostring(fcoglUI.CurrentTab))
@@ -946,7 +963,8 @@ function fcoglWindowClass:UpdateUI(state)
             self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetHidden(false)
             self.frame:GetNamedChild("RollTheDice"):SetEnabled(true)
             self.frame:GetNamedChild("RollTheDice"):SetHidden(false)
-            self.frame:GetNamedChild("NewGuildSalesLottery"):SetEnabled(true)
+d(">UpdateUI")
+            self:checkNewGuildSalesLotteryButtonEnabled()
             self.frame:GetNamedChild("NewGuildSalesLottery"):SetHidden(false)
             --Unhide the search
             self.searchBox:SetHidden(false)
@@ -984,7 +1002,7 @@ end -- fcoglWindow:UpdateUI(state)
 
 --Change the tabs at the WishList menu
 function fcoglUI.SetTab(index, override)
-df("SetTab - index: %s, override: %s", tostring(index), tostring(override))
+--df("SetTab - index: %s, override: %s", tostring(index), tostring(override))
     if not fcoglUIwindow then return end
     --Do not activate active tab
     if fcoglUI.CurrentTab and (override == true or fcoglUI.CurrentTab ~= index) then
