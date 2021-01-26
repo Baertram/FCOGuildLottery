@@ -410,7 +410,7 @@
                                 ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_INFO), "info", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
                             </OnInitialized>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Amount" />
-							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$(parent)" offsetX="-16" />
+							<Anchor point="TOPRIGHT" offsetX="-16" />
                             <Dimensions x="100" y="32" />
                         </Control>
 					</Controls>
@@ -576,7 +576,6 @@
 								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_ROLL), "roll", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
 							</OnInitialized>
 							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Name" />
-							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$(parent)" offsetX="-16" />
 							<Dimensions x="100" y="32" />
                         </Control>
 					</Controls>

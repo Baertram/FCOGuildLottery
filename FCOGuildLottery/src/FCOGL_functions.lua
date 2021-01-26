@@ -884,7 +884,7 @@ end
 
 --Reset the stored / last used data and enable a new lottery dice throw, where the popups of guild and timeFrame selection
 --are showing up again
-function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, startingNewLottery, guildIndex, daysBefore)
+function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, startingNewLottery, guildIndex, daysBefore, callbackYes, callbackNo)
     noSecurityQuestion = noSecurityQuestion or false
     local resetDataNow = false
     if not noSecurityQuestion then
@@ -900,7 +900,12 @@ function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, s
                     question    = "Do you want to reset the currently\nactive guild sales lottery?",
                     callbackData = {
                         yes = function()
-                            resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex, daysBefore)
+                            if callbackYes ~= nil and type(callbackYes) == "function" then
+                                resetCurrentGuildSalesLotteryData(false, guildIndex, daysBefore)
+                                callbackYes(guildIndex, daysBefore)
+                            else
+                                resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex, daysBefore)
+                            end
                         end,
                         no  = function() end,
                     },
