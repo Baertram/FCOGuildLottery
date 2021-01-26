@@ -771,7 +771,7 @@ function FCOGL_UI_OnArrowKey( editBox, isNumeric, isDefaultDiceNumber, doIncreas
     else
         if doIncrease == true then
             newValue = tostring(numberText + 1)
-            if newValue > "999"" then newValue = "999"" end
+            if newValue > "999" then newValue = "999" end
         else
             newValue = tostring(numberText - 1)
             if newValue <= "0" then
