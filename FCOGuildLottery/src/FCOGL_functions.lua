@@ -907,7 +907,11 @@ function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, s
                                 resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex, daysBefore)
                             end
                         end,
-                        no  = function() end,
+                        no  = function()
+                            if callbackNo ~= nil and type(callbackNo) == "function" then
+                                callbackNo(guildIndex, daysBefore)
+                            end
+                        end
                     },
                 }
                 ZO_Dialogs_ShowDialog(resetGuildSalesLotteryDialogName, data, nil, nil)
@@ -951,7 +955,7 @@ end
 function FCOGuildLottery.RollTheDiceForGuildSalesLottery(noChatOutput)
     noChatOutput = noChatOutput or false
 --d("RollTheDiceForGuildSalesLottery")
-df( "RollTheDiceForGuildSalesLottery" )
+df( "RollTheDiceForGuildSalesLottery - noChatOutput: %s", tostring(noChatOutput) )
     local guildId
     local guildIndex
 
@@ -1105,6 +1109,7 @@ df("<guild sell rank data missing!")
 end
 
 function FCOGuildLottery.NewGuildSalesLottery(guildIndex, daysBefore)
+df("[FCOGuildLottery.NewGuildSalesLottery] - index: %s, daysBefore: %s", tostring(guildIndex), tostring(daysBefore))
     if FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier ~= nil then return end
     --Set the guildIndex and daysBefore to start a new guild sales lottery with function
     FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex = guildIndex

@@ -136,10 +136,10 @@ function fcoglWindowClass:Setup(listType)
         end
         --Search
         self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("SearchDrop"))
-        fcoglUI.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, listType, "name")
+        self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, listType, "name")
         --Guilds
         self.guildsDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("GuildsDrop"))
-        fcoglUI.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, listType, "guilds")
+        self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, listType, "guilds")
 
         --Search box and search functions
         self.searchBox = self.frame:GetNamedChild("SearchBox")
@@ -214,7 +214,7 @@ function fcoglWindowClass:Setup(listType)
         end
         --Search
         self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("SearchDrop"))
-        fcoglUI.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, listType, "name")
+        self.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, listType, "name")
 
         --Search box and search functions
         self.searchBox = self.frame:GetNamedChild("SearchBox")
@@ -271,7 +271,7 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
                 if rankingData == nil or #rankingData == 0 then return false end
                 for i = 1, #rankingData do
                     local item = rankingData[i]
-                    table.insert(self.masterList, fcoglUI.CreateGuildSalesRankingEntry(item))
+                    table.insert(self.masterList, self:CreateGuildSalesRankingEntry(item))
                 end
                 --self:updateSortHeaderAnchorsAndPositions(fcoglUI.CurrentTab, settings.maxNameColumnWidth, 32)
             end
@@ -291,7 +291,7 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
             if tableWithLastDiceThrows == nil or NonContiguousCount(tableWithLastDiceThrows) == 0 then return false end
             diceHistoryLinesAdded = 0
             for _, diceThrowData in pairs(tableWithLastDiceThrows) do
-                table.insert(self.masterList, fcoglUI.CreateDiceThrowHistoryEntry(diceThrowData))
+                table.insert(self.masterList, self:CreateDiceThrowHistoryEntry(diceThrowData))
             end
         end
     end
@@ -401,12 +401,12 @@ function fcoglWindowClass:SetupItemRow(control, data, listType)
 end
 
 function fcoglWindowClass:FilterScrollList()
-    --d("[fcoglWindow:FilterScrollList]")
-    local scrollData = ZO_ScrollList_GetDataList(self.list)
-    ZO_ClearNumericallyIndexedTable(scrollData)
-
     local listType = self:GetListType()
     if not listType then return end
+    df("list:FilterScrollList-currentTab: %s, listType: %s", tostring(fcoglUI.CurrentTab), tostring(listType))
+
+    local scrollData = ZO_ScrollList_GetDataList(self.list)
+    ZO_ClearNumericallyIndexedTable(scrollData)
 
     --Get the search method chosen at the search dropdown
     --self.searchType = 1
@@ -465,7 +465,10 @@ function fcoglWindowClass:UpdateCounter(scrollData)
 end
 
 function fcoglWindowClass:BuildSortKeys()
---d("[fcoglUI.BuildSortKeys]")
+    local listType = self:GetListType()
+    if not listType then return end
+    df("list:BuildSortKeys-currentTab: %s, listType: %s", tostring(fcoglUI.CurrentTab), tostring(listType))
+
     if fcoglUI.sortKeys ~= nil and type(fcoglUI.sortKeys) == "table" then
         self.sortKeys = fcoglUI.sortKeys
     else
@@ -487,6 +490,10 @@ function fcoglWindowClass:BuildSortKeys()
 end
 
 function fcoglWindowClass:SortScrollList( )
+    local listType = self:GetListType()
+    if not listType then return end
+    df("list:SortScrollList-currentTab: %s, listType: %s", tostring(fcoglUI.CurrentTab), tostring(listType))
+
     --Build the sortkeys depending on the settings
     self:BuildSortKeys()
     --Get the current sort header's key and direction
@@ -523,6 +530,9 @@ end
 
 function fcoglWindowClass:SearchByCriteria(data, searchInput, searchType)
     if data == nil or searchInput == nil or searchInput == ""  or searchType == nil then return nil end
+    local listType = self:GetListType()
+    if not listType then return end
+
     local searchValueType = type(searchInput)
     local searchInputLower
     local searchValueIsString = false
@@ -556,6 +566,9 @@ end
 function fcoglWindowClass:CheckForMatch(data, searchInput )
     local searchType = self.searchType
     if searchType ~= nil then
+        local listType = self:GetListType()
+        if not listType then return end
+
         --Search by name
         if searchType == FCOGL_SEARCH_TYPE_NAME then
             local isMatch = false
@@ -602,27 +615,27 @@ end
 ------------------------------------------------
 --- Combo Box Initializers
 ------------------------------------------------
-function fcoglUI.initializeSearchDropdown(window, currentTab, currentListType, searchBoxType)
-    if window == nil then return false end
+function fcoglWindowClass:initializeSearchDropdown(currentTab, currentListType, searchBoxType)
+    if self == nil then return false end
     currentTab = currentTab or fcoglUI.CurrentTab or FCOGL_TAB_GUILDSALESLOTTERY
-    currentListType = currentListType or fcoglUI.CurrentListType or FCOGL_LISTTYPE_GUILD_SALES_LOTTERY
+    currentListType = currentListType or self:GetListType()
     searchBoxType = searchBoxType or "name"
     local currentTab2SearchDropValues = {
         [FCOGL_TAB_GUILDSALESLOTTERY]   = {
             [FCOGL_LISTTYPE_GUILD_SALES_LOTTERY] = {
-                ["name"] = {dropdown=window.searchDrop,  prefix=FCOGL_SEARCHDROP_PREFIX,  entryCount=FCOGL_SEARCH_TYPE_ITERATION_END,
+                ["name"] = {dropdown=self.searchDrop,  prefix=FCOGL_SEARCHDROP_PREFIX,  entryCount=FCOGL_SEARCH_TYPE_ITERATION_END,
                             exclude = {
                                 [FCOGL_SEARCH_TYPE_NAME]     = false,
                             }, --exclude the search entries from the set search
                 },
-                ["guilds"] = {dropdown=window.guildsDrop,  prefix=FCOGL_GUILDSDROP_PREFIX,  entryCount=#FCOGuildLottery.guildsData + 1, --5 guilds + 1 non-guild entry
+                ["guilds"] = {dropdown=self.guildsDrop,  prefix=FCOGL_GUILDSDROP_PREFIX,  entryCount=#FCOGuildLottery.guildsData + 1, --5 guilds + 1 non-guild entry
                               exclude = {
                                   [FCOGL_SEARCH_TYPE_NAME]     = false,
                               }, --exclude the search entries from the set search
                 },
             },
             [FCOGL_LISTTYPE_ROLLED_DICE_HISTORY] = {
-                ["name"] = {dropdown=window.searchDrop,  prefix=FCOGL_SEARCHDROP_PREFIX,  entryCount=FCOGL_SEARCH_TYPE_ITERATION_END,
+                ["name"] = {dropdown=self.searchDrop,  prefix=FCOGL_SEARCHDROP_PREFIX,  entryCount=FCOGL_SEARCH_TYPE_ITERATION_END,
                             exclude = {
                                 [FCOGL_SEARCH_TYPE_NAME]     = false,
                             }, --exclude the search entries from the set search
@@ -634,25 +647,26 @@ function fcoglUI.initializeSearchDropdown(window, currentTab, currentListType, s
     local searchDropData = searchDropAtTab[searchBoxType]
     if searchDropData == nil then return false end
     --d(">searchDropData: " .. tostring(searchDropData.dropdown) ..", " ..tostring(searchDropData.prefix) .. ", " .. tostring(searchDropData.entryCount))
-    window:InitializeComboBox(searchDropData.dropdown, searchDropData.prefix, searchDropData.entryCount, searchDropData.exclude, searchBoxType )
+    self:InitializeComboBox(searchDropData.dropdown, searchDropData.prefix, searchDropData.entryCount, searchDropData.exclude, searchBoxType )
 end
 
 function fcoglUI.SelectLastDropdownEntry(searchBoxType, lastIndex, callCallback)
-    if searchBoxType == nil or lastIndex == nil or lastIndex <= 0 then return end
     callCallback = callCallback or false
+    df("SelectLastDropdownEntry - lastIndex: %s, searchBoxType: %s, callCallback: %s", tostring(lastIndex), tostring(searchBoxType), tostring(callCallback))
+    if searchBoxType == nil or lastIndex == nil or lastIndex <= 0 then return end
     local comboBox
     if searchBoxType == "guilds" then
-        local guildsDrop = fcoglUIwindow.frame.guildsDrop
+        local guildsDrop = fcoglUIwindow.guildsDrop
         if guildsDrop == nil then return end
-        comboBox = guildsDrop.m_comboBox
+        comboBox = guildsDrop
 
     elseif searchBoxType == "name" then
-        local searchDrop = fcoglUIwindow.frame.searchDrop
+        local searchDrop = fcoglUIwindow.searchDrop
         if searchDrop == nil then return end
-        comboBox = searchDrop.m_comboBox
+        comboBox = searchDrop
     end
 
-    if not comboBox then return end
+    if not comboBox or comboBox and not comboBox.SelectItemByIndex then return end
     local callItemEntryCallback = ZO_COMBOBOX_UPDATE_NOW
     if not callCallback then
         callItemEntryCallback = ZO_COMBOBOX_SUPPRESS_UPDATE
@@ -661,6 +675,7 @@ function fcoglUI.SelectLastDropdownEntry(searchBoxType, lastIndex, callCallback)
 end
 
 local function abortUpdateNow(p_searchBoxType, p_lastIndex)
+    df(">abortUpdateNow - lastIndex: %s, searchBoxType: %s", tostring(p_lastIndex), tostring(p_searchBoxType))
     --Select the before selected dropdown entry but without calling the callback
     fcoglUI.SelectLastDropdownEntry(p_searchBoxType, p_lastIndex, false)
 end
@@ -668,11 +683,11 @@ end
 function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, searchBoxType )
     local isGuildsCB = ((prefix == FCOGL_GUILDSDROP_PREFIX) or searchBoxType == "guilds") or false
     local isNameSearchCB = ((prefix == FCOGL_SEARCHDROP_PREFIX) or searchBoxType == "name") or false
---d("[fcoglWindow:InitializeComboBox]isSetSearchCB: " .. tostring(isSetSearchCB) .. ", isCharCB: " .. tostring(isCharCB) .. ", prefix: " .. tostring(prefix) ..", max: " .. tostring(max))
+df("[fcoglWindowClass:InitializeComboBox]isGuildsCB: " .. tostring(isGuildsCB) .. ", isNameSearchCB: " .. tostring(isNameSearchCB) .. ", prefix: " .. tostring(prefix) ..", max: " .. tostring(max))
     control:SetSortsItems(false)
     control:ClearItems()
 
-    local entryCallbackNoGuild = function( _, _, entry, selectionChanged, oldItem ) --comboBox, entryText, entry, selectionChanged, oldItem )
+    local entryCallbackNoGuild = function( _, _, entry, _ ) --comboBox, entryText, entry )
         --No guild selected!
         FCOGuildLottery.ResetCurrentGuildSalesLotteryData(true, false, nil, nil)
         local lastSelectedIndex = self:GetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType)
@@ -685,8 +700,10 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
     end
 
     --Combobox entry selected calback function
-    local entryCallbackGuild = function( _, _, entry, selectionChanged, oldItem ) --comboBox, entryText, entry, selectionChanged, oldItem )
+    local entryCallbackGuild = function( _, _, entry, _ ) --comboBox, entryText, entry, selectionChanged )
+        df(">entryCallbackGuild - selectedIndex: %s, id: %s searchBoxType: %s", tostring(entry.selectedIndex), tostring(entry.id), tostring(searchBoxType))
         local function updateEntryNow(guildIndex, daysBefore)
+            df(">>updateEntryNow - selectedIndex: %s, CurrentTab: %s searchBoxType: %s", tostring(entry.selectedIndex), tostring(fcoglUI.CurrentTab), tostring(searchBoxType))
             self:SetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType, entry.selectedIndex)
             fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true)
             FCOGuildLottery.NewGuildSalesLottery(guildIndex, daysBefore)
@@ -707,7 +724,8 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
 
     end
 
-    local entryCallbackName = function( _, _, entry, selectionChanged, oldItem ) --comboBox, entryText, entry, selectionChanged, oldItem )
+    local entryCallbackName = function( _, _, entry, _ ) --comboBox, entryText, entry, selectionChanged )
+df(">entryCallbackName - selectedIndex: %s, id: %s searchBoxType: %s", tostring(entry.selectedIndex), tostring(entry.id), tostring(searchBoxType))
         self:SetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType, entry.selectedIndex)
         self:RefreshFilters()
     end
@@ -935,7 +953,7 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 --FCOGuildLottery UI functions
 
-function fcoglUI.CreateGuildSalesRankingEntry(item)
+function fcoglWindowClass:CreateGuildSalesRankingEntry(item)
     --local uniqueId = FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier
     --local guildId = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId
     --[[
@@ -958,7 +976,7 @@ function fcoglUI.CreateGuildSalesRankingEntry(item)
     return guildSalesRankingLine
 end
 
-function fcoglUI.CreateDiceThrowHistoryEntry(diceRolledData)
+function fcoglWindowClass:CreateDiceThrowHistoryEntry(diceRolledData)
     --[[
         --Columns of "diceRolledData":
         --characterId
@@ -1034,13 +1052,12 @@ end
 
 function fcoglUI.saveSortGroupHeader(currentTab)
 --d("[WL.saveSortGroupHeader]")
+    local settings = FCOGuildLottery.settingsVars.settings
     if fcoglUIwindow ~= nil then
-        local settings = FCOGuildLottery.settingsVars.settings
         settings.UIwindow.sortKeys[currentTab][FCOGL_LISTTYPE_GUILD_SALES_LOTTERY]  = fcoglUIwindow.currentSortKey
         settings.UIwindow.sortOrder[currentTab][FCOGL_LISTTYPE_GUILD_SALES_LOTTERY] = fcoglUIwindow.currentSortOrder
     end
     if fcoglUIDiceHistoryWindow ~= nil and fcoglUIDiceHistoryWindow.frame ~= nil and not fcoglUIDiceHistoryWindow.frame:IsControlHidden() then
-        local settings = FCOGuildLottery.settingsVars.settings
         settings.UIwindow.sortKeys[currentTab][FCOGL_LISTTYPE_ROLLED_DICE_HISTORY]  = fcoglUIDiceHistoryWindow.currentSortKey
         settings.UIwindow.sortOrder[currentTab][FCOGL_LISTTYPE_ROLLED_DICE_HISTORY] = fcoglUIDiceHistoryWindow.currentSortOrder
     end
@@ -1096,9 +1113,8 @@ end
 
 function fcoglWindowClass:UpdateUI(state)
     fcoglUI.CurrentState = state
-    --d("[fcoglWindow:UpdateUI] state: " ..tostring(state) .. ", currentTab: " ..tostring(fcoglUI.CurrentTab))
-
     local listType = self:GetListType()
+    df("[window:UpdateUI] state: %s, currentTab: %s, listType: %s", tostring(state), tostring(fcoglUI.CurrentTab), tostring(listType))
     if listType == nil then return end
 
     local frameControl = self.frame
@@ -1128,7 +1144,7 @@ function fcoglWindowClass:UpdateUI(state)
                 self.frame:GetNamedChild("GuildsDrop"):SetHidden(false)
 
                 --Hide/Unhide the dice history frame
-                fcoglUI:ToggleDiceRollHistory(FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden)
+                fcoglUI.ToggleDiceRollHistory(FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden)
 
                 --Unhide the scroll list
                 self.frame:GetNamedChild("List"):SetHidden(false)
@@ -1168,10 +1184,10 @@ end -- fcoglWindow:UpdateUI(state)
 
 --Change the tabs at the WishList menu
 function fcoglUI.SetTab(index, override)
---df("SetTab - index: %s, override: %s", tostring(index), tostring(override))
+df("[SetTab] - index: %s, override: %s", tostring(index), tostring(override))
     if not fcoglUIwindow then return end
     --Do not activate active tab
-    if fcoglUI.CurrentTab and (override == true or fcoglUI.CurrentTab ~= index) then
+    if fcoglUI.CurrentTab ~= nil and (override == true or fcoglUI.CurrentTab ~= index) then
         --Save the current sort order and key
         fcoglUI.saveSortGroupHeader(fcoglUI.CurrentTab)
         --Change to the new tab
@@ -1181,21 +1197,21 @@ function fcoglUI.SetTab(index, override)
         fcoglUIwindow.masterList = {}
         --Reset variable
         fcoglUI.comingFromSortScrollListSetupFunction = false
-        --Update the UI (hide/show items)
+        --Update the UI (hide/show items), and also check for the dice roll history to show
         fcoglUIwindow:UpdateUI(fcoglUI.CurrentState)
     end
 end
 
 --Toggle the dice roll history "attached" window part at the right
-function fcoglUI:ToggleDiceRollHistory(setHidden)
---d(">ToggleDiceRollHistory - setHidden: " ..tostring(setHidden))
+function fcoglUI.ToggleDiceRollHistory(setHidden)
+df("[ToggleDiceRollHistory] - setHidden: %s", tostring(setHidden))
     local frameControl = fcoglUIwindow and fcoglUIwindow.frame
     if frameControl == nil or frameControl:IsControlHidden() then return end
     local frameDiceHistoryControl = fcoglUIDiceHistoryWindow and fcoglUIDiceHistoryWindow.control
     if frameDiceHistoryControl == nil then return end
     local isHidden = frameDiceHistoryControl:IsControlHidden()
     local newState = (setHidden ~= nil and setHidden) or (not isHidden)
-
+df(">newHiddenState: %s", tostring(newState) )
     frameDiceHistoryControl:SetHidden(newState)
     --(Un)hide the scroll list
     fcoglUIDiceHistoryWindow.list:SetHidden(newState)
@@ -1222,5 +1238,6 @@ function fcoglUI:ToggleDiceRollHistory(setHidden)
     if newState == false then
         ZO_ScrollList_Clear(fcoglUIDiceHistoryWindow.list)
         fcoglUIDiceHistoryWindow.masterList = {}
+        fcoglUIDiceHistoryWindow:RefreshFilters()
     end
 end
