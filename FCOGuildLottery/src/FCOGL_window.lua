@@ -117,7 +117,7 @@ function fcoglWindowClass:Setup(listType)
     if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
         --Scroll UI
         ZO_ScrollList_AddDataType(self.list, fcoglUI.SCROLLLIST_DATATYPE_GUILDSALESRANKING, "FCOGLRowGuildSales", 30, function(control, data)
-            self:SetupItemRow(control, data, listType)
+            self:SetupItemRow(control, data, self.listType)
         end)
         ZO_ScrollList_EnableHighlight(self.list, "ZO_ThinListHighlight")
         self:SetAlternateRowBackgrounds(true)
@@ -140,10 +140,10 @@ function fcoglWindowClass:Setup(listType)
         end
         --Search
         self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("SearchDrop"))
-        self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, listType, "name")
+        self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "name")
         --Guilds
         self.guildsDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("GuildsDrop"))
-        self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, listType, "guilds")
+        self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "guilds")
 
         --Search box and search functions
         self.searchBox = self.frame:GetNamedChild("SearchBox")
@@ -195,7 +195,7 @@ function fcoglWindowClass:Setup(listType)
 
         --Scroll UI
         ZO_ScrollList_AddDataType(self.list, fcoglUI.SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY, "FCOGLRowDiceHistory", 30, function(control, data)
-            self:SetupItemRow(control, data, listType)
+            self:SetupItemRow(control, data, self.listType)
         end)
         ZO_ScrollList_EnableHighlight(self.list, "ZO_ThinListHighlight")
         self:SetAlternateRowBackgrounds(true)
@@ -218,7 +218,7 @@ function fcoglWindowClass:Setup(listType)
         end
         --Search
         self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("SearchDrop"))
-        self.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, listType, "name")
+        self.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "name")
 
         --Search box and search functions
         self.searchBox = self.frame:GetNamedChild("SearchBox")
@@ -245,9 +245,9 @@ function fcoglWindowClass:Setup(listType)
 
     end
 
-    self.headers:SetHidden(true)
-    self.list = self.frame:GetNamedChild("List")
-    self.list:SetHidden(true)
+    --self.headers:SetHidden(true)
+    --self.list = self.frame:GetNamedChild("List")
+    --self.list:SetHidden(true)
 
     --[[
         --self:RefreshData() will run:
@@ -267,13 +267,14 @@ end
 function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
     calledFromFilterFunction = calledFromFilterFunction or false
     local listType = self:GetListType()
-    df("list:BuildMasterList-calledFromFilterFunction: %s, currentTab: %s, listType: %s", tostring(calledFromFilterFunction), tostring(fcoglUI.CurrentTab), tostring(listType))
+    local guildSalesLotteryActive = isGuildSalesLotteryActive()
+
+    df("list:BuildMasterList-calledFromFilterFunction: %s, currentTab: %s, listType: %s, guildLotteryActive: %s", tostring(calledFromFilterFunction), tostring(fcoglUI.CurrentTab), tostring(listType), tostring(guildSalesLotteryActive))
     if listType == nil then return end
 
     if fcoglUI.CurrentTab == FCOGL_TAB_GUILDSALESLOTTERY then
         --Guild sales lottery is active?
 
-        local guildSalesLotteryActive = isGuildSalesLotteryActive()
 
         if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
             if guildSalesLotteryActive == true then
@@ -317,8 +318,8 @@ end
 
 --Setup the data of each row which gets added to the ZO_SortFilterList
 function fcoglWindowClass:SetupItemRow(control, data, listType)
---df("SetupItemRow")
-    if fcoglUI.comingFromSortScrollListSetupFunction then return end
+--df("SetupItemRow - listType: %s,comingFromSortScrollListSetupFunction: %s", tostring(listType), tostring(fcoglUI.comingFromSortScrollListSetupFunction))
+    --if fcoglUI.comingFromSortScrollListSetupFunction then return end
 
     if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
         --local clientLang = fcoglUI.clientLang or fcoglUI.fallbackSetLang
@@ -380,8 +381,9 @@ function fcoglWindowClass:SetupItemRow(control, data, listType)
     elseif listType == FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
         --local clientLang = fcoglUI.clientLang or fcoglUI.fallbackSetLang
         control.data = data
+
         --local updateSortHeaderDimensionsAndAnchors = false
-        local noColumn = control:GetNamedChild("No")
+        local noColumn   = control:GetNamedChild("No")
         local dateColumn = control:GetNamedChild("DateTime")
         local nameColumn = control:GetNamedChild("Name")
         local rollColumn = control:GetNamedChild("Roll")
@@ -441,7 +443,7 @@ function fcoglWindowClass:FilterScrollList()
     end
     ------------------------------------------------------------------------------------------------------------------------
     --Rebuild the masterlist so the total list and counts are correct!
-    checkIfMasterListRebuildNeeded(self)
+    --checkIfMasterListRebuildNeeded(self)
     if fcoglUI.CurrentTab == FCOGL_TAB_GUILDSALESLOTTERY then
         if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
             for i = 1, #self.masterList do
@@ -520,7 +522,7 @@ function fcoglWindowClass:SortScrollList( )
 --d("[fcoglWindow:SortScrollList] sortKey: " .. tostring(self.currentSortKey) .. ", sortOrder: " ..tostring(self.currentSortOrder))
 	if (self.currentSortKey ~= nil and self.currentSortOrder ~= nil) then
         --If not coming from setup function
-        if fcoglUI.comingFromSortScrollListSetupFunction then return end
+        --if fcoglUI.comingFromSortScrollListSetupFunction then return end
         --Update the scroll list and re-sort it -> Calls "SetupItemRow" internally!
 		local scrollData = ZO_ScrollList_GetDataList(self.list)
         if scrollData and #scrollData > 0 then
