@@ -60,14 +60,14 @@ end
 local function IsGuildIndexValid(guildIndex)
     return (guildIndex ~= nil and guildIndex >= 1 and guildIndex <= MAX_GUILDS) or false
 end
-FCOGL.IsGuildIndexValid = IsGuildIndexValid
+FCOGuildLottery.IsGuildIndexValid = IsGuildIndexValid
 
 local function getGuildIdAndName(guildIndex)
     local guildId = GetGuildId(guildIndex)
     local guildName = ZO_CachedStrFormat(SI_UNIT_NAME, GetGuildName(guildId))
     return guildId, guildName
 end
-FCOGL.getGuildIdAndName = getGuildIdAndName
+FCOGuildLottery.getGuildIdAndName = getGuildIdAndName
 
 
 local function chatOutputRolledDice(rolledDiceSide, rolledName, guildIndex)
@@ -93,6 +93,13 @@ local function chatOutputRolledDice(rolledDiceSide, rolledName, guildIndex)
         end
         --"#<<1>>, congratulations to \'<<C:2>>\'"
         StartChatInput(zo_strformat(chatText, tostring(rolledDiceSide), tostring(rolledName)), chatChannel, nil)
+    end
+end
+
+local function checkIfPendingSellEventAndResetGuildSalesLottery(guildId)
+    if FCOGuildLottery.IsSellEventPendingForGuildId(guildId) == true then
+        FCOGuildLottery.ResetCurrentGuildSalesLotteryData(true, false, nil, nil, nil, nil)
+        return
     end
 end
 
@@ -550,7 +557,7 @@ function FCOGuildLottery.GetGuildSalesMemberCount(guildId, daysToGetBefore, star
     local currentlyUsedGuildSalesLotteryMemberCount = FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberCount
     if FCOGuildLottery.currentlyUsedGuildSalesLotteryData ~= nil and currentlyUsedGuildSalesLotteryMemberCount ~= nil and currentlyUsedGuildSalesLotteryMemberCount > 0 then
         df(">currentlyUsedGuildSalesLotteryMemberCount: " ..tostring(currentlyUsedGuildSalesLotteryMemberCount))
---d(">currentlyUsedGuildSalesLotteryMemberCount: " ..tostring(currentlyUsedGuildSalesLotteryMemberCount))
+        --d(">currentlyUsedGuildSalesLotteryMemberCount: " ..tostring(currentlyUsedGuildSalesLotteryMemberCount))
         return currentlyUsedGuildSalesLotteryMemberCount
     else
         --Check the sales data for the guildId
@@ -571,16 +578,14 @@ function FCOGuildLottery.GetGuildSalesMemberCount(guildId, daysToGetBefore, star
         ]]
 
         --Is the listener of this guild still working?
-        if FCOGuildLottery.IsSellEventPendingForGuildId(guildId) == true then
-            FCOGuildLottery.ResetCurrentGuildSalesLotteryData(true, false)
-            return
-        end
+        if checkIfPendingSellEventAndResetGuildSalesLottery(guildId) then return end
+
         --df(">got here 1: Listener okay, data should be there")
         if FCOGuildLottery.guildSellStats ~= nil then
             local sellStatsOfGuildId = FCOGuildLottery.guildSellStats[guildId]
             if sellStatsOfGuildId ~= nil then
                 uniqueIdentifier = uniqueIdentifier or buildUniqueId(guildId, daysToGetBefore)
---d(">uniqueIdentifier: " ..tostring(uniqueIdentifier) .. ", daysToGetBefore: " ..tostring(daysToGetBefore))
+                --d(">uniqueIdentifier: " ..tostring(uniqueIdentifier) .. ", daysToGetBefore: " ..tostring(daysToGetBefore))
                 local sellStatsDetailsOfGuildId = sellStatsOfGuildId[uniqueIdentifier]
                 if sellStatsDetailsOfGuildId ~= nil then
                     --df(">got here 2 - uniqueId data found")
@@ -745,9 +750,33 @@ function FCOGuildLottery.RollTheDiceWithDefaultSides(noChatOutput)
     if sidesOfDice <= 0 then sidesOfDice = FCOGL_DICE_SIDES_DEFAULT end
     df( "RollTheDiceWithDefaultSides - noChatOutput: " .. tostring(noChatOutput))
 
-    FCOGuildLottery.currentlyUsedDiceRollType = FCOGL_DICE_ROLL_TYPE_GENERIC
-
-    FCOGuildLottery.RollTheDice(sidesOfDice, noChatOutput)
+    local diceRollData = FCOGuildLottery.RollTheDice(sidesOfDice, noChatOutput)
+FCOGuildLottery._diceRollDataWithDefaultSides = diceRollData
+    if diceRollData ~= nil then
+        --Is the UI currently shown?
+        local fcoglUI = FCOGuildLottery.UI
+        local fcoglUIwindow = fcoglUI and fcoglUI.window
+        local fcoglDiceHistorywindow = fcoglUI and fcoglUI.diceHistoryWindow
+        if fcoglUIwindow ~= nil and fcoglDiceHistorywindow ~= nil then
+            local windowFrame = fcoglUIwindow.frame
+            local diceHistoryWindowFrame = fcoglDiceHistorywindow.frame
+            if windowFrame:IsControlHidden() then
+                --Setting "Show UI" -> Create UI now and show it
+                if FCOGuildLottery.settingsVars.settings.showUIAfterDiceRoll == true then
+                    fcoglUI.Show(true)
+                end
+            end
+            if not windowFrame:IsControlHidden() then
+                --Set the UI tab to "Guild Sales Lottery" and refresh the data
+                --fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true) --activate even if already shown, to update it
+                if not diceHistoryWindowFrame:IsControlHidden() then
+d(">Updating the dice history window list")
+                    --Only update the dice history list
+                    fcoglDiceHistorywindow:RefreshData()
+                end
+            end
+        end
+    end
 end
 
 --Roll the dice with pre-defined sides of the dice. Do further checks for a guild sales lottery, or other guild related
@@ -808,12 +837,8 @@ df( "RollTheDice - sidesOfDice: " ..tostring(sidesOfDice)  ..", noChatOutput: " 
     local guildId = FCOGuildLottery.currentlyUsedDiceRollGuildId
     local rolledGuildMemberDisplayName, memberNote, rankIndex, playerStatus, secsSinceLogoff, guildIndex, soldSum
     if guildId ~= nil then
-        --Was the roll done via a generic slash command?
-        --Or was the roll done for a x days sales lottery of a guild?
-        if isGuildSalesLottery == true then
-            --Get the guildMember with the rolled dice value (or if guild sales lotter: from the sales history data -> via LibHistoire)
-            rolledGuildMemberDisplayName, memberNote, rankIndex, playerStatus, secsSinceLogoff, guildIndex, soldSum = FCOGuildLottery.GetRolledGuildMemberInfo(guildId, diceSide, isGuildSalesLottery)
-        end
+        --Get the guildMember with the rolled dice value (or if guild sales lottery: from the sales history data -> via LibHistoire)
+        rolledGuildMemberDisplayName, memberNote, rankIndex, playerStatus, secsSinceLogoff, guildIndex, soldSum = FCOGuildLottery.GetRolledGuildMemberInfo(guildId, diceSide, isGuildSalesLottery)
         if rolledGuildMemberDisplayName == nil then return end
     end
     local diceRollData = {
@@ -841,7 +866,7 @@ df( "RollTheDice - sidesOfDice: " ..tostring(sidesOfDice)  ..", noChatOutput: " 
     end
     if not noChatOutput then
         local diceTypeStr
-        local settings = FCOGuildLottery.settingsVars.settings
+        --local settings = FCOGuildLottery.settingsVars.settings
         if guildId ~= nil then
             local guildName = GetGuildName(guildId)
             if isGuildSalesLottery == true then
@@ -885,39 +910,46 @@ end
 --Reset the stored / last used data and enable a new lottery dice throw, where the popups of guild and timeFrame selection
 --are showing up again
 function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, startingNewLottery, guildIndex, daysBefore, callbackYes, callbackNo)
+    d("FCOGuildLottery.ResetCurrentGuildSalesLotteryData - noSecurityQuestion: " ..tostring(noSecurityQuestion) .. ", startingNewLottery: " ..tostring(startingNewLottery) .. ", guildIndex: " ..tostring(guildIndex) .. ", daysBefore: " ..tostring(daysBefore))
     noSecurityQuestion = noSecurityQuestion or false
     local resetDataNow = false
-    if not noSecurityQuestion then
+    --ONLY resetting the data?
+    if noSecurityQuestion == true and startingNewLottery == false and guildIndex == nil and daysBefore == nil then
+        resetDataNow = true
+    else
         if FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier ~= nil then
-            resetDataNow = false
-            --Show security question dialog
-            --Do you really want to reset... ?
-            local resetGuildSalesLotteryDialogName = FCOGuildLottery.getDialogName("resetGuildSalesLottery")
-            df("dialogName: %s", tostring(resetGuildSalesLotteryDialogName))
-            if resetGuildSalesLotteryDialogName ~= nil and not ZO_Dialogs_IsShowingDialog(resetGuildSalesLotteryDialogName) then
-                local data = {
-                    title       = "Reset guild sales lottery",
-                    question    = "Do you want to reset the currently\nactive guild sales lottery?",
-                    callbackData = {
-                        yes = function()
-                            if callbackYes ~= nil and type(callbackYes) == "function" then
-                                resetCurrentGuildSalesLotteryData(false, guildIndex, daysBefore)
-                                callbackYes(guildIndex, daysBefore)
-                            else
+            if not noSecurityQuestion then
+                --Show security question dialog
+                --Do you really want to reset... ?
+                local resetGuildSalesLotteryDialogName = FCOGuildLottery.getDialogName("resetGuildSalesLottery")
+                df("dialogName: %s", tostring(resetGuildSalesLotteryDialogName))
+                if resetGuildSalesLotteryDialogName ~= nil and not ZO_Dialogs_IsShowingDialog(resetGuildSalesLotteryDialogName) then
+                    local data = {
+                        title       = "Reset guild sales lottery",
+                        question    = "Do you want to reset the currently\nactive guild sales lottery?",
+                        callbackData = {
+                            yes = function()
                                 resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex, daysBefore)
+                                if callbackYes ~= nil and type(callbackYes) == "function" then
+                                    callbackYes(guildIndex, daysBefore)
+                                end
+                            end,
+                            no  = function()
+                                if callbackNo ~= nil and type(callbackNo) == "function" then
+                                    callbackNo(guildIndex, daysBefore)
+                                end
                             end
-                        end,
-                        no  = function()
-                            if callbackNo ~= nil and type(callbackNo) == "function" then
-                                callbackNo(guildIndex, daysBefore)
-                            end
-                        end
-                    },
-                }
-                ZO_Dialogs_ShowDialog(resetGuildSalesLotteryDialogName, data, nil, nil)
+                        },
+                    }
+                    ZO_Dialogs_ShowDialog(resetGuildSalesLotteryDialogName, data, nil, nil)
+                end
+            else
+                resetDataNow = true
             end
         else
-            resetDataNow = true
+            if resetDataNow == false and startingNewLottery == true then
+                resetDataNow = true
+            end
         end
     end
     if resetDataNow == true then
@@ -927,13 +959,12 @@ end
 
 --Build the ranks list and get number of members having sold something in the timeframe
 function FCOGuildLottery.BuildGuildSalesMemberRank(guildId, daysBefore, startTime, endTime, uniqueIdentifier)
-df( "BuildGuildSalesMemberRank - guildId: %s, endTime: %s, daysBefore: %s, startTime: %s, uniqueId: %s", tostring(guildId), os.date("%c", endTime), tostring(daysBefore), os.date("%c", startTime) , tostring(uniqueIdentifier))
---d( string.format("BuildGuildSalesMemberRank - guildId: %s, endTime: %s, daysBefore: %s, startTime: %s, uniqueId: %s", tostring(guildId), os.date("%c", endTime), tostring(daysBefore), os.date("%c", startTime) , tostring(uniqueIdentifier)))
+    df( "BuildGuildSalesMemberRank - guildId: %s, endTime: %s, daysBefore: %s, startTime: %s, uniqueId: %s", tostring(guildId), os.date("%c", endTime), tostring(daysBefore), os.date("%c", startTime) , tostring(uniqueIdentifier))
+    --d( string.format("BuildGuildSalesMemberRank - guildId: %s, endTime: %s, daysBefore: %s, startTime: %s, uniqueId: %s", tostring(guildId), os.date("%c", endTime), tostring(daysBefore), os.date("%c", startTime) , tostring(uniqueIdentifier)))
     if guildId == nil or guildId == 0 then return end
-    if FCOGuildLottery.IsSellEventPendingForGuildId(guildId) == true then
-        FCOGuildLottery.ResetCurrentGuildSalesLotteryData(true, false)
-        return
-    end
+
+    if checkIfPendingSellEventAndResetGuildSalesLottery(guildId) then return end
+
     local guildSalesMemberCount = FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberCount
     if guildSalesMemberCount == nil or guildSalesMemberCount == 0 then
         guildSalesMemberCount = FCOGuildLottery.GetGuildSalesMemberCount(
@@ -944,8 +975,8 @@ df( "BuildGuildSalesMemberRank - guildId: %s, endTime: %s, daysBefore: %s, start
                 uniqueIdentifier
         )
     end
-df(">guildSalesMemberCount: " ..tostring(guildSalesMemberCount))
---d(">guildSalesMemberCount: " ..tostring(guildSalesMemberCount))
+    df(">guildSalesMemberCount: " ..tostring(guildSalesMemberCount))
+    --d(">guildSalesMemberCount: " ..tostring(guildSalesMemberCount))
     return guildSalesMemberCount
 end
 
@@ -954,7 +985,6 @@ end
 --/
 function FCOGuildLottery.RollTheDiceForGuildSalesLottery(noChatOutput)
     noChatOutput = noChatOutput or false
---d("RollTheDiceForGuildSalesLottery")
 df( "RollTheDiceForGuildSalesLottery - noChatOutput: %s", tostring(noChatOutput) )
     local guildId
     local guildIndex
@@ -1129,14 +1159,36 @@ function FCOGuildLottery.StartNewGuildSalesLottery(guildIndex, daysBefore, dataW
     dataWasResetAlready = dataWasResetAlready or false
     if not dataWasResetAlready then
         --Reset and show dialog asking before, if any guild sales lottery is already active
-        FCOGuildLottery.ResetCurrentGuildSalesLotteryData(false, true, guildIndex, daysBefore)
+        FCOGuildLottery.ResetCurrentGuildSalesLotteryData(false, true, guildIndex, daysBefore, nil, nil)
     else
         FCOGuildLottery.NewGuildSalesLottery(guildIndex, daysBefore)
     end
 end
 
+function FCOGuildLottery.RollTheDiceNormalForGuildMemberCheck(guildIndex, noChatOutput)
+    noChatOutput = noChatOutput or false
+    local function abortFunc()
+        FCOGuildLottery.currentlyUsedDiceRollGuildName = nil
+        FCOGuildLottery.currentlyUsedDiceRollGuildId = nil
+        FCOGuildLottery.currentlyUsedDiceRollType =  FCOGL_DICE_ROLL_TYPE_GENERIC
+        return
+    end
+    if not IsGuildIndexValid(guildIndex) then
+        return abortFunc()
+    end
+    local diceSidesGuild = FCOGuildLottery.GetGuildMemberCount(guildIndex)
+    if not diceSidesGuild or diceSidesGuild == 0 then
+        return abortFunc()
+    end
+
+    FCOGuildLottery.currentlyUsedDiceRollGuildName, FCOGuildLottery.currentlyUsedDiceRollGuildId = FCOGuildLottery.GetGuildName(guildIndex, noChatOutput, true)
+    FCOGuildLottery.currentlyUsedDiceRollType = FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC
+    return diceSidesGuild
+end
+
 function FCOGuildLottery.RollTheDiceCheck(noChatOutput)
     noChatOutput = noChatOutput or false
+    df( "RollTheDiceCheck - noChatOutput: " .. tostring(noChatOutput))
     if FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier ~= nil and
         FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= nil and
         FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId ~= nil then
@@ -1145,8 +1197,6 @@ function FCOGuildLottery.RollTheDiceCheck(noChatOutput)
         FCOGuildLottery.RollTheDiceWithDefaultSides(noChatOutput)
     end
 end
-
-
 
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
@@ -1168,7 +1218,7 @@ function FCOGuildLottery.parseSlashCommandArguments(args, firstArg)
                 return intVal
             end
         else
-            --Default dice sides = FCOGL_MAX_DICE_SIDES (500)
+            --Default dice sides = FCOGL_MAX_DICE_SIDES (999)
             return FCOGL_MAX_DICE_SIDES
         end
 

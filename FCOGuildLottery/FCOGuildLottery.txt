@@ -7,7 +7,7 @@
 ## SavedVariables: FCOGuildLottery_Settings
 ## DependsOn: LibAsync>=20301 LibAddonMenu-2.0>=32 LibCustomMenu>=694  LibHistoire>=392
 ## OptionalDependsOn: LibDebugLogger>=201
-## OptionalDependsOn: MasterMerchant>=3514 TamrielTradeCenter ArkadiusTradeTools ArkadiusTradeToolsSales
+## OptionalDependsOn: MasterMerchant>=3514 TamrielTradeCentre ArkadiusTradeTools ArkadiusTradeToolsSales
 
 ## Libraries
 ## Not included, please check the addon description and install them as standalone libraries!
