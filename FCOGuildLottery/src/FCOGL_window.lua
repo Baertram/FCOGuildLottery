@@ -126,9 +126,13 @@ function fcoglWindowClass:Setup(listType)
 
         --Build the sortkeys depending on the settings
         --self:BuildSortKeys() --> Will be called internally in "self.sortHeaderGroup:SelectAndResetSortForKey"
-        self.currentSortKey = "name"
-        self.currentSortOrder = ZO_SORT_ORDER_UP
-        self.sortHeaderGroup:SelectAndResetSortForKey(self.currentSortKey) -- Will call "SortScrollList" internally
+        --Default values
+        --self.currentSortKey, self.currentSortOrder = fcoglUI.loadSortGroupHeader(fcoglUI.CurrentTab, self.listType)
+        --self.sortHeaderGroup:SelectAndResetSortForKey(self.currentSortKey) -- Will call "SortScrollList" internally
+        local currentSortKey, currentSortOrder = fcoglUI.loadSortGroupHeader(fcoglUI.CurrentTab, self.listType)
+        df(">Setup List 1 BEFORE - self.currentSortKey: %s, self.currentSortOrder: %s, svCurrentSortKey: %s, svCurrentSortOrder: %s", tostring(self.currentSortKey), tostring(self.currentSortOrder), tostring(currentSortKey), tostring(currentSortOrder))
+        self:resetSortGroupHeader(fcoglUI.CurrentTab, self.listType)
+        df(">>Setup List 1 AFTER self.currentSortOrder: %s", tostring(self.currentSortOrder))
         --The sort function
         self.sortFunction = function( listEntry1, listEntry2 )
             if     self.currentSortKey == nil or self.sortKeys[self.currentSortKey] == nil
@@ -204,9 +208,10 @@ function fcoglWindowClass:Setup(listType)
 
         --Build the sortkeys depending on the settings
         --self:BuildSortKeys() --> Will be called internally in "self.sortHeaderGroup:SelectAndResetSortForKey"
-        self.currentSortKey = "name"
-        self.currentSortOrder = ZO_SORT_ORDER_UP
-        self.sortHeaderGroup:SelectAndResetSortForKey(self.currentSortKey) -- Will call "SortScrollList" internally
+        --self.currentSortKey, self.currentSortOrder = fcoglUI.loadSortGroupHeader(fcoglUI.CurrentTab, self.listType)
+        --self.sortHeaderGroup:SelectAndResetSortForKey(self.currentSortKey) -- Will call "SortScrollList" internally
+        self:resetSortGroupHeader(fcoglUI.CurrentTab, self.listType)
+        df(">Setup List 2 - self.currentSortOrder: %s", tostring(self.currentSortOrder))
         --The sort function
         self.sortFunction = function( listEntry1, listEntry2 )
             if     self.currentSortKey == nil or self.sortKeys[self.currentSortKey] == nil
@@ -244,6 +249,8 @@ function fcoglWindowClass:Setup(listType)
         self.headerRoll     = self.headers:GetNamedChild("Roll")
 
     end
+
+    fcoglUI.enableSaveSortGroupHeaders(self.headers)
 
     --self.headers:SetHidden(true)
     --self.list = self.frame:GetNamedChild("List")
@@ -519,7 +526,7 @@ function fcoglWindowClass:SortScrollList( )
     --Get the current sort header's key and direction
     self.currentSortKey = self.sortHeaderGroup:GetCurrentSortKey()
     self.currentSortOrder = self.sortHeaderGroup:GetSortDirection()
---d("[fcoglWindow:SortScrollList] sortKey: " .. tostring(self.currentSortKey) .. ", sortOrder: " ..tostring(self.currentSortOrder))
+d("> sortKey: " .. tostring(self.currentSortKey) .. ", sortOrder: " ..tostring(self.currentSortOrder))
 	if (self.currentSortKey ~= nil and self.currentSortOrder ~= nil) then
         --If not coming from setup function
         --if fcoglUI.comingFromSortScrollListSetupFunction then return end
@@ -695,8 +702,6 @@ function fcoglUI.SelectLastDropdownEntry(searchBoxType, lastIndex, callCallback)
 end
 
 local function abortUpdateNow(p_searchBoxType, p_lastIndex)
-d(string.format(">abortUpdateNow - lastIndex: %s, searchBoxType: %s", tostring(p_lastIndex), tostring(p_searchBoxType)))
-
     df(">abortUpdateNow - lastIndex: %s, searchBoxType: %s", tostring(p_lastIndex), tostring(p_searchBoxType))
     --Select the before selected dropdown entry but without calling the callback
     fcoglUI.SelectLastDropdownEntry(p_searchBoxType, p_lastIndex, false)
@@ -746,10 +751,8 @@ d(">UpdateEntryNow_NoGuild")
 
     --Combobox entry selected calback function
     local entryCallbackGuild = function( _, _, entry, _ ) --comboBox, entryText, entry, selectionChanged )
-d(">entryCallbackGuild, id: " ..tostring(tostring(entry.id)))
         df(">entryCallbackGuild - selectedIndex: %s, id: %s, searchBoxType: %s", tostring(entry.selectedIndex), tostring(entry.id), tostring(searchBoxType))
         local function updateEntryNow(guildIndex, daysBefore)
-d(">UpdateEntryNow_guild - guildIndex: " ..tostring(guildIndex) .. ", daysBefore: " ..tostring(daysBefore))
             df(">>updateEntryNow - selectedIndex: %s, CurrentTab: %s searchBoxType: %s", tostring(entry.selectedIndex), tostring(fcoglUI.CurrentTab), tostring(searchBoxType))
             comboBoxOwner:SetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType, entry.selectedIndex)
 
@@ -1118,19 +1121,72 @@ function fcoglUI.OnWindowMoveStop()
     settings.UIwindow.top   = frameControl:GetTop()
 end
 
-function fcoglUI.saveSortGroupHeader(currentTab)
---d("[WL.saveSortGroupHeader]")
+function fcoglUI.loadSortGroupHeader(currentTab, listType)
     local settings = FCOGuildLottery.settingsVars.settings
+    local uiWindowSettings = settings.UIwindow
+    local sortKey = uiWindowSettings.sortKeys[currentTab] and uiWindowSettings.sortKeys[currentTab][listType]
+    if sortKey== nil then sortKey = (listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY and "name") or "datetime" end
+    local sortOrder = uiWindowSettings.sortOrder[currentTab] and uiWindowSettings.sortOrder[currentTab][listType]
+    if sortOrder == nil then sortOrder = (listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY and ZO_SORT_ORDER_UP) or ZO_SORT_ORDER_DOWN end
+    df("[fcoglUI.loadSortGroupHeader]currentTab: %s, listType: %s, sortKey: %s, sortOrder: %s", tostring(currentTab), tostring(listType), tostring(sortKey), tostring(sortOrder))
+    return sortKey, sortOrder
+end
+
+function fcoglUI.saveSortGroupHeader(currentTab)
+df("[fcoglUI.saveSortGroupHeader]currentTab: %s", tostring(currentTab))
     if fcoglUIwindow ~= nil then
-        settings.UIwindow.sortKeys[currentTab][FCOGL_LISTTYPE_GUILD_SALES_LOTTERY]  = fcoglUIwindow.currentSortKey
-        settings.UIwindow.sortOrder[currentTab][FCOGL_LISTTYPE_GUILD_SALES_LOTTERY] = fcoglUIwindow.currentSortOrder
+        fcoglUIwindow.currentSortKey = fcoglUIwindow.sortHeaderGroup:GetCurrentSortKey()
+        fcoglUIwindow.currentSortOrder = fcoglUIwindow.sortHeaderGroup:GetSortDirection()
+
+        FCOGuildLottery.settingsVars.settings.UIwindow.sortKeys[currentTab][FCOGL_LISTTYPE_GUILD_SALES_LOTTERY]  = fcoglUIwindow.currentSortKey
+        FCOGuildLottery.settingsVars.settings.UIwindow.sortOrder[currentTab][FCOGL_LISTTYPE_GUILD_SALES_LOTTERY] = fcoglUIwindow.currentSortOrder
+df(">listType: %s, sortKey: %s, sortOrder: %s", tostring(FCOGL_LISTTYPE_GUILD_SALES_LOTTERY), tostring(fcoglUIwindow.currentSortKey), tostring(fcoglUIwindow.currentSortOrder))
     end
-    if fcoglUIDiceHistoryWindow ~= nil and fcoglUIDiceHistoryWindow.frame ~= nil and not fcoglUIDiceHistoryWindow.frame:IsControlHidden() then
-        settings.UIwindow.sortKeys[currentTab][FCOGL_LISTTYPE_ROLLED_DICE_HISTORY]  = fcoglUIDiceHistoryWindow.currentSortKey
-        settings.UIwindow.sortOrder[currentTab][FCOGL_LISTTYPE_ROLLED_DICE_HISTORY] = fcoglUIDiceHistoryWindow.currentSortOrder
+    if fcoglUIDiceHistoryWindow ~= nil then
+        fcoglUIDiceHistoryWindow.currentSortKey = fcoglUIDiceHistoryWindow.sortHeaderGroup:GetCurrentSortKey()
+        fcoglUIDiceHistoryWindow.currentSortOrder = fcoglUIDiceHistoryWindow.sortHeaderGroup:GetSortDirection()
+
+        FCOGuildLottery.settingsVars.settings.UIwindow.sortKeys[currentTab][FCOGL_LISTTYPE_ROLLED_DICE_HISTORY]  = fcoglUIDiceHistoryWindow.currentSortKey
+        FCOGuildLottery.settingsVars.settings.UIwindow.sortOrder[currentTab][FCOGL_LISTTYPE_ROLLED_DICE_HISTORY] = fcoglUIDiceHistoryWindow.currentSortOrder
+df(">listType: %s, sortKey: %s, sortOrder: %s", tostring(FCOGL_LISTTYPE_ROLLED_DICE_HISTORY), tostring(fcoglUIDiceHistoryWindow.currentSortKey), tostring(fcoglUIDiceHistoryWindow.currentSortOrder))
     end
 end
 
+function fcoglUI.enableSaveSortGroupHeaders(headerControlParent)
+df("[fcoglUI.enableSaveSortGroupHeaders]currentTab: %s", tostring(fcoglUI.CurrentTab))
+    if not headerControlParent then return end
+    for i=1, headerControlParent:GetNumChildren(), 1 do
+        local headerControl = headerControlParent:GetChild(i)
+        if headerControl ~= nil then
+            --Add the handler "OnMouseUp
+            ZO_PostHookHandler(headerControl, "OnMouseUp", function(headerControlVar, mouseButton, upInside, shift, ctrl, alt, command)
+                df("sortGroupHeader clicked]currentTab: %s, headerClicked: %s, mouseButton: %s, upInside: %s", tostring(fcoglUI.CurrentTab), tostring(headerControlVar:GetName()), tostring(mouseButton), tostring(upInside))
+                if upInside then
+                    fcoglUI.saveSortGroupHeader(fcoglUI.CurrentTab)
+                end
+            end, addonName)
+        end
+    end
+end
+
+function fcoglWindowClass:resetSortGroupHeader(currentTab, listType)
+df("[fcoglWindowClass:resetSortGroupHeader]currentTab: %s, listType: %s", tostring(currentTab), tostring(listType))
+    currentTab = currentTab or fcoglUI.CurrentTab
+    listType = listType or self:GetListType()
+    if not currentTab or not listType then return end
+    if self.sortHeaderGroup ~= nil then
+        local currentSortKey, currentSortOrder
+        currentSortKey, currentSortOrder = fcoglUI.loadSortGroupHeader(fcoglUI.CurrentTab, listType)
+d("> sortKey: " .. tostring(self.currentSortKey) .. ", sortOrder: " ..tostring(self.currentSortOrder))
+        self.sortHeaderGroup:SelectAndResetSortForKey(currentSortKey)
+d("> sortKeyAfterReset: " .. tostring(self.currentSortKey) .. ", sortOrderAfterReset: " ..tostring(self.currentSortOrder))
+        --Select the sort header again to invert the sort order, if last sort order was inverted
+        if currentSortOrder == ZO_SORT_ORDER_DOWN then
+            self.sortHeaderGroup:SelectHeaderByKey(currentSortKey)
+d("> sortKeyAfterInvert: " .. tostring(self.currentSortKey) .. ", sortOrderAfterInvert: " ..tostring(self.currentSortOrder))
+        end
+    end
+end
 
 function fcoglWindowClass:updateSortHeaderAnchorsAndPositions(currentTab, nameHeaderWidth, nameHeaderHeight)
 --d("[fcoglWindowClass]:updateSortHeaderAnchorsAndPositions")
@@ -1158,32 +1214,13 @@ function fcoglWindowClass:checkNewGuildSalesLotteryButtonEnabled()
     return isEnabled
 end
 
-function fcoglWindowClass:resetSortGroupHeader(currentTab, listType)
-    --d("[fcoglWindowClass:resetSortGroupHeader]")
-    currentTab = currentTab or fcoglUI.CurrentTab
-    listType = listType or self:GetListType()
-    if not currentTab or not listType then return end
-    if self.sortHeaderGroup ~= nil then
-        local settings = FCOGuildLottery.settingsVars.settings
-        local settingsUIWindow = settings.UIwindow
-        local sortHeaderKey = settingsUIWindow.sortKeys[currentTab][listType] or "name"
-        local sortOrder = settingsUIWindow.sortOrder[currentTab][listType]
-
-        self.currentSortKey = sortHeaderKey
-        self.currentSortOrder = sortOrder
-        self.sortHeaderGroup:SelectAndResetSortForKey(sortHeaderKey)
-        --Select the sort header again to invert the sort order, if last sort order was inverted
-        if sortOrder == ZO_SORT_ORDER_DOWN then
-            self.sortHeaderGroup:SelectHeaderByKey(sortHeaderKey)
-        end
-    end
-end
-
 function fcoglWindowClass:UpdateUI(state)
     fcoglUI.CurrentState = state
     local listType = self:GetListType()
     df("[window:UpdateUI] state: %s, currentTab: %s, listType: %s", tostring(state), tostring(fcoglUI.CurrentTab), tostring(listType))
     if listType == nil then return end
+
+    --fcoglUI.saveSortGroupHeader(fcoglUI.CurrentTab)
 
     local frameControl = self.frame
     ------------------------------------------------------------------------------------------------------------------------
@@ -1193,7 +1230,6 @@ function fcoglWindowClass:UpdateUI(state)
         if fcoglUI.CurrentState == FCOGL_TAB_STATE_LOADED then
             --WLW_UpdateSceneFragmentTitle(WISHLIST_SCENE_NAME, TITLE_FRAGMENT, "Label", GetString(WISHLIST_TITLE) ..  " - " .. zo_strformat(GetString(WISHLIST_SETS_LOADED), 0))
             --updateSceneFragmentTitle(WISHLIST_SCENE_NAME, TITLE_FRAGMENT, "Label", GetString(WISHLIST_TITLE) .. " - " .. GetString(WISHLIST_BUTTON_SEARCH_TT):upper())
-
 
             if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
                 --Hide currently unused tabs
@@ -1251,7 +1287,8 @@ function fcoglWindowClass:UpdateUI(state)
             self.searchBox:Clear()
 
             --Reset the sortGroupHeader
-            self:resetSortGroupHeader(fcoglUI.CurrentTab, listType)
+            -->Currently not needed as there is only 1 tab
+            --self:resetSortGroupHeader(fcoglUI.CurrentTab, listType)
 
             self:RefreshData()
         end
@@ -1264,10 +1301,10 @@ end -- fcoglWindow:UpdateUI(state)
 function fcoglUI.SetTab(index, override)
 df("[SetTab] - index: %s, override: %s", tostring(index), tostring(override))
     if not fcoglUIwindow then return end
+    --fcoglUI.saveSortGroupHeader(fcoglUI.CurrentTab)
+
     --Do not activate active tab
     if override == true or fcoglUI.CurrentTab == nil or (fcoglUI.CurrentTab ~= nil and fcoglUI.CurrentTab ~= index) then
-        --Save the current sort order and key
-        fcoglUI.saveSortGroupHeader(fcoglUI.CurrentTab)
         --Change to the new tab
         fcoglUI.CurrentTab = index
 
@@ -1294,7 +1331,7 @@ df("[ToggleDiceRollHistory] - setHidden: %s", tostring(setHidden))
     if frameDiceHistoryControl == nil then return end
     local isHidden = frameDiceHistoryControl:IsControlHidden()
     local newState = (setHidden ~= nil and setHidden) or (not isHidden)
-df(">newHiddenState: %s", tostring(newState) )
+df(">newHiddenState: %s", tostring(newState))
 
     frameDiceHistoryControl:SetHidden(newState)
 

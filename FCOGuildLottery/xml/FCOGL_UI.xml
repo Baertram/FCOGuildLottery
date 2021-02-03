@@ -8,9 +8,9 @@
 		<Label name="FCOGLSearchLabel" font="ZoFontGameLargeBold" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_NORMAL" virtual="true" />
         <!--Sort headers -->
         <Control name="FCOGLSortHeader" inherits="ZO_SortHeaderBehavior" virtual="true">
-            <Controls>
+			<Controls>
                 <Label name="$(parent)Name" font="MyFontGame20" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_NORMAL"  horizontalAlignment="CENTER" verticalAlignment="CENTER" wrapMode="ELLIPSIS">
-                        <AnchorFill />
+					<AnchorFill />
                 </Label>
             </Controls>
         </Control>

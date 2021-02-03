@@ -72,13 +72,13 @@ function FCOGuildLottery.getSettings()
             sortKeys = {
               [FCOGL_TAB_GUILDSALESLOTTERY] = {
                   [FCOGL_LISTTYPE_GUILD_SALES_LOTTERY] = "name",
-                  [FCOGL_LISTTYPE_ROLLED_DICE_HISTORY] = "name",
+                  [FCOGL_LISTTYPE_ROLLED_DICE_HISTORY] = "datetime",
               },
             },
             sortOrder = {
               [FCOGL_TAB_GUILDSALESLOTTERY] = {
                   [FCOGL_LISTTYPE_GUILD_SALES_LOTTERY] = ZO_SORT_ORDER_DOWN,
-                  [FCOGL_LISTTYPE_ROLLED_DICE_HISTORY] = ZO_SORT_ORDER_DOWN,
+                  [FCOGL_LISTTYPE_ROLLED_DICE_HISTORY] = ZO_SORT_ORDER_UP,
               },
             },
         },
