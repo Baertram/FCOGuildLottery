@@ -149,7 +149,7 @@
 					  disabled="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_disabled.dds"
 			/>
 			<OnClicked>
-				FCOGL.UI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY)
+				FCOGL.UI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, false)
 			</OnClicked>
 			<OnMouseEnter>
 				FCOGL.ShowTooltip(self, TOP, GetString(FCOGL_GUILD_SALES_LOTTERY))

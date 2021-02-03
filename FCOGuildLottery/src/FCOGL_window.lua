@@ -243,10 +243,11 @@ function fcoglWindowClass:Setup(listType)
         self.headerDate     = self.headers:GetNamedChild("DateTime")
         self.headerRoll     = self.headers:GetNamedChild("Roll")
 
-        self.headers:SetHidden(true)
-        self.list = self.frame:GetNamedChild("List")
-        self.list:SetHidden(true)
     end
+
+    self.headers:SetHidden(true)
+    self.list = self.frame:GetNamedChild("List")
+    self.list:SetHidden(true)
 
     --[[
         --self:RefreshData() will run:
@@ -300,9 +301,15 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
                 tableWithLastDiceThrows = FCOGuildLottery.diceRollHistory
             end
             if tableWithLastDiceThrows == nil or NonContiguousCount(tableWithLastDiceThrows) == 0 then return false end
+            local helperList = {}
             for _, diceThrowData in pairs(tableWithLastDiceThrows) do
-                diceThrowData.no = #self.masterList + 1
-                table.insert(self.masterList, self:CreateDiceThrowHistoryEntry(diceThrowData))
+                table.insert(helperList, diceThrowData)
+            end
+            table.sort(helperList, function(a, b) return a.timestamp < b.timestamp end)
+
+            for _, diceThrowDataSorted in ipairs(helperList) do
+                diceThrowDataSorted.no = #self.masterList + 1
+                table.insert(self.masterList, self:CreateDiceThrowHistoryEntry(diceThrowDataSorted))
             end
         end
     end
@@ -1185,14 +1192,14 @@ function fcoglWindowClass:UpdateUI(state)
             --WLW_UpdateSceneFragmentTitle(WISHLIST_SCENE_NAME, TITLE_FRAGMENT, "Label", GetString(WISHLIST_TITLE) ..  " - " .. zo_strformat(GetString(WISHLIST_SETS_LOADED), 0))
             --updateSceneFragmentTitle(WISHLIST_SCENE_NAME, TITLE_FRAGMENT, "Label", GetString(WISHLIST_TITLE) .. " - " .. GetString(WISHLIST_BUTTON_SEARCH_TT):upper())
 
-            --Hide currently unused tabs
-            frameControl:GetNamedChild("TabList"):SetEnabled(false)
-            frameControl:GetNamedChild("TabList"):SetHidden(true)
-            frameControl:GetNamedChild("TabDiceRollHistory"):SetEnabled(true)
-            frameControl:GetNamedChild("TabDiceRollHistory"):SetHidden(false)
-            --Unhide the current tab
 
             if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
+                --Hide currently unused tabs
+                frameControl:GetNamedChild("TabList"):SetEnabled(false)
+                frameControl:GetNamedChild("TabList"):SetHidden(true)
+                frameControl:GetNamedChild("TabDiceRollHistory"):SetEnabled(true)
+                frameControl:GetNamedChild("TabDiceRollHistory"):SetHidden(false)
+
                 --Unhide buttons at the tab
                 self.frame:GetNamedChild("RollTheDice"):SetEnabled(true)
                 self.frame:GetNamedChild("RollTheDice"):SetHidden(false)
@@ -1201,9 +1208,6 @@ function fcoglWindowClass:UpdateUI(state)
                 self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetHidden(false)
 
                 self.frame:GetNamedChild("GuildsDrop"):SetHidden(false)
-
-                --Hide/Unhide the dice history frame
-                fcoglUI.ToggleDiceRollHistory(FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden)
 
                 --Unhide the scroll list
                 self.frame:GetNamedChild("List"):SetHidden(false)
@@ -1219,9 +1223,21 @@ function fcoglWindowClass:UpdateUI(state)
                 self.headerAmount:SetHidden(false)
                 self.headerInfo:SetHidden(false)
 
-            --elseif listType == FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
+                --Hide/Unhide the dice history frame -> Will call recursively function UpdateUI(state) for listType
+                --FCOGL_LISTTYPE_ROLLED_DICE_HISTORY
+                fcoglUI.ToggleDiceRollHistory(FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden)
 
 
+            elseif listType == FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
+                --Unhide the scroll list
+                self.frame:GetNamedChild("List"):SetHidden(false)
+                --Unhide the scroll list headers
+                self.frame:GetNamedChild("Headers"):SetHidden(false)
+
+                self.headerNo:SetHidden(false)
+                self.headerDate:SetHidden(false)
+                self.headerName:SetHidden(false)
+                self.headerRoll:SetHidden(false)
             end
 
             --For both list types
@@ -1247,17 +1263,22 @@ function fcoglUI.SetTab(index, override)
 df("[SetTab] - index: %s, override: %s", tostring(index), tostring(override))
     if not fcoglUIwindow then return end
     --Do not activate active tab
-    if fcoglUI.CurrentTab ~= nil and (override == true or fcoglUI.CurrentTab ~= index) then
+    if override == true or fcoglUI.CurrentTab == nil or (fcoglUI.CurrentTab ~= nil and fcoglUI.CurrentTab ~= index) then
         --Save the current sort order and key
         fcoglUI.saveSortGroupHeader(fcoglUI.CurrentTab)
         --Change to the new tab
         fcoglUI.CurrentTab = index
-        --Clear the master list of the currently shown ZO_SortFilterList
+
+        --Clear the master list of the currently shown ZO_SortFilterLists
         ZO_ScrollList_Clear(fcoglUIwindow.list)
         fcoglUIwindow.masterList = {}
+        ZO_ScrollList_Clear(fcoglUIDiceHistoryWindow.list)
+        fcoglUIDiceHistoryWindow.masterList = {}
+
         --Reset variable
         fcoglUI.comingFromSortScrollListSetupFunction = false
         --Update the UI (hide/show items), and also check for the dice roll history to show
+        --via function fcoglUI.ToggleDiceRollHistory() -> Calls fcoglUIDiceHistoryWindow:UpdateUI
         fcoglUIwindow:UpdateUI(fcoglUI.CurrentState)
     end
 end
@@ -1272,18 +1293,10 @@ df("[ToggleDiceRollHistory] - setHidden: %s", tostring(setHidden))
     local isHidden = frameDiceHistoryControl:IsControlHidden()
     local newState = (setHidden ~= nil and setHidden) or (not isHidden)
 df(">newHiddenState: %s", tostring(newState) )
-    --(Un)hide the scroll list
-    fcoglUIDiceHistoryWindow.list:SetHidden(false)
-
-    --Change the sort headers
-    local diceRollHistoryHeader = frameDiceHistoryControl:GetNamedChild("Headers")
-    --diceRollHistoryHeader:ClearAnchors()
-    --diceRollHistoryHeader:SetDimensions(445, 30)
-    --diceRollHistoryHeader:SetAnchor(TOPLEFT, frameDiceHistoryControl, TOPLEFT, 30, 51)
-    --diceRollHistoryHeader:SetAnchor(TOPRIGHT, frameDiceHistoryControl, TOPRIGHT, 0, 51)
-    diceRollHistoryHeader:SetHidden(false)
 
     frameDiceHistoryControl:SetHidden(newState)
+
+    fcoglUIDiceHistoryWindow:UpdateUI(fcoglUI.CurrentState)
 
     --Update the texture at the toggle button
     local tabDiceRollHistoryButton = frameControl:GetNamedChild("TabDiceRollHistory")
@@ -1296,6 +1309,7 @@ df(">newHiddenState: %s", tostring(newState) )
     --Dice history is shown? Update the list (masterlist) via the Refresh function from UpdateUI
     -->Will call BuildMasterlist then
     --Clear the list here first!
+--[[
     if newState == false then
 d(">diceHistoryWindow shown: RefreshData now")
         --Clear the master list of the currently shown ZO_SortFilterList -> DiceRollHistory
@@ -1303,4 +1317,5 @@ d(">diceHistoryWindow shown: RefreshData now")
         fcoglUIDiceHistoryWindow.masterList = {}
         fcoglUIDiceHistoryWindow:RefreshData()
     end
+]]
 end
