@@ -27,6 +27,8 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_CLOSE                                 = "Close",
     FCOGL_TOGGLE_DICE_ROLL_HISTORY              = "Toggle dice roll history",
     FCOGL_GUILD_SALES_LOTTERY                   = "Guild sales lottery",
+
+    FCOGL_DICE_PREFIX                           = "D",
 }
 local langEn = FCOGuildLottery.lang["en"]
 

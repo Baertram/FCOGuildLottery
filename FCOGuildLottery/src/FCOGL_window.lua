@@ -25,7 +25,6 @@ local fcoglUIDiceHistoryWindow
 fcoglUI.CurrentState    = FCOGL_TAB_STATE_LOADING
 fcoglUI.CurrentTab      = FCOGL_TAB_GUILDSALESLOTTERY
 fcoglUI.comingFromSortScrollListSetupFunction = false
-fcoglUI.sortType = 1
 fcoglUI.selectedGuildDataBeforeUpdate = nil
 fcoglUI.searchBoxLastSelected = {}
 
@@ -39,11 +38,6 @@ local SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY   = fcoglUI.SCROLLLIST_DATATYPE_RO
 
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
-local function isGuildSalesLotteryActive()
-    return (FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier ~= nil and
-            FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId ~= nil) or false
-end
-
 local function updateMaxDefaultDiceSides()
     local defaultSidesOfDice = FCOGuildLottery.settingsVars.settings.defaultDiceSides
     FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
@@ -161,7 +155,7 @@ function fcoglWindowClass:Setup(listType)
             ]]
         end)
         self.search = ZO_StringSearch:New()
-        self.search:AddProcessor(fcoglUI.sortType, function(stringSearch, data, searchTerm, cache)
+        self.search:AddProcessor(SCROLLLIST_DATATYPE_GUILDSALESRANKING, function(stringSearch, data, searchTerm, cache)
             return(self:ProcessItemEntry(stringSearch, data, searchTerm, cache))
         end)
 
@@ -236,7 +230,7 @@ function fcoglWindowClass:Setup(listType)
             ]]
         end)
         self.search = ZO_StringSearch:New()
-        self.search:AddProcessor(fcoglUI.sortType, function(stringSearch, data, searchTerm, cache)
+        self.search:AddProcessor(SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY, function(stringSearch, data, searchTerm, cache)
             return(self:ProcessItemEntry(stringSearch, data, searchTerm, cache))
         end)
 
@@ -274,7 +268,7 @@ end
 function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
     calledFromFilterFunction = calledFromFilterFunction or false
     local listType = self:GetListType()
-    local guildSalesLotteryActive = isGuildSalesLotteryActive()
+    local guildSalesLotteryActive = FCOGuildLottery.IsGuildSalesLotteryActive()
 
     df("list:BuildMasterList-calledFromFilterFunction: %s, currentTab: %s, listType: %s, guildLotteryActive: %s", tostring(calledFromFilterFunction), tostring(fcoglUI.CurrentTab), tostring(listType), tostring(guildSalesLotteryActive))
     if listType == nil then return end
@@ -310,8 +304,14 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
             end
             if tableWithLastDiceThrows == nil or NonContiguousCount(tableWithLastDiceThrows) == 0 then return false end
             local helperList = {}
-            for _, diceThrowData in pairs(tableWithLastDiceThrows) do
-                table.insert(helperList, diceThrowData)
+            if guildSalesLotteryActive == true then
+                for timeStamp, diceThrowData in pairs(tableWithLastDiceThrows) do
+                    table.insert(helperList, diceThrowData[timeStamp])
+                end
+            else
+                for _, diceThrowData in pairs(tableWithLastDiceThrows) do
+                    table.insert(helperList, diceThrowData)
+                end
             end
             table.sort(helperList, function(a, b) return a.timestamp < b.timestamp end)
 
@@ -412,13 +412,13 @@ function fcoglWindowClass:SetupItemRow(control, data, listType)
         if not data.columnWidth then data.columnWidth = 200 end
         nameColumn:SetDimensions(data.columnWidth, 30)
         nameColumn:SetAnchor(LEFT, dateColumn, RIGHT, 0, 0)
-        nameColumn:SetText(data.name)
+        nameColumn:SetText(data.nameText)
         nameColumn:SetHidden(false)
         nameColumn:SetMouseEnabled(true)
         rollColumn:ClearAnchors()
         rollColumn:SetAnchor(LEFT, nameColumn, RIGHT, 0, 0)
         rollColumn:SetAnchor(RIGHT, control, RIGHT, 0, 0)
-        rollColumn:SetText(data.roll)
+        rollColumn:SetText(data.rollText)
         rollColumn:SetHidden(false)
         rollColumn:SetMouseEnabled(true)
     end
@@ -458,7 +458,7 @@ function fcoglWindowClass:FilterScrollList()
                 local data = self.masterList[i]
                 --Search for text/set bonuses
                 if searchInput == "" or self:CheckForMatch(data, searchInput) then
-                    table.insert(scrollData, ZO_ScrollList_CreateDataEntry(fcoglUI.SCROLLLIST_DATATYPE_GUILDSALESRANKING, data))
+                    table.insert(scrollData, ZO_ScrollList_CreateDataEntry(SCROLLLIST_DATATYPE_GUILDSALESRANKING, data))
                 end
             end
 
@@ -469,7 +469,7 @@ function fcoglWindowClass:FilterScrollList()
                 local data = self.masterList[i]
                 --Search for text/set bonuses
                 if searchInput == "" or self:CheckForMatch(data, searchInput) then
-                    table.insert(scrollData, ZO_ScrollList_CreateDataEntry(fcoglUI.SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY, data))
+                    table.insert(scrollData, ZO_ScrollList_CreateDataEntry(SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY, data))
                 end
             end
         end
@@ -732,7 +732,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
         --No guild selected!
         local lastSelectedIndex = comboBoxOwner:GetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType)
         --Currently guild sales lottery active?
-        local isGuildSalesLotteryCurrentlyActive = isGuildSalesLotteryActive()
+        local isGuildSalesLotteryCurrentlyActive = FCOGuildLottery.IsGuildSalesLotteryActive()
         if isGuildSalesLotteryCurrentlyActive == true then
             --Show ask dialog and reset the guild sales lottery to none if "yes" is chosen at the dialog
             --or reset to the before chosen dropdown entry
@@ -776,7 +776,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
         --Guild selected
         local lastSelectedIndex = comboBoxOwner:GetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType)
         --Is currently a guild sales lottery active? Then ask if it should aborted, If not: Switch back to active guildId
-        local isGuildSalesLotteryCurrentlyActive = isGuildSalesLotteryActive()
+        local isGuildSalesLotteryCurrentlyActive = FCOGuildLottery.IsGuildSalesLotteryActive()
         if isGuildSalesLotteryCurrentlyActive == true then
             --Show ask dialog and reset the guild sales lottery to the new guildId if "yes" is chosen at the dialog
             --or reset to the before chosen dropdown entry
@@ -948,7 +948,7 @@ function FCOGL_UI_OnTextChanged( editBox, isNumeric, isDefaultDiceNumber, checkE
     --Do not update the savedvars number of dices if any guildId was selected
     local guildIndex = fcoglUIwindow.guildsDrop:GetSelectedItemData().index
     df("FCOGL_UI_OnTextChanged - guildIndex: %s, isNumeric: %s, isDefaultDiceNumber: %s, checkEmpty: %s", tostring(guildIndex), tostring(isNumeric), tostring(isDefaultDiceNumber), tostring(checkEmpty))
-    if guildIndex ~= nil and guildIndex > 0 then return end
+    if guildIndex ~= nil and guildIndex > 0 and guildIndex <= MAX_GUILDS then return end
 
     local defaultVar
     if isDefaultDiceNumber == true then
