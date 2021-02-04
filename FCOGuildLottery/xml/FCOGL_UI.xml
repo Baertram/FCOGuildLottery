@@ -244,7 +244,7 @@
                       pressed="/esoui/art/buttons/large_rightarrow_down.dds"
 					  disabled="/esoui/art/buttons/large_rightarrow_disabled.dds"/>
 			<OnClicked>
-				<!-- TODO: Change FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS to the valkue of an edit box -->
+				-- TODO: Change FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS to the valkue of an edit box
 				FCOGL.StartNewGuildSalesLottery(FCOGLFrameGuildsDrop.m_comboBox.m_selectedItemData.index, FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS, false)
 			</OnClicked>
 			<OnMouseEnter>

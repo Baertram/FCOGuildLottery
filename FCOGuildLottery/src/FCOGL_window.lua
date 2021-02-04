@@ -46,6 +46,7 @@ end
 
 local function updateMaxDefaultDiceSides()
     local defaultSidesOfDice = FCOGuildLottery.settingsVars.settings.defaultDiceSides
+    FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
     fcoglUIwindow.editBoxDiceSides:SetText(tostring(defaultSidesOfDice))
 end
 
@@ -178,7 +179,6 @@ function fcoglWindowClass:Setup(listType)
         self.editBoxDiceSides:SetTextType(TEXT_TYPE_NUMERIC_UNSIGNED_INT)
         FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
         self.editBoxDiceSides:SetText(tostring(FCOGuildLottery.settingsVars.settings.defaultDiceSides))
-        FCOGuildLottery.prevVars.doNotRunOnTextChanged = false
 
         --Add the FCOGL scene
     --fcoglUI.scene = ZO_Scene:New(fcoglUI.SCENE_NAME, SCENE_MANAGER)
@@ -526,7 +526,7 @@ function fcoglWindowClass:SortScrollList( )
     --Get the current sort header's key and direction
     self.currentSortKey = self.sortHeaderGroup:GetCurrentSortKey()
     self.currentSortOrder = self.sortHeaderGroup:GetSortDirection()
-d("> sortKey: " .. tostring(self.currentSortKey) .. ", sortOrder: " ..tostring(self.currentSortOrder))
+    df("> sortKey: %s, sortOrder: %s", tostring(self.currentSortKey), tostring(self.currentSortOrder))
 	if (self.currentSortKey ~= nil and self.currentSortOrder ~= nil) then
         --If not coming from setup function
         --if fcoglUI.comingFromSortScrollListSetupFunction then return end
@@ -711,13 +711,12 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
     local comboBoxOwner = self
     local isGuildsCB = ((prefix == FCOGL_GUILDSDROP_PREFIX) or searchBoxType == "guilds") or false
     local isNameSearchCB = ((prefix == FCOGL_SEARCHDROP_PREFIX) or searchBoxType == "name") or false
-df("[fcoglWindowClass:InitializeComboBox]isGuildsCB: " .. tostring(isGuildsCB) .. ", isNameSearchCB: " .. tostring(isNameSearchCB) .. ", prefix: " .. tostring(prefix) ..", max: " .. tostring(max))
+    df("[fcoglWindowClass:InitializeComboBox]isGuildsCB: " .. tostring(isGuildsCB) .. ", isNameSearchCB: " .. tostring(isNameSearchCB) .. ", prefix: " .. tostring(prefix) ..", max: " .. tostring(max))
     control:SetSortsItems(false)
     control:ClearItems()
 
     local entryCallbackNoGuild = function( _, _, entry, _ ) --comboBox, entryText, entry )
         local function updateEntryNowNoGuild(guildIndex, daysBefore)
-d(">UpdateEntryNow_NoGuild")
             df(">>UpdateEntryNow_NoGuild - selectedIndex: %s, CurrentTab: %s searchBoxType: %s", tostring(entry.selectedIndex), tostring(fcoglUI.CurrentTab), tostring(searchBoxType))
             comboBoxOwner:SetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType, entry.selectedIndex)
             --Set to normal dice roll
@@ -764,6 +763,7 @@ d(">UpdateEntryNow_NoGuild")
             --Update the maximum number of the dice sides to the current guild's member #
             local diceSidesGuild = FCOGuildLottery.RollTheDiceNormalForGuildMemberCheck(entry.index, true)
             if diceSidesGuild and diceSidesGuild > 0 then
+                FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
                 fcoglUIwindow.editBoxDiceSides:SetText(tostring(diceSidesGuild))
             else
                 updateMaxDefaultDiceSides()
@@ -936,6 +936,7 @@ function FCOGL_UI_OnMouseUp( rowControlUp, button, upInside )
 end
 
 function FCOGL_UI_OnTextChanged( editBox, isNumeric, isDefaultDiceNumber, checkEmpty )
+    --Do not update the savedvars number of dices if auto-update is disabled by the preventer variable
     if FCOGuildLottery.prevVars.doNotRunOnTextChanged == true then
         FCOGuildLottery.prevVars.doNotRunOnTextChanged = false
         return
@@ -943,6 +944,12 @@ function FCOGL_UI_OnTextChanged( editBox, isNumeric, isDefaultDiceNumber, checkE
     isNumeric = isNumeric or false
     isDefaultDiceNumber = isDefaultDiceNumber or false
     checkEmpty = checkEmpty or false
+
+    --Do not update the savedvars number of dices if any guildId was selected
+    local guildIndex = fcoglUIwindow.guildsDrop:GetSelectedItemData().index
+    df("FCOGL_UI_OnTextChanged - guildIndex: %s, isNumeric: %s, isDefaultDiceNumber: %s, checkEmpty: %s", tostring(guildIndex), tostring(isNumeric), tostring(isDefaultDiceNumber), tostring(checkEmpty))
+    if guildIndex ~= nil and guildIndex > 0 then return end
+
     local defaultVar
     if isDefaultDiceNumber == true then
         defaultVar = FCOGL_DICE_SIDES_DEFAULT
@@ -966,7 +973,7 @@ function FCOGL_UI_OnTextChanged( editBox, isNumeric, isDefaultDiceNumber, checkE
             if isDefaultDiceNumber == true then
                 FCOGuildLottery.settingsVars.settings.defaultDiceSides = tonumber(text)
             end
-        --else
+            --else
             --updateVar = tostring(text)
         end
     end
@@ -1009,8 +1016,8 @@ function FCOGL_UI_OnArrowKey( editBox, isNumeric, isDefaultDiceNumber, doIncreas
     end
     text = newValue or text
     if text ~= nil then
-        FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
         if text ~= "" then
+            FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
             if isDefaultDiceNumber == true then
                 FCOGuildLottery.settingsVars.settings.defaultDiceSides = tonumber(text)
             end
@@ -1097,7 +1104,7 @@ local function showUIWindow(doShow)
         FCOGuildLottery.UI.windowShown = doShow
         if doShow == true then
             setWindowPosition(windowFrame)
-            fcoglUIwindow:UpdateUI(FCOGL_TAB_STATE_LOADED)
+            fcoglUIwindow:UpdateUI(FCOGL_TAB_STATE_LOADED, false)
         else
             local windowDiceRollFrame = fcoglUIDiceHistoryWindow.frame
             if windowDiceRollFrame:IsHidden() then return end
@@ -1177,14 +1184,14 @@ df("[fcoglWindowClass:resetSortGroupHeader]currentTab: %s, listType: %s", tostri
     if self.sortHeaderGroup ~= nil then
         local currentSortKey, currentSortOrder
         currentSortKey, currentSortOrder = fcoglUI.loadSortGroupHeader(fcoglUI.CurrentTab, listType)
-d("> sortKey: " .. tostring(self.currentSortKey) .. ", sortOrder: " ..tostring(self.currentSortOrder))
+        --df("> sortKey: " .. tostring(self.currentSortKey) .. ", sortOrder: " ..tostring(self.currentSortOrder))
         self.sortHeaderGroup:SelectAndResetSortForKey(currentSortKey)
-d("> sortKeyAfterReset: " .. tostring(self.currentSortKey) .. ", sortOrderAfterReset: " ..tostring(self.currentSortOrder))
         --Select the sort header again to invert the sort order, if last sort order was inverted
         if currentSortOrder == ZO_SORT_ORDER_DOWN then
             self.sortHeaderGroup:SelectHeaderByKey(currentSortKey)
-d("> sortKeyAfterInvert: " .. tostring(self.currentSortKey) .. ", sortOrderAfterInvert: " ..tostring(self.currentSortOrder))
+        --df("> sortKeyAfterInvert: " .. tostring(self.currentSortKey) .. ", sortOrderAfterInvert: " ..tostring(self.currentSortOrder))
         end
+        df("> sortKeyAfterReset: " .. tostring(self.currentSortKey) .. ", sortOrderAfterReset: " ..tostring(self.currentSortOrder))
     end
 end
 
@@ -1197,6 +1204,24 @@ function fcoglWindowClass:updateSortHeaderAnchorsAndPositions(currentTab, nameHe
     end
 end
 
+function fcoglWindowClass:checkRefreshGuildSalesLotteryButtonEnabled()
+    --No guildId selected?
+    local isEnabled = true
+    local guildIndex = self.guildsDrop:GetSelectedItemData().index
+    if guildIndex == nil or guildIndex == FCOGuildLottery.noGuildIndex or
+            not FCOGuildLottery.IsGuildIndexValid(guildIndex)
+            or not FCOGuildLottery.IsGuildSalesLotteryActive()
+            or (FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= nil and
+                FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= guildIndex )
+    then
+        isEnabled = false
+    end
+    local reloadGuildSalesLotteryButton = self.frame:GetNamedChild("ReloadGuildSalesLottery")
+    reloadGuildSalesLotteryButton:SetEnabled(isEnabled)
+    reloadGuildSalesLotteryButton:SetMouseEnabled(isEnabled)
+    return isEnabled
+end
+
 function fcoglWindowClass:checkNewGuildSalesLotteryButtonEnabled()
     local isEnabled = true
     --No guildId selected?
@@ -1206,15 +1231,13 @@ function fcoglWindowClass:checkNewGuildSalesLotteryButtonEnabled()
         isEnabled = false
     end
     local newGuildSalesLotteryButton = self.frame:GetNamedChild("NewGuildSalesLottery")
-    local reloadGuildSalesLotteryButton = self.frame:GetNamedChild("ReloadGuildSalesLottery")
     newGuildSalesLotteryButton:SetEnabled(isEnabled)
     newGuildSalesLotteryButton:SetMouseEnabled(isEnabled)
-    reloadGuildSalesLotteryButton:SetEnabled(isEnabled)
-    reloadGuildSalesLotteryButton:SetMouseEnabled(isEnabled)
     return isEnabled
 end
 
-function fcoglWindowClass:UpdateUI(state)
+function fcoglWindowClass:UpdateUI(state, override)
+    override = override or false
     fcoglUI.CurrentState = state
     local listType = self:GetListType()
     df("[window:UpdateUI] state: %s, currentTab: %s, listType: %s", tostring(state), tostring(fcoglUI.CurrentTab), tostring(listType))
@@ -1242,6 +1265,7 @@ function fcoglWindowClass:UpdateUI(state)
                 self.frame:GetNamedChild("RollTheDice"):SetEnabled(true)
                 self.frame:GetNamedChild("RollTheDice"):SetHidden(false)
                 self:checkNewGuildSalesLotteryButtonEnabled()
+                self:checkRefreshGuildSalesLotteryButtonEnabled()
                 self.frame:GetNamedChild("NewGuildSalesLottery"):SetHidden(false)
                 self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetHidden(false)
 
@@ -1263,7 +1287,7 @@ function fcoglWindowClass:UpdateUI(state)
 
                 --Hide/Unhide the dice history frame -> Will call recursively function UpdateUI(state) for listType
                 --FCOGL_LISTTYPE_ROLLED_DICE_HISTORY
-                fcoglUI.ToggleDiceRollHistory(FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden)
+                fcoglUI.ToggleDiceRollHistory(FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden, override)
 
 
             elseif listType == FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
@@ -1318,43 +1342,34 @@ df("[SetTab] - index: %s, override: %s", tostring(index), tostring(override))
         fcoglUI.comingFromSortScrollListSetupFunction = false
         --Update the UI (hide/show items), and also check for the dice roll history to show
         --via function fcoglUI.ToggleDiceRollHistory() -> Calls fcoglUIDiceHistoryWindow:UpdateUI
-        fcoglUIwindow:UpdateUI(fcoglUI.CurrentState)
+        fcoglUIwindow:UpdateUI(fcoglUI.CurrentState, override)
     end
 end
 
 --Toggle the dice roll history "attached" window part at the right
-function fcoglUI.ToggleDiceRollHistory(setHidden)
-df("[ToggleDiceRollHistory] - setHidden: %s", tostring(setHidden))
+function fcoglUI.ToggleDiceRollHistory(setHidden, blockToggle)
+    blockToggle = blockToggle or false
+    df("[ToggleDiceRollHistory] - setHidden: %s, blockToggle: %s", tostring(setHidden), tostring(blockToggle))
     local frameControl = fcoglUIwindow and fcoglUIwindow.frame
     if frameControl == nil or frameControl:IsControlHidden() then return end
     local frameDiceHistoryControl = fcoglUIDiceHistoryWindow and fcoglUIDiceHistoryWindow.control
     if frameDiceHistoryControl == nil then return end
     local isHidden = frameDiceHistoryControl:IsControlHidden()
     local newState = (setHidden ~= nil and setHidden) or (not isHidden)
-df(">newHiddenState: %s", tostring(newState))
+    df(">newHiddenState: %s", tostring(newState))
+    if not blockToggle then
+        frameDiceHistoryControl:SetHidden(newState)
+    end
 
-    frameDiceHistoryControl:SetHidden(newState)
-
-    fcoglUIDiceHistoryWindow:UpdateUI(fcoglUI.CurrentState)
+    fcoglUIDiceHistoryWindow:UpdateUI(fcoglUI.CurrentState, false)
 
     --Update the texture at the toggle button
-    local tabDiceRollHistoryButton = frameControl:GetNamedChild("TabDiceRollHistory")
-    local newStateVal = buttonNewStateVal[newState]
-    tabDiceRollHistoryButton:SetState(newStateVal)
-    --Save the current state to the SavedVariables
---d(">Updating to: " ..tostring(newState))
-    FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden = newState
-
-    --Dice history is shown? Update the list (masterlist) via the Refresh function from UpdateUI
-    -->Will call BuildMasterlist then
-    --Clear the list here first!
---[[
-    if newState == false then
-d(">diceHistoryWindow shown: RefreshData now")
-        --Clear the master list of the currently shown ZO_SortFilterList -> DiceRollHistory
-        ZO_ScrollList_Clear(fcoglUIDiceHistoryWindow.list)
-        fcoglUIDiceHistoryWindow.masterList = {}
-        fcoglUIDiceHistoryWindow:RefreshData()
+    if not blockToggle then
+        local tabDiceRollHistoryButton = frameControl:GetNamedChild("TabDiceRollHistory")
+        local newStateVal = buttonNewStateVal[newState]
+        tabDiceRollHistoryButton:SetState(newStateVal)
+        --Save the current state to the SavedVariables
+        --d(">Updating to: " ..tostring(newState))
+        FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden = newState
     end
-]]
 end

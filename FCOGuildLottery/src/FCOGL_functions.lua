@@ -907,17 +907,23 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 --Lottery functions
 
+function FCOGuildLottery.IsGuildSalesLotteryActive()
+    return (FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier ~= nil and
+           FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= nil and
+           FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId ~= nil) or false
+end
+
 --Reset the stored / last used data and enable a new lottery dice throw, where the popups of guild and timeFrame selection
 --are showing up again
 function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, startingNewLottery, guildIndex, daysBefore, callbackYes, callbackNo)
-    d("FCOGuildLottery.ResetCurrentGuildSalesLotteryData - noSecurityQuestion: " ..tostring(noSecurityQuestion) .. ", startingNewLottery: " ..tostring(startingNewLottery) .. ", guildIndex: " ..tostring(guildIndex) .. ", daysBefore: " ..tostring(daysBefore))
+    df("FCOGuildLottery.ResetCurrentGuildSalesLotteryData - noSecurityQuestion: %s, startingNewLottery: %s, guildIndex: %s, daysBefore: %s, guildSalesLotteryIdActive: %s", tostring(noSecurityQuestion), tostring(startingNewLottery), tostring(guildIndex), tostring(daysBefore), tostring(FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier))
     noSecurityQuestion = noSecurityQuestion or false
     local resetDataNow = false
     --ONLY resetting the data?
     if noSecurityQuestion == true and startingNewLottery == false and guildIndex == nil and daysBefore == nil then
         resetDataNow = true
     else
-        if FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier ~= nil then
+        if FCOGuildLottery.IsGuildSalesLotteryActive() then
             if not noSecurityQuestion then
                 --Show security question dialog
                 --Do you really want to reset... ?
@@ -953,6 +959,7 @@ function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, s
         end
     end
     if resetDataNow == true then
+        df(">resetting data now - startingNewLottery: %s, index: %s, daysBefore: %s", tostring(startingNewLottery), tostring(guildIndex), tostring(daysBefore))
         resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex, daysBefore)
     end
 end
@@ -990,7 +997,7 @@ df( "RollTheDiceForGuildSalesLottery - noChatOutput: %s", tostring(noChatOutput)
     local guildIndex
 
     --Build the unique identifier and set the other needed variables
-    if FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier == nil then
+    if not FCOGuildLottery.IsGuildSalesLotteryActive() then
         --Which guildIndex and Id should be used? And how many days backwards?
         -->All chosen via the slash command /gsl /guildsaleshistory or /dicegsl
         guildIndex = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex
@@ -1148,6 +1155,7 @@ df("[FCOGuildLottery.NewGuildSalesLottery] - index: %s, daysBefore: %s", tostrin
 end
 
 function FCOGuildLottery.StartNewGuildSalesLottery(guildIndex, daysBefore, dataWasResetAlready)
+df("[FCOGuildLottery.StartNewGuildSalesLottery] - index: %s, daysBefore: %s, dataWasResetAlready: %s", tostring(guildIndex), tostring(daysBefore), tostring(dataWasResetAlready))
     if not IsGuildIndexValid(guildIndex) or daysBefore == nil then
         showNewGSLSlashCommandHelp((FCOGuildLottery.noGuildIndex ~= nil and guildIndex == FCOGuildLottery.noGuildIndex) or false)
         return
@@ -1167,6 +1175,7 @@ end
 
 function FCOGuildLottery.RollTheDiceNormalForGuildMemberCheck(guildIndex, noChatOutput)
     noChatOutput = noChatOutput or false
+df("[FCOGuildLottery.RollTheDiceNormalForGuildMemberCheck] - index: %s, noChatOutput: %s", tostring(guildIndex), tostring(noChatOutput))
     local function abortFunc()
         FCOGuildLottery.currentlyUsedDiceRollGuildName = nil
         FCOGuildLottery.currentlyUsedDiceRollGuildId = nil
@@ -1189,9 +1198,7 @@ end
 function FCOGuildLottery.RollTheDiceCheck(noChatOutput)
     noChatOutput = noChatOutput or false
     df( "RollTheDiceCheck - noChatOutput: " .. tostring(noChatOutput))
-    if FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier ~= nil and
-        FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= nil and
-        FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId ~= nil then
+    if FCOGuildLottery.IsGuildSalesLotteryActive() then
         FCOGuildLottery.RollTheDiceForGuildSalesLottery(noChatOutput)
     else
         FCOGuildLottery.RollTheDiceWithDefaultSides(noChatOutput)
@@ -1256,7 +1263,7 @@ end
 --Start (if not started yet) or roll a dice for the current guild sales lottery, via slash command
 function FCOGuildLottery.GuildSalesLotterySlashCommand(args)
     --Are we starting a new guild sales lottery with this "dice roll"?
-    if FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier == nil then
+    if not FCOGuildLottery.IsGuildSalesLotteryActive() then
         showNewGSLSlashCommandHelp()
     else
         --Just roll next dice
