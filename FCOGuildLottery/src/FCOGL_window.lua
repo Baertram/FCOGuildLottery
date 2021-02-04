@@ -577,20 +577,26 @@ function fcoglWindowClass:SearchByCriteria(data, searchInput, searchType)
         end
     end
 
-
-
---[[
-    data["name"]
-    data["rank"]
-    data["amount"]
-    data["price"]
-    data["tax"]
-    data["info"]
-]]
+    --TODO
+    --[[
+    if searchType == FCOGL_SEARCH_TYPE_??? then
+        if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
+        elseif listType == FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
+        end
+    end
+    ]]
+    --[[
+        data["name"]
+        data["rank"]
+        data["amount"]
+        data["price"]
+        data["tax"]
+        data["info"]
+    ]]
     return false
 end
 
-function fcoglWindowClass:CheckForMatch(data, searchInput )
+function fcoglWindowClass:CheckForMatch(data, searchInput)
     local searchType = self.searchType
     if searchType ~= nil then
         local listType = self:GetListType()
@@ -603,14 +609,23 @@ function fcoglWindowClass:CheckForMatch(data, searchInput )
             if searchInputNumber ~= nil then
                 local searchValueType = type(searchInputNumber)
                 if searchValueType == "number" then
-                    isMatch = searchInputNumber == data.rank or false
+                    if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
+                        isMatch = searchInputNumber == data.rank or false
+                    elseif listType == FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
+                        isMatch = searchInputNumber == data.no or false
+                    end
                 end
             else
+                -->Calls the Process function defined at AddProcessor -> function ProcessItemEntry
                 isMatch = self.search:IsMatch(searchInput, data)
             end
             return isMatch
         else
-            return(self:SearchByCriteria(data, searchInput, searchType))
+            if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
+                return(self:SearchByCriteria(data, searchInput, searchType))
+            elseif listType == FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
+                return(self:SearchByCriteria(data, searchInput, searchType))
+            end
         end
     end
 	return(false)
@@ -618,9 +633,17 @@ end
 
 function fcoglWindowClass:ProcessItemEntry(stringSearch, data, searchTerm )
 --d("[WLW.ProcessItemEntry] stringSearch: " ..tostring(stringSearch) .. ", setName: " .. tostring(data.name:lower()) .. ", searchTerm: " .. tostring(searchTerm))
-	if ( data.name and zo_plainstrfind(data.name:lower(), searchTerm) ) then
-		return(true)
-	end
+    local listType = self:GetListType()
+    if not listType then return end
+    if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
+        if ( data.name and zo_plainstrfind(data.name:lower(), searchTerm) ) then
+            return(true)
+        end
+    elseif listType == FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
+        if ( data.nameText and zo_plainstrfind(data.nameText:lower(), searchTerm) ) then
+            return(true)
+        end
+    end
 	return(false)
 end
 
