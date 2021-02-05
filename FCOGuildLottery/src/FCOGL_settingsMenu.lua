@@ -72,6 +72,33 @@ function FCOGuildLottery.buildAddonMenu()
         --==============================================================================
         {
             type = 'header',
+            name = GetString(FCOGL_LAM_FORMAT_OPTIONS),
+        },
+        {
+            type = "checkbox",
+            name = GetString(FCOGL_LAM_USE_24h_FORMAT),
+            tooltip = GetString(FCOGL_LAM_USE_24h_FORMAT_TT),
+            getFunc = function() return settings.use24hFormat end,
+            setFunc = function(value)
+                settings.use24hFormat = value
+            end,
+            default = defaults.use24hFormat,
+            disabled = function() return settings.useCustomDateFormat ~= "" end
+        },
+        {
+            type = "editbox",
+            name = GetString(FCOGL_LAM_USE_CUSTOM_DATETIME_FORMAT),
+            tooltip = GetString(FCOGL_LAM_USE_CUSTOM_DATETIME_FORMAT_TT),
+            getFunc = function() return settings.useCustomDateFormat end,
+            setFunc = function(value)
+                settings.useCustomDateFormat = value
+            end,
+            default = defaults.useCustomDateFormat,
+        },
+
+        --==============================================================================
+        {
+            type = 'header',
             name = 'Dice settings',
         },
         {
@@ -87,6 +114,7 @@ function FCOGuildLottery.buildAddonMenu()
             setFunc = function(value) settings.defaultDiceSides = value   end,
             default = function() return defaults.defaultDiceSides end,
         },
+
         --==============================================================================
         {
             type = 'header',
@@ -102,6 +130,7 @@ function FCOGuildLottery.buildAddonMenu()
             setFunc = function(value) settings.preFillChatEditBoxAfterDiceRollTextTemplates.normal[1] = value end,
             default = function() return defaults.preFillChatEditBoxAfterDiceRollTextTemplates.normal[1] end,
         },
+
         --==============================================================================
         {
             type = 'header',
@@ -125,6 +154,7 @@ function FCOGuildLottery.buildAddonMenu()
             setFunc = function(value) settings.preFillChatEditBoxAfterDiceRollTextTemplates.guilds[1] = value end,
             default = function() return defaults.preFillChatEditBoxAfterDiceRollTextTemplates.guilds[1] end,
         },
+
         --==============================================================================
         {
             type = 'header',

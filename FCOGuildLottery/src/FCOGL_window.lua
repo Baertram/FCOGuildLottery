@@ -1386,11 +1386,7 @@ df("[SetTab] - index: %s, override: %s", tostring(index), tostring(override))
         --Change to the new tab
         fcoglUI.CurrentTab = index
 
-        --Clear the master list of the currently shown ZO_SortFilterLists
-        ZO_ScrollList_Clear(fcoglUIwindow.list)
-        fcoglUIwindow.masterList = {}
-        ZO_ScrollList_Clear(fcoglUIDiceHistoryWindow.list)
-        fcoglUIDiceHistoryWindow.masterList = {}
+        fcoglUI.ResetWindowLists()
 
         --Reset variable
         fcoglUI.comingFromSortScrollListSetupFunction = false
@@ -1426,6 +1422,15 @@ function fcoglUI.ToggleDiceRollHistory(setHidden, blockToggle)
         --d(">Updating to: " ..tostring(newState))
         FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden = newState
     end
+end
+
+function fcoglUI.ResetWindowLists()
+    if not fcoglUIwindow then return end
+    --Clear the master list of the currently shown ZO_SortFilterLists
+    ZO_ScrollList_Clear(fcoglUIwindow.list)
+    fcoglUIwindow.masterList = {}
+    ZO_ScrollList_Clear(fcoglUIDiceHistoryWindow.list)
+    fcoglUIDiceHistoryWindow.masterList = {}
 end
 
 function fcoglUI.RefreshWindowLists()
