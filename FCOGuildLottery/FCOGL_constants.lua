@@ -79,12 +79,14 @@ FCOGuildLottery.guildsData = {}
 
 ------------------------------------------------------------------------------------------------------------------------
 FCOGuildLottery.lastRolledChatOutput = nil
+FCOGuildLottery.lastRolledGuildChatOutput = nil
 
 ------------------------------------------------------------------------------------------------------------------------
-FCOGuildLottery.guildSellListeners         = {}
-FCOGuildLottery.guildSellListenerCompleted = {}
-FCOGuildLottery.guildSellStats             = {}
-FCOGuildLottery.diceRollHistory = {}
+FCOGuildLottery.guildSellListeners          = {}
+FCOGuildLottery.guildSellListenerCompleted  = {}
+FCOGuildLottery.guildSellStats              = {}
+FCOGuildLottery.diceRollHistory             = {}
+FCOGuildLottery.diceRollGuildsHistory       = {}
 FCOGuildLottery.diceRollGuildLotteryHistory = {}
 
 ------------------------------------------------------------------------------------------------------------------------

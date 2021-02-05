@@ -48,8 +48,15 @@ function FCOGuildLottery.slashCommands()
     end
 
     SLASH_COMMANDS["/dicelast"]             = function()
-        if FCOGuildLottery.lastRolledChatOutput == nil then return end
-        dfa( FCOGuildLottery.lastRolledChatOutput )
+        local lastOutputText
+        if FCOGuildLottery.currentlyUsedDiceRollGuildId ~= nil then
+            lastOutputText = FCOGuildLottery.lastRolledGuildChatOutput
+            if lastOutputText == nil then return end
+        else
+            lastOutputText = FCOGuildLottery.lastRolledChatOutput
+            if lastOutputText == nil then return end
+        end
+        dfa( lastOutputText )
     end
 
     --Reset slash command for the guild sales lottery

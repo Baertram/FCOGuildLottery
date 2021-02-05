@@ -110,6 +110,7 @@ function FCOGuildLottery.buildGuildsDropEntries()
     local guildsOfAccount = {}
     for guildIndex=1, GetNumGuilds() do
         local guildId = GetGuildId(guildIndex)
+        FCOGuildLottery.diceRollGuildsHistory[guildId] = FCOGuildLottery.diceRollGuildsHistory[guildId] or {}
         local gotTrader = (IsPlayerInGuild(guildId) and DoesGuildHavePrivilege(guildId, GUILD_PRIVILEGE_TRADING_HOUSE)) or false
         local guildName = ZO_CachedStrFormat(SI_UNIT_NAME, GetGuildName(guildId))
         if not gotTrader then
@@ -746,36 +747,21 @@ local function rollADiceUntilNewValue(diceSides, rolledBefore)
 end
 
 function FCOGuildLottery.RollTheDiceWithDefaultSides(noChatOutput)
-    local sidesOfDice = FCOGuildLottery.settingsVars.settings.defaultDiceSides
+    --Is a guildId selected?
+    local sidesOfDice = 0
+    if FCOGuildLottery.currentlyUsedDiceRollGuildId ~= nil then
+        --Get the count of guild members
+        sidesOfDice = FCOGuildLottery.GetGuildMemberCount(GetGuildIndexById(FCOGuildLottery.currentlyUsedDiceRollGuildId))
+    else
+        sidesOfDice = FCOGuildLottery.settingsVars.settings.defaultDiceSides
+    end
+    df("RollTheDiceWithDefaultSides - sidesOfDice: %s, noChatOutput: %s", tostring(sidesOfDice), tostring(noChatOutput))
     if sidesOfDice <= 0 then sidesOfDice = FCOGL_DICE_SIDES_DEFAULT end
-    df( "RollTheDiceWithDefaultSides - noChatOutput: " .. tostring(noChatOutput))
 
     local diceRollData = FCOGuildLottery.RollTheDice(sidesOfDice, noChatOutput)
-FCOGuildLottery._diceRollDataWithDefaultSides = diceRollData
+--FCOGuildLottery._diceRollDataWithDefaultSides = diceRollData
     if diceRollData ~= nil then
-        --Is the UI currently shown?
-        local fcoglUI = FCOGuildLottery.UI
-        local fcoglUIwindow = fcoglUI and fcoglUI.window
-        local fcoglDiceHistorywindow = fcoglUI and fcoglUI.diceHistoryWindow
-        if fcoglUIwindow ~= nil and fcoglDiceHistorywindow ~= nil then
-            local windowFrame = fcoglUIwindow.frame
-            local diceHistoryWindowFrame = fcoglDiceHistorywindow.frame
-            if windowFrame:IsControlHidden() then
-                --Setting "Show UI" -> Create UI now and show it
-                if FCOGuildLottery.settingsVars.settings.showUIAfterDiceRoll == true then
-                    fcoglUI.Show(true)
-                end
-            end
-            if not windowFrame:IsControlHidden() then
-                --Set the UI tab to "Guild Sales Lottery" and refresh the data
-                --fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true) --activate even if already shown, to update it
-                if not diceHistoryWindowFrame:IsControlHidden() then
-d(">Updating the dice history window list")
-                    --Only update the dice history list
-                    fcoglDiceHistorywindow:RefreshData()
-                end
-            end
-        end
+        FCOGuildLottery.UI.RefreshWindowLists()
     end
 end
 
@@ -806,7 +792,7 @@ function FCOGuildLottery.RollTheDice(sidesOfDice, noChatOutput)
     noChatOutput = noChatOutput or false
     sidesOfDice = sidesOfDice or FCOGL_MAX_DICE_SIDES --Number of max guild members, currently 500
     if sidesOfDice <= 0 then sidesOfDice = 1 end
-df( "RollTheDice - sidesOfDice: " ..tostring(sidesOfDice)  ..", noChatOutput: " .. tostring(noChatOutput))
+df( "RollTheDice - sidesOfDice: %s, noChatOutput: %s", tostring(sidesOfDice), tostring(noChatOutput))
 
     local now = GetTimeStamp()
     math.randomseed(os.time()) -- random initialize
@@ -839,7 +825,10 @@ df( "RollTheDice - sidesOfDice: " ..tostring(sidesOfDice)  ..", noChatOutput: " 
     if guildId ~= nil then
         --Get the guildMember with the rolled dice value (or if guild sales lottery: from the sales history data -> via LibHistoire)
         rolledGuildMemberDisplayName, memberNote, rankIndex, playerStatus, secsSinceLogoff, guildIndex, soldSum = FCOGuildLottery.GetRolledGuildMemberInfo(guildId, diceSide, isGuildSalesLottery)
-        if rolledGuildMemberDisplayName == nil then return end
+        if rolledGuildMemberDisplayName == nil then
+df( "<ABORT: rolledGuildMemberDisplayName is nil - sidesOfDice: %s, guildId: %s", tostring(sidesOfDice), tostring(guildId))
+            return
+        end
     end
     local diceRollData = {
         --Info about the dice roller
@@ -861,9 +850,15 @@ df( "RollTheDice - sidesOfDice: " ..tostring(sidesOfDice)  ..", noChatOutput: " 
         diceRollData.rolledGuildMemberSecsSinceLogoff   = secsSinceLogoff
         soldSum                                         = soldSum
     end
-    if diceRollTypeGuild ~= FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY then
-        FCOGuildLottery.diceRollHistory[now] = diceRollData
+    if not isGuildSalesLottery then
+        if guildId ~= nil then
+            FCOGuildLottery.diceRollGuildsHistory[guildId] = FCOGuildLottery.diceRollGuildsHistory[guildId] or {}
+            FCOGuildLottery.diceRollGuildsHistory[guildId][now] = diceRollData
+        else
+            FCOGuildLottery.diceRollHistory[now] = diceRollData
+        end
     end
+FCOGuildLottery._diceRollData = diceRollData
     if not noChatOutput then
         local diceTypeStr
         --local settings = FCOGuildLottery.settingsVars.settings
@@ -881,17 +876,24 @@ df( "RollTheDice - sidesOfDice: " ..tostring(sidesOfDice)  ..", noChatOutput: " 
         dfa( lastDiceRollChatOutput )
 
         --Remember the last chat output of the dice rolle for the slash commands /gsllast and /dicelast
-        if guildId ~= nil and isGuildSalesLottery == true then
-            local memberFoundText = string.format(">>Found member \'%s\' at rank: %s, with sold sum: %s", tostring(rolledGuildMemberDisplayName), tostring(diceSide), tostring(soldSum))
-            lastDiceRollChatOutput = lastDiceRollChatOutput .. "\n" .. memberFoundText
-            FCOGuildLottery.currentlyUsedGuildSalesLotteryLastRolledChatOutput = lastDiceRollChatOutput
+        if guildId ~= nil then
+            local memberFoundText
+            if isGuildSalesLottery == true then
+                memberFoundText = string.format(">>Found member \'%s\' at rank: %s, with sold sum: %s", tostring(rolledGuildMemberDisplayName), tostring(diceSide), tostring(soldSum))
+                lastDiceRollChatOutput = lastDiceRollChatOutput .. "\n" .. memberFoundText
+                FCOGuildLottery.currentlyUsedGuildSalesLotteryLastRolledChatOutput = lastDiceRollChatOutput
+            else
+                memberFoundText = string.format(">>Found member \'%s\'", tostring(rolledGuildMemberDisplayName))
+                lastDiceRollChatOutput = lastDiceRollChatOutput .. "\n" .. memberFoundText
+                FCOGuildLottery.lastRolledGuildChatOutput = lastDiceRollChatOutput
+            end
             dfa( memberFoundText )
         else
             FCOGuildLottery.lastRolledChatOutput = lastDiceRollChatOutput
         end
     end
     local rolledName = diceRollData.rolledGuildMemberName
-    if guildId ~= nil and isGuildSalesLottery == true then
+    if guildId ~= nil then
         rolledName = diceRollData.rolledGuildMemberName
     else
         rolledName = ""
@@ -1064,7 +1066,7 @@ df( "RollTheDiceForGuildSalesLottery - noChatOutput: %s", tostring(noChatOutput)
     if countMembersAtRank ~= nil and countMembersAtRank > 0 then
         --Roll the dice with the number of guild sales members rank of that guildId
         rolledData = FCOGuildLottery.RollTheDice(countMembersAtRank, noChatOutput)
-
+FCOGuildLottery._diceRollDataGuildSalesLottery = rolledData
         if rolledData ~= nil and rolledData.timestamp ~= nil then
             FCOGuildLottery.diceRollGuildLotteryHistory[guildId] = FCOGuildLottery.diceRollGuildLotteryHistory[guildId] or {}
             local currentlyUsedGuildSalesLotteryUniqueIdentifier = FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier
@@ -1073,24 +1075,7 @@ df( "RollTheDiceForGuildSalesLottery - noChatOutput: %s", tostring(noChatOutput)
             FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentlyUsedGuildSalesLotteryUniqueIdentifier][currentlyUsedGuildSalesLotteryTimestamp] = FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentlyUsedGuildSalesLotteryUniqueIdentifier][currentlyUsedGuildSalesLotteryTimestamp] or {}
             FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentlyUsedGuildSalesLotteryUniqueIdentifier][currentlyUsedGuildSalesLotteryTimestamp][rolledData.timestamp] = rolledData
 
-            --Is the UI currently shown?
-            local fcoglUI = FCOGuildLottery.UI
-            local fcoglUIwindow = fcoglUI and fcoglUI.window
-            if fcoglUIwindow ~= nil then
-                local windowFrame = fcoglUIwindow.frame
-                if windowFrame:IsControlHidden() then
-                    --Setting "Show UI" -> Create UI now and show it
-                    if FCOGuildLottery.settingsVars.settings.showUIAfterDiceRoll == true then
-                        fcoglUI.Show(true)
-                    end
-                end
-                if not windowFrame:IsControlHidden() then
-                    --Set the UI tab to "Guild Sales Lottery" and refresh the data
-                    fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true) --activate even if already shown, to update it
-                    --Scroll to the currently rolled member rank line
-                    --TODO
-                end
-            end
+            FCOGuildLottery.UI.RefreshWindowLists()
         end
     else
         resetCurrentGuildSalesLotteryData()
@@ -1142,6 +1127,7 @@ df( "GetRolledGuildMemberInfo-guildId: " ..tostring(guildId) .. ", diceSide: " .
 df("<guild sell rank data missing!")
         end
     end
+df("<<memberName: %s", tostring(memberName))
     return memberName, memberNote, rankIndex, playerStatus, secsSinceLogoff, guildIndex, soldSum
 end
 

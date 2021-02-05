@@ -41,6 +41,7 @@ function FCOGuildLottery.getSettings()
         defaultDiceSides = FCOGL_DICE_SIDES_DEFAULT,
 
         diceRollHistory = {},
+        diceRollGuildsHistory = {},
         diceRollGuildLotteryHistory = {},
 
         --false: Like MasterMerchant determines the sales from the history -> Until current time.
@@ -106,7 +107,8 @@ function FCOGuildLottery.getSettings()
     --=============================================================================================================
 
     --Connect local variables with the SV
-    FCOGuildLottery.diceRollHistory = FCOGuildLottery.settingsVars.settings.diceRollHistory
+    FCOGuildLottery.diceRollHistory             = FCOGuildLottery.settingsVars.settings.diceRollHistory
+    FCOGuildLottery.diceRollGuildsHistory       = FCOGuildLottery.settingsVars.settings.diceRollGuildsHistory
     FCOGuildLottery.diceRollGuildLotteryHistory = FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory
 
     --[[

@@ -60,6 +60,9 @@ local function addonLoaded(eventName, addon)
     --Get the SavedVariables
     FCOGuildLottery.getSettings()
 
+    --Get the guilds data for the dropdown boxes
+    FCOGuildLottery.guildsData = FCOGuildLottery.buildGuildsDropEntries()
+
     --Add the slash commands
     FCOGuildLottery.slashCommands()
 
@@ -68,9 +71,6 @@ local function addonLoaded(eventName, addon)
 
     --Dialogs
     FCOGuildLottery.AskBeforeResetDialogInitialize(FCOGLAskBeforeResetDialogXML, FCOGuildLottery.getDialogName("resetGuildSalesLottery"))
-
-    --Get the guilds data for the dropdown boxes
-    FCOGuildLottery.guildsData = FCOGuildLottery.buildGuildsDropEntries()
 
     --EVENTS
     --Register for the zone change/player ready event
