@@ -1312,13 +1312,13 @@ d(">1")
     local newDateTable = {year=currentDateTable.year, month=currentDateTable.month, day=currentDateTable.day}
     local guildLotteryDateEnd
     if settings.cutOffGuildSalesHistoryCurrentDateMidnight== true then
-        newDateTable.hour       = 0
-        newDateTable.minutes    = 0
-        newDateTable.seconds    = 0
+        newDateTable.hour   = 0
+        newDateTable.min    = 0
+        newDateTable.sec    = 0
     else
-        newDateTable.hour       = currentDateTable.hour
-        newDateTable.minutes    = currentDateTable.minutes
-        newDateTable.seconds    = currentDateTable.seconds
+        newDateTable.hour   = currentDateTable.hour
+        newDateTable.min    = currentDateTable.min
+        newDateTable.sec    = currentDateTable.sec
     end
     guildLotteryDateEnd = os.date("%c", os.time(newDateTable))
 d(">2")
