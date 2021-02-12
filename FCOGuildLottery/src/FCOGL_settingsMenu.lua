@@ -54,12 +54,12 @@ function FCOGuildLottery.buildAddonMenu()
 
         {
             type = 'description',
-            text = 'Helper addon for a guild lottery. Chat slash commands are:\n/fcogl   Toggle the UI\n/fcogls   Toggle the settings menu\n/dice <number>   Will roll a dice with <number> sides. If left empty this will roll a dice with 500 sides!\n/diceG1 - /diceG5  Will roll a dice for the number of guild members of guild 1 - 5\n/newgsl <guildIndex 1 to 5> will reset the last used lottery data and start a new one\n/gsl will roll the next dice for the active guild sales lottery.\n/gsllast or /dicelast will show the last dice roll results in your local chat (or if you got it enabled: within the \'DebugLogViewer\' UI) again.',
+            text = GetString(FCOGL_LAM_DESCRIPTION),
         },
         {
             type = 'dropdown',
-            name = 'Settings save type',
-            tooltip = 'Use account wide settings for all your characters, or save them separatley for each character?',
+            name = GetString(FCOGL_LAM_SAVE_TYPE),
+            tooltip = GetString(FCOGL_LAM_SAVE_TYPE_TT),
             choices = savedVariablesOptions,
             choicesValues = savedVariablesOptionsValues,
             getFunc = function() return FCOGuildLottery.settingsVars.defaultSettings.saveMode end,
@@ -99,12 +99,12 @@ function FCOGuildLottery.buildAddonMenu()
         --==============================================================================
         {
             type = 'header',
-            name = 'Dice settings',
+            name = GetString(FCOGL_LAM_DICE_OPTIONS),
         },
         {
             type    = "slider",
-            name    = "Default dice sides",
-            tooltip = "The standard sides of a dice which you roll via the \'/dice\' slash command, or via the keybind \'Roll dice with def. sides\'",
+            name    = GetString(FCOGL_LAM_DEFAULT_DICE_SIDES),
+            tooltip = GetString(FCOGL_LAM_DEFAULT_DICE_SIDES_TT),
             min     = 1,
             max     = FCOGL_MAX_DICE_SIDES,
             step    = 1,
@@ -114,16 +114,24 @@ function FCOGuildLottery.buildAddonMenu()
             setFunc = function(value) settings.defaultDiceSides = value   end,
             default = function() return defaults.defaultDiceSides end,
         },
+        {
+            type    = "checkbox",
+            name    = GetString(FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL),
+            tooltip = GetString(FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL_TT),
+            getFunc = function() return settings.showUIAfterDiceRoll end,
+            setFunc = function(value) settings.showUIAfterDiceRoll = value end,
+            default = function() return defaults.showUIAfterDiceRoll end,
+        },
 
         --==============================================================================
         {
             type = 'header',
-            name = 'Guild role settings',
+            name = GetString(FCOGL_LAM_GUILD_ROLL_OPTIONS),
         },
         {
             type    = "editbox",
-            name    = "Chat edit box: Dice roll result",
-            tooltip = "Define the text that should be shown in the chat after a normal guild dice roll was done, and a member index was determined\n\nYou can use the following placeholders:\n<<1>>   Dice roll #\n<<2>>   @AccountName of guild member.",
+            name    = GetString(FCOGL_LAM_GUILD_DICE_ROLL_RESULT_TO_CHAT_EDIT),
+            tooltip = GetString(FCOGL_LAM_GUILD_DICE_ROLL_RESULT_TO_CHAT_EDIT_TT),
             isMultiline = false,
             isExtraWide = true,
             getFunc = function() return settings.preFillChatEditBoxAfterDiceRollTextTemplates.normal[1] end,
@@ -134,35 +142,47 @@ function FCOGuildLottery.buildAddonMenu()
         --==============================================================================
         {
             type = 'header',
-            name = 'Guild lottery settings',
+            name = GetString(FCOGL_LAM_GUILD_LOTTERY_OPTIONS)
         },
         {
             type    = "checkbox",
-            name    = "Cut-off at 00:00 current day",
-            tooltip = "Cut-off the guild sales history data at the current day at 00:00.\nNo newer events coming in after 00:00 via LibHistoire will be used for the ranking!\nIf this setting is disabled (default setting) the ranking will be using the same values as Master Merchant e.g. does for the 7 days ranking.",
+            name    = GetString(FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT),
+            tooltip = GetString(FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT_TT),
             getFunc = function() return settings.cutOffGuildSalesHistoryCurrentDateMidnight end,
             setFunc = function(value) settings.cutOffGuildSalesHistoryCurrentDateMidnight = value end,
             default = function() return defaults.cutOffGuildSalesHistoryCurrentDateMidnight end,
         },
         {
             type    = "editbox",
-            name    = "Chat edit box: Dice roll result",
-            tooltip = "Define the text that should be shown in the chat after a guild sales lottery dice roll was done, and a member rank was determined\n\nYou can use the following placeholders:\n<<1>>   Dice roll #\n<<2>>   @AccountName of seller.",
+            name    = GetString(FCOGL_LAM_GUILD_DICE_ROLL_RESULT_TO_CHAT_EDIT),
+            tooltip = GetString(FCOGL_LAM_GUILD_LOTTERY_DICE_ROLL_RESULT_TO_CHAT_EDIT_TT),
             isMultiline = false,
             isExtraWide = true,
             getFunc = function() return settings.preFillChatEditBoxAfterDiceRollTextTemplates.guilds[1] end,
             setFunc = function(value) settings.preFillChatEditBoxAfterDiceRollTextTemplates.guilds[1] = value end,
             default = function() return defaults.preFillChatEditBoxAfterDiceRollTextTemplates.guilds[1] end,
         },
+        {
+            type = 'datepicker',
+            name = GetString(FCOGL_LAM_GUILD_LOTTERY_DATE_FROM),
+            tooltip = GetString(FCOGL_LAM_GUILD_LOTTERY_DATE_FROM_TT),
+            getFunc = function() return FCOGuildLottery.settingsVars.settings.guildLotteryDateStart end,
+            setFunc = function(dateTimeStampPicked)
+                FCOGuildLottery.settingsVars.settings.guildLotteryDateStart = dateTimeStampPicked
+                FCOGuildLottery.settingsVars.settings.guildLotteryDateStartSet = true
+            end,
+            width = "full",
+            reference = "FCOGL_DatePickerFrom"
+        },
 
         --==============================================================================
         {
             type = 'header',
-            name = 'Debugging',
+            name = GetString(FCOGL_LAM_DEBUG_OPTIONS),
         },
         {
             type    = "checkbox",
-            name    = "Debug",
+            name    = GetString(FCOGL_LAM_DEBUG_OPTIONS),
             tooltip = "Enable debugging output",
             getFunc = function() return settings.debug  end,
             setFunc = function(value) settings.debug = value   end,
@@ -170,8 +190,8 @@ function FCOGuildLottery.buildAddonMenu()
         },
         {
             type    = "checkbox",
-            name    = "Chat output too (LibDebugLogger)",
-            tooltip = "If LibDebugLogger is enabled the logging will only be shown in the UI DebugLogViewer, or within the SavedVariables file LibDebugLogger.lua.\nIf you enable the setting there also will be a chat output shown for you, but only if:\n|c5F5F5F\'LibDebugLogger\' is loaded AND \'DebugLogViewer\' is currently not loaded|r.",
+            name    = GetString(FCOGL_LAM_DEBUG_CHAT_OUTPUT_TOO),
+            tooltip = GetString(FCOGL_LAM_DEBUG_CHAT_OUTPUT_TOO_TT),
             getFunc = function() return settings.debugToChatToo  end,
             setFunc = function(value) settings.debugToChatToo = value   end,
             default = function() return defaults.debugToChatToo  end,

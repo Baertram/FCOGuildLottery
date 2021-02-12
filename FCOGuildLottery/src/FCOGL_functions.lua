@@ -798,6 +798,7 @@ df( "RollTheDice - sidesOfDice: %s, noChatOutput: %s", tostring(sidesOfDice), to
     math.randomseed(os.time()) -- random initialize
 
     local diceRollTypeGuild = FCOGuildLottery.currentlyUsedDiceRollType
+    --local isNormalGuildRoll = (diceRollTypeGuild == FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC) or false
     local isGuildSalesLottery = (diceRollTypeGuild == FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY) or false
 
     --Create random dice value
@@ -858,7 +859,6 @@ df( "<ABORT: rolledGuildMemberDisplayName is nil - sidesOfDice: %s, guildId: %s"
             FCOGuildLottery.diceRollHistory[now] = diceRollData
         end
     end
-FCOGuildLottery._diceRollData = diceRollData
     if not noChatOutput then
         local diceTypeStr
         --local settings = FCOGuildLottery.settingsVars.settings
@@ -1066,7 +1066,6 @@ df( "RollTheDiceForGuildSalesLottery - noChatOutput: %s", tostring(noChatOutput)
     if countMembersAtRank ~= nil and countMembersAtRank > 0 then
         --Roll the dice with the number of guild sales members rank of that guildId
         rolledData = FCOGuildLottery.RollTheDice(countMembersAtRank, noChatOutput)
-FCOGuildLottery._diceRollDataGuildSalesLottery = rolledData
         if rolledData ~= nil and rolledData.timestamp ~= nil then
             FCOGuildLottery.diceRollGuildLotteryHistory[guildId] = FCOGuildLottery.diceRollGuildLotteryHistory[guildId] or {}
             local currentlyUsedGuildSalesLotteryUniqueIdentifier = FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier
@@ -1166,6 +1165,13 @@ df("[FCOGuildLottery.RollTheDiceNormalForGuildMemberCheck] - index: %s, noChatOu
         FCOGuildLottery.currentlyUsedDiceRollGuildName = nil
         FCOGuildLottery.currentlyUsedDiceRollGuildId = nil
         FCOGuildLottery.currentlyUsedDiceRollType =  FCOGL_DICE_ROLL_TYPE_GENERIC
+        return
+    end
+    --Is currently any guild lottery active? As a normal guild dice roll would interrupt it we need to ask if we want to
+    if FCOGuildLottery.IsGuildSalesLotteryActive() then
+        --Show dialog and ask if we really want to! If yes is chosen: Try the dice throw again now, after resetting the current guild lottery
+        FCOGuildLottery.ResetCurrentGuildSalesLotteryData(false, false, nil, nil, FCOGuildLottery.normalGuildMemeberDiceRollSlashCommand, nil)
+        --Abort here now and let the dialog Yes callback function try again, or no do nothing
         return
     end
     if not IsGuildIndexValid(guildIndex) then

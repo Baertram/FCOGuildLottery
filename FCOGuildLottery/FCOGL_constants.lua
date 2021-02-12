@@ -54,7 +54,6 @@ if LibHistoire ~= nil then
 
     --Adding a callback to the LibHistoire INITIALIZED event
     FCOGuildLottery.LH:RegisterCallback(FCOGuildLottery.LH.callback.INITIALIZED, function()
-        df( ">>>>>>>>>> \'LibHistoire\' is initialized now >>>>>>>>>>")
         FCOGuildLottery.libHistoireIsReady = true
         --Further sales history read and build for the default 7 days backwards will be done at event_player_activated!
     end)

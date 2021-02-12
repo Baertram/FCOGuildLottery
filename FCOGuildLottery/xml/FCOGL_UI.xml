@@ -347,6 +347,12 @@
                     </Controls>
 				</Control>
 
+				<Label name="$(parent)GuildLotteryDateStartLabel" font="ZoFontGameSmall" horizontalAlignment="LEFT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED">
+					<Anchor point="BOTTOM" relativeTo="$(parent)GuildsDrop" relativePoint="TOP" offsetX="0" offsetY="-1" />
+					<Dimensions x="300" y="32" />
+				</Label>
+
+
 				<!-- Sort headers -->
 				<Control name="$(parent)Headers">
 					<Anchor point="TOPLEFT" offsetX="30" offsetY="51" />

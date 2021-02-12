@@ -16,10 +16,12 @@ local dfw   = FCOGuildLottery.dfw
 --SLASH COMMANDS
 local function normalGuildMemeberDiceRollSlashCommand(guildIndex)
     local diceSidesGuild = FCOGuildLottery.RollTheDiceNormalForGuildMemberCheck(guildIndex, false)
-    if diceSidesGuild then
+    if diceSidesGuild ~= nil then
         FCOGuildLottery.RollTheDice(diceSidesGuild, false)
     end
 end
+FCOGuildLottery.normalGuildMemeberDiceRollSlashCommand = normalGuildMemeberDiceRollSlashCommand
+
 function FCOGuildLottery.slashCommands()
     SLASH_COMMANDS["/diceg1"] = function()
         normalGuildMemeberDiceRollSlashCommand(1)
