@@ -805,6 +805,7 @@ df( "RollTheDice - sidesOfDice: %s, noChatOutput: %s", tostring(sidesOfDice), to
     local diceSide
 
     if isGuildSalesLottery == true then
+d(">IsGuildSalesLottery: true")
         if FCOGuildLottery.currentlyUsedGuildSalesLotteryRolls ~= nil then
             diceSide = rollADiceUntilNewValue(sidesOfDice, FCOGuildLottery.currentlyUsedGuildSalesLotteryRolls)
             if sidesOfDice == 1 then
@@ -824,6 +825,7 @@ df( "RollTheDice - sidesOfDice: %s, noChatOutput: %s", tostring(sidesOfDice), to
     local guildId = FCOGuildLottery.currentlyUsedDiceRollGuildId
     local rolledGuildMemberDisplayName, memberNote, rankIndex, playerStatus, secsSinceLogoff, guildIndex, soldSum
     if guildId ~= nil then
+df(">guildId found %s", guildId)
         --Get the guildMember with the rolled dice value (or if guild sales lottery: from the sales history data -> via LibHistoire)
         rolledGuildMemberDisplayName, memberNote, rankIndex, playerStatus, secsSinceLogoff, guildIndex, soldSum = FCOGuildLottery.GetRolledGuildMemberInfo(guildId, diceSide, isGuildSalesLottery)
         if rolledGuildMemberDisplayName == nil then
@@ -913,6 +915,18 @@ function FCOGuildLottery.IsGuildSalesLotteryActive()
     return (FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier ~= nil and
            FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= nil and
            FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId ~= nil) or false
+end
+
+function FCOGuildLottery.UpdateMaxDiceSidesForGuildLottery(numDiceSides)
+df("UpdateMaxDiceSidesForGuildLottery - numDiceSides: %s", tostring(numDiceSides))
+    if numDiceSides == nil then return end
+    FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
+    FCOGuildLottery.UI.window.editBoxDiceSides:SetText(tostring(numDiceSides))
+end
+
+function FCOGuildLottery.ReloadGuildSalesLotteryRanks()
+    df("ReloadGuildSalesLotteryRanks")
+    if not FCOGuildLottery.IsGuildSalesLotteryActive() then return end
 end
 
 --Reset the stored / last used data and enable a new lottery dice throw, where the popups of guild and timeFrame selection
@@ -1048,6 +1062,7 @@ df( "RollTheDiceForGuildSalesLottery - noChatOutput: %s", tostring(noChatOutput)
     else
         guildId     = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId
         guildIndex  = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex
+        df(">Use existing guild sales lottery id %s, \'%s\' >>>>>>>>>>>>>>>>>>>>", tostring(guildId), os.date("%c", FCOGuildLottery.currentlyUsedGuildSalesLotteryTimestamp))
     end
 
     --Set the dice roll type
@@ -1064,9 +1079,13 @@ df( "RollTheDiceForGuildSalesLottery - noChatOutput: %s", tostring(noChatOutput)
         )
     end
     if countMembersAtRank ~= nil and countMembersAtRank > 0 then
+        FCOGuildLottery.UpdateMaxDiceSidesForGuildLottery(countMembersAtRank)
+
         --Roll the dice with the number of guild sales members rank of that guildId
         rolledData = FCOGuildLottery.RollTheDice(countMembersAtRank, noChatOutput)
+d(">>after rolled the dice, rolledData: %s", tostring(rolledData ~= nil))
         if rolledData ~= nil and rolledData.timestamp ~= nil then
+d(">>>rolleData found")
             FCOGuildLottery.diceRollGuildLotteryHistory[guildId] = FCOGuildLottery.diceRollGuildLotteryHistory[guildId] or {}
             local currentlyUsedGuildSalesLotteryUniqueIdentifier = FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier
             local currentlyUsedGuildSalesLotteryTimestamp = FCOGuildLottery.currentlyUsedGuildSalesLotteryTimestamp
@@ -1137,6 +1156,14 @@ df("[FCOGuildLottery.NewGuildSalesLottery] - index: %s, daysBefore: %s", tostrin
     FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex = guildIndex
     FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore = daysBefore
     FCOGuildLottery.RollTheDiceForGuildSalesLottery()
+end
+
+function FCOGuildLottery.GetGuildSalesLotteryStartDate()
+    --TODO Check the settings for the startdate:
+    --TODO FCOGuildLottery.settingsVars.settings.guildLotteryDateStart
+    --TODO Count the days difference between now and this date, and return the days difference value.
+    --TODO If below 1, then use 1
+    return FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS
 end
 
 function FCOGuildLottery.StartNewGuildSalesLottery(guildIndex, daysBefore, dataWasResetAlready)
