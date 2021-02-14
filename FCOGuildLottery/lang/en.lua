@@ -30,6 +30,10 @@ FCOGuildLottery.lang["en"] = {
 
     FCOGL_DICE_PREFIX                           = "D",
 
+    FCOGL_CURRENTGUILSALESLOTTERY_TEXT              = "Start: %s / End: %s",
+    FCOGL_CURRENTGUILSALESLOTTERY_DICEHISTORY_TEXT  = "From: %s / -%s days",
+    FCOGL_GUILDSALESLOTTERY_HISTORY_DROP_TT         = "Select from saved guild sales lottery histories, by date & time",
+
     --LAM settings menu
     --Description
     FCOGL_LAM_DESCRIPTION                       = 'Helper addon for a guild lottery. Chat slash commands are:\n/fcogl   Toggle the UI\n/fcogls   Toggle the settings menu\n/dice <number>   Will roll a dice with <number> sides. If left empty this will roll a dice with 500 sides!\n/diceG1 - /diceG5  Will roll a dice for the number of guild members of guild 1 - 5\n/newgsl <guildIndex 1 to 5> will reset the last used lottery data and start a new one\n/gsl will roll the next dice for the active guild sales lottery.\n/gsllast or /dicelast will show the last dice roll results in your local chat (or if you got it enabled: within the \'DebugLogViewer\' UI) again.',

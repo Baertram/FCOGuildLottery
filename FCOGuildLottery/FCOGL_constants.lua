@@ -40,7 +40,9 @@ FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS = 7 -- 1 week
 FCOGuildLottery.lang = {}
 
 FCOGuildLottery.constStr = {}
-FCOGuildLottery.constStr.guildLotteryLastNDays = "GuildSellsLast%sDays_%s" --1st: days, 2nd: guildName
+--Changed at 20210214, removed GuildName as the uniqueId will be used inside tables where the unique guildId is already given as a top level filter
+--FCOGuildLottery.constStr.guildLotteryLastNDays = "GuildSellsLast%sDays_%s" --1st: days, 2nd: guildName
+FCOGuildLottery.constStr.guildLotteryLastNDays = "GuildSells_Last%sDays" --1st: days
 
 FCOGuildLottery.noGuildIndex = MAX_GUILDS + 1 -- The index of the first non-guild entry in the guilds dropdown box
 ------------------------------------------------------------------------------------------------------------------------
@@ -115,6 +117,7 @@ FCOGL_LISTTYPE_ROLLED_DICE_HISTORY = 2
 
 FCOGL_SEARCHDROP_PREFIX = "FCOGL_SEARCHDROP"
 FCOGL_GUILDSDROP_PREFIX = "FCOGL_GUILDSDROP"
+FCOGL_GUILDSALESHISTORYDROP_PREFIX = "FCOGL_GUILDSALESHISTORYDROP"
 
 FCOGL_SEARCH_TYPE_NAME = 1
 

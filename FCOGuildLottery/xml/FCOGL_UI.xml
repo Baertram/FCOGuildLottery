@@ -349,7 +349,7 @@
 				</Control>
 
 				<Label name="$(parent)GuildLotteryDateStartLabel" font="ZoFontGameSmall" horizontalAlignment="LEFT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED">
-					<Anchor point="BOTTOM" relativeTo="$(parent)GuildsDrop" relativePoint="TOP" offsetX="0" offsetY="-1" />
+					<Anchor point="BOTTOM" relativeTo="$(parent)GuildsDrop" relativePoint="TOP" offsetX="0" offsetY="2" />
 					<Dimensions x="300" y="32" />
 				</Label>
 
@@ -514,6 +514,44 @@
 			<DimensionConstraints minX="500" minY="300" />
 			<Anchor point="TOPLEFT" relativeTo="FCOGLFrame" relativePoint="TOPRIGHT" offsetX="0" offsetY="0"/>
 			<Controls>
+				<Label name="$(parent)HistoryTypeLabel" font="ZoFontGameSmall" horizontalAlignment="LEFT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED">
+					<Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPLEFT" offsetX="10" offsetY="10" />
+					<Dimensions x="300" y="32" />
+				</Label>
+				<Label name="$(parent)GuildSalesHistoryInfoLabel" font="ZoFontGameSmall" horizontalAlignment="LEFT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED">
+					<Anchor point="TOPLEFT" relativeTo="$(parent)HistoryTypeLabel" relativePoint="BOTTOMLEFT" offsetX="0" offsetY="3" />
+					<Dimensions x="300" y="32" />
+				</Label>
+				<Control name="$(parent)GuildHistoryDrop" resizeToFitDescendents="true" mouseEnabled="true">
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)HistoryTypeLabel" />
+					<OnInitialized>
+						ZO_ComboBox:New(self)
+					</OnInitialized>
+					<OnMouseUp>
+						if button == MOUSE_BUTTON_INDEX_LEFT and upInside then
+							ZO_ComboBox_DropdownClicked(self)
+						end
+					</OnMouseUp>
+					<Controls>
+						<Label name="$(parent)Anchor" inherits="FCOGLSearchLabel">
+							<Anchor point="RIGHT" />
+						</Label>
+						<Button name="$(parent)OpenDropdown" inherits="ZO_DropdownButton">
+							<Dimensions x="16" y="16" />
+							<Anchor point="RIGHT" relativeTo="$(parent)Anchor" relativePoint="LEFT" offsetX="-3" />
+							<OnClicked>
+								ZO_ComboBox_DropdownClicked(self:GetParent())
+							</OnClicked>
+							<OnMouseEnter>
+								FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_GUILDSALESLOTTERY_HISTORY_DROP_TT))
+							</OnMouseEnter>
+							<OnMouseExit>
+								FCOGL.HideTooltip()
+							</OnMouseExit>
+						</Button>
+					</Controls>
+				</Control>
+
 				<Backdrop name="$(parent)Search" tier="HIGH" inherits="ZO_SingleLineEditBackdrop_Keyboard">
 					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" offsetX="-38" offsetY="14" />
 					<Dimensions x="150" />
@@ -588,11 +626,6 @@
                         </Control>
 					</Controls>
 				</Control>
-
-				<Label name="$(parent)HistoryTypeLabel" font="ZoFontGameSmall" horizontalAlignment="LEFT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED">
-					<Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPLEFT" offsetX="10" offsetY="10" />
-					<Dimensions x="300" y="32" />
-				</Label>
 
 				<Control name="$(parent)List" inherits="ZO_ScrollList">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)Headers" relativePoint="BOTTOMLEFT" offsetY="3" />
