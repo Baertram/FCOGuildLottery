@@ -294,7 +294,7 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
                 end
                 --self:updateSortHeaderAnchorsAndPositions(fcoglUI.CurrentTab, settings.maxNameColumnWidth, 32)
             elseif FCOGuildLottery.currentlyUsedDiceRollGuildId ~= nil then
-                --TODO Show the normal guild members list!
+                --TODO Show the normal guild members list at the ranks list?
 
             end
         end
@@ -763,6 +763,53 @@ local function abortUpdateNow(p_searchBoxType, p_lastIndex)
     fcoglUI.SelectLastDropdownEntry(p_searchBoxType, p_lastIndex, false)
 end
 
+function fcoglUI.getSelectedGuildsDropEntry()
+    return fcoglUIwindow.guildsDrop:GetSelectedItemData()
+end
+
+local function setLastSelected()
+    local selectedGuildDropsData = fcoglUI.getSelectedGuildsDropEntry()
+    fcoglUIwindow:SetSearchBoxLastSelected(fcoglUI.CurrentTab, "guilds", selectedGuildDropsData.selectedIndex)
+end
+
+function fcoglUI.resetGuildDropDownToNone()
+    setLastSelected()
+
+    --Reset the guildId etc. which will be selected as a guild was selected at teh guilds dropdown and NO guildLottery was started
+    FCOGuildLottery.currentlyUsedDiceRollGuildId = nil
+
+    --Set to normal dice roll
+    FCOGuildLottery.currentlyUsedDiceRollType = FCOGL_DICE_ROLL_TYPE_GENERIC
+
+    --Update the maximum number of the dice sides to the maximum possible again
+    updateMaxDefaultDiceSides()
+
+    --Set the current tab as active again to force the update of all lists and buttons
+    fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true)
+end
+
+function fcoglUI.resetGuildDropDownToGuild(guildIndex)
+    setLastSelected()
+
+    --Set the current guildId for normal guild member dice rolls
+    FCOGuildLottery.currentlyUsedDiceRollType = FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC
+    --Set the guildId for the normal guild dice rolls
+    FCOGuildLottery.currentlyUsedDiceRollGuildId = GetGuildId(guildIndex)
+
+    --Update the maximum number of the dice sides to the current guild's member #
+    local diceSidesGuild = FCOGuildLottery.RollTheDiceNormalForGuildMemberCheck(guildIndex, true)
+    if diceSidesGuild and diceSidesGuild > 0 then
+        FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
+        fcoglUIwindow.editBoxDiceSides:SetText(tostring(diceSidesGuild))
+    else
+        updateMaxDefaultDiceSides()
+    end
+
+    --Set the current tab as active again to force the update of all lists and buttons
+    fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true)
+end
+
+
 function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, searchBoxType )
     local comboBoxOwner = self
     local isGuildsCB = ((prefix == FCOGL_GUILDSDROP_PREFIX) or searchBoxType == "guilds") or false
@@ -778,6 +825,8 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
     local entryCallbackNoGuild = function( _, _, entry, _ ) --comboBox, entryText, entry )
         local function updateEntryNowNoGuild(guildIndex, daysBefore)
             df(">>UpdateEntryNow_NoGuild - selectedIndex: %s, CurrentTab: %s searchBoxType: %s", tostring(entry.selectedIndex), tostring(fcoglUI.CurrentTab), tostring(searchBoxType))
+            fcoglUI.resetGuildDropDownToNone()
+            --[[
             comboBoxOwner:SetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType, entry.selectedIndex)
             --Reset the guildId etc. which will be selected as a guild was selected at teh guilds dropdown and NO guildLottery was started
             FCOGuildLottery.currentlyUsedDiceRollGuildId = nil
@@ -790,6 +839,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
 
             --Set the current tab as active again to force the update of all lists and buttons
             fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true)
+            ]]
         end
         --No guild selected!
         local lastSelectedIndex = comboBoxOwner:GetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType)
@@ -815,6 +865,8 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
         df(">entryCallbackGuild - selectedIndex: %s, id: %s, searchBoxType: %s", tostring(entry.selectedIndex), tostring(entry.id), tostring(searchBoxType))
         local function updateEntryNow(guildIndex, daysBefore)
             df(">>updateEntryNow - selectedIndex: %s, CurrentTab: %s searchBoxType: %s", tostring(entry.selectedIndex), tostring(fcoglUI.CurrentTab), tostring(searchBoxType))
+            fcoglUI.resetGuildDropDownToGuild(guildIndex)
+            --[[
             comboBoxOwner:SetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType, entry.selectedIndex)
 
             --Set the current guildId for normal guild member dice rolls
@@ -833,6 +885,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
 
             --Set the current tab as active again to force the update of all lists and buttons
             fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true)
+            ]]
         end
 
         --Guild selected
@@ -1355,35 +1408,51 @@ function fcoglWindowClass:updateSortHeaderAnchorsAndPositions(currentTab, nameHe
     end
 end
 
-function fcoglWindowClass:checkRefreshGuildSalesLotteryButtonEnabled()
-df("fcoglWindowClass:checkRefreshGuildSalesLotteryButtonEnabled")
+function fcoglWindowClass:checkStopGuildSalesLotteryButtonEnabled()
+    df("fcoglWindowClass:checkStopGuildSalesLotteryButtonEnabled")
+    local stopGuildSalesLotteryButton = self.frame:GetNamedChild("StopGuildSalesLottery")
+    if not stopGuildSalesLotteryButton then return end
     --No guildId selected?
     local isEnabled = self:checkNewGuildSalesLotteryButtonEnabled()
     if not isEnabled or not FCOGuildLottery.IsGuildSalesLotteryActive()
-        or ( FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= nil and
-        FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= self.guildsDrop:GetSelectedItemData().index ) then
+            or ( FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= nil and
+            FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= self.guildsDrop:GetSelectedItemData().index ) then
         isEnabled = false
-d(">isEnabled -> false")
     end
+    stopGuildSalesLotteryButton:SetEnabled(isEnabled)
+    stopGuildSalesLotteryButton:SetMouseEnabled(isEnabled)
+    return isEnabled
+end
+
+function fcoglWindowClass:checkRefreshGuildSalesLotteryButtonEnabled()
+    df("fcoglWindowClass:checkRefreshGuildSalesLotteryButtonEnabled")
     local reloadGuildSalesLotteryButton = self.frame:GetNamedChild("ReloadGuildSalesLottery")
+    if not reloadGuildSalesLotteryButton then return end
+    --No guildId selected?
+    local isEnabled = self:checkNewGuildSalesLotteryButtonEnabled()
+    if not isEnabled or not FCOGuildLottery.IsGuildSalesLotteryActive()
+            or ( FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= nil and
+            FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= self.guildsDrop:GetSelectedItemData().index ) then
+        isEnabled = false
+    end
     reloadGuildSalesLotteryButton:SetEnabled(isEnabled)
     reloadGuildSalesLotteryButton:SetMouseEnabled(isEnabled)
     return isEnabled
 end
 
 function fcoglWindowClass:checkNewGuildSalesLotteryButtonEnabled()
-df("fcoglWindowClass:checkNewGuildSalesLotteryButtonEnabled")
+    df("fcoglWindowClass:checkNewGuildSalesLotteryButtonEnabled")
+    local newGuildSalesLotteryButton = self.frame:GetNamedChild("NewGuildSalesLottery")
+    if not newGuildSalesLotteryButton then return end
     local isEnabled = true
     --No guildId selected?
     local selectedGuildDropsData = self.guildsDrop:GetSelectedItemData()
     local guildIndex = selectedGuildDropsData.index
     local gotTrader = selectedGuildDropsData.gotTrader
     if guildIndex == nil or guildIndex == FCOGuildLottery.noGuildIndex or
-        not FCOGuildLottery.IsGuildIndexValid(guildIndex) or not gotTrader then
+            not FCOGuildLottery.IsGuildIndexValid(guildIndex) or not gotTrader then
         isEnabled = false
     end
-d(">isEnabled: " ..tostring(isEnabled))
-    local newGuildSalesLotteryButton = self.frame:GetNamedChild("NewGuildSalesLottery")
     newGuildSalesLotteryButton:SetEnabled(isEnabled)
     newGuildSalesLotteryButton:SetMouseEnabled(isEnabled)
     return isEnabled
@@ -1504,8 +1573,10 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 self.frame:GetNamedChild("RollTheDice"):SetHidden(false)
                 self:checkNewGuildSalesLotteryButtonEnabled()
                 self:checkRefreshGuildSalesLotteryButtonEnabled()
+                self:checkStopGuildSalesLotteryButtonEnabled()
                 self.frame:GetNamedChild("NewGuildSalesLottery"):SetHidden(false)
-                self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetHidden(false)
+                --self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetHidden(false)
+                self.frame:GetNamedChild("StopGuildSalesLottery"):SetHidden(false)
 
                 self.frame:GetNamedChild("GuildsDrop"):SetHidden(false)
 

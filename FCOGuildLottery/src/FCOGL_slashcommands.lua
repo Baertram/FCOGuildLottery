@@ -15,10 +15,12 @@ local dfw   = FCOGuildLottery.dfw
 ------------------------------------------------------------------------------------------------------------------------
 --SLASH COMMANDS
 local function normalGuildMemeberDiceRollSlashCommand(guildIndex)
+    FCOGuildLottery.RememberCurrentGenericGuildDiceThrowData()
     local diceSidesGuild = FCOGuildLottery.RollTheDiceNormalForGuildMemberCheck(guildIndex, false)
     if diceSidesGuild ~= nil then
-        FCOGuildLottery.RollTheDice(diceSidesGuild, false)
+        FCOGuildLottery.RollTheDice(diceSidesGuild, false, FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC)
     end
+    FCOGuildLottery.ResetCurrentGenericGuildDiceThrowData()
 end
 FCOGuildLottery.normalGuildMemeberDiceRollSlashCommand = normalGuildMemeberDiceRollSlashCommand
 
@@ -41,12 +43,14 @@ function FCOGuildLottery.slashCommands()
 
     --Generic slash commands
     SLASH_COMMANDS["/dice"] = function(params)
+        FCOGuildLottery.RememberCurrentGenericGuildDiceThrowData()
         local diceSides = FCOGuildLottery.parseSlashCommandArguments(params, "/dice")
         if diceSides == nil or diceSides <= 0 then
             diceSides = FCOGL_MAX_DICE_SIDES
         end
         FCOGuildLottery.currentlyUsedDiceRollType = FCOGL_DICE_ROLL_TYPE_GENERIC
-        FCOGuildLottery.RollTheDice(diceSides, false)
+        FCOGuildLottery.RollTheDiceAndUpdateUIIfShown(diceSides, false, FCOGL_DICE_ROLL_TYPE_GENERIC)
+        FCOGuildLottery.ResetCurrentGenericGuildDiceThrowData()
     end
 
     SLASH_COMMANDS["/dicelast"]             = function()

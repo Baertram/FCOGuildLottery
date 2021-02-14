@@ -88,7 +88,11 @@ function FCOGuildLottery.getSettings()
         UIDiceHistoryWindow = {
             isHidden = true,
         },
-        showUIAfterDiceRoll = false,
+        showUIForDiceRollTypes = {
+          [FCOGL_DICE_ROLL_TYPE_GENERIC]                = false,
+          [FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC]          = false,
+          [FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY]    = false,
+        },
 
     }
     FCOGuildLottery.settingsVars.defaults = defaults

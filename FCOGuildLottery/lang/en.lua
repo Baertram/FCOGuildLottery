@@ -19,10 +19,19 @@ FCOGuildLottery.lang["en"] = {
 
     FCOGL_NO_GUILD                              = "-> No guild <-",
 
+    FCOGL_DICE_TYPE_STRING_RANDOM               = "Random",
+    FCOGL_DICE_TYPE_STRING_GUILD                = "Guild's \'%s\' member index ",
+    FCOGL_DICE_TYPE_STRING_GUILDSALESLOTTERY    = "Guild's \'%s\' sales lottery rank ",
+
+    FCOGL_LASTROLLED_DICE_CHAT_OUTPUT           = "%s dice roll (D%s) =   %s",
+    FCOGL_LASTROLLED_DICE_FOUND_MEMBER_SOLD_CHAT_OUTPUT = ">>Found member \'%s\' at rank: %s, with sold sum: %s",
+    FCOGL_LASTROLLED_DICE_FOUND_MEMBER_CHAT_OUTPUT = ">>Found member \'%s\'",
+
     FCOGL_DICE_SIDES                            = "# of sides of the dice",
     FCOGL_START_NEW_GUILD_SALES_LOTTERY         = "Start new guild sales lottery",
     FCOGL_ROLL_THE_DICE                         = "Roll the dice",
     FCOGL_REFRESH                               = "Refresh",
+    FCOGL_STOP_GUILDSALESLOTTERY                = "Stop guild sales lottery",
     FCOGL_SETTINGS                              = "Open settings",
     FCOGL_CLOSE                                 = "Close",
     FCOGL_TOGGLE_DICE_ROLL_HISTORY              = "Toggle dice roll history",
@@ -57,7 +66,7 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT     = "Cut-off at 00:00 current day",
     FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT_TT  = "Cut-off the guild sales history data at the current day at 00:00.\nNo newer events coming in after 00:00 via LibHistoire will be used for the ranking!\nIf this setting is disabled (default setting) the ranking will be using the same values as Master Merchant e.g. does for the 7 days ranking.",
     FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL    = "Show UI after dice roll",
-    FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL_TT = "Automatically show the UI after a dice roll was done via a slash command. The dice roll history will be shown as well then.",
+    FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL_TT = "Automatically show the UI after a dice roll was done via a slash command.\nThe dice roll history will be shown as well then, but only if not any other dice roll type was already selected at the UI (e.g. it will not show the generic guild throw history if a guid sales history was already started and selected / it will not show the generic history if a guild was selected already).",
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM               = "Date from",
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM_TT            = "The start date of the guild sales lottery. Default value is today - 7 days (at midnight).",
 

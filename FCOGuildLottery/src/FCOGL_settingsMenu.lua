@@ -118,9 +118,9 @@ function FCOGuildLottery.buildAddonMenu()
             type    = "checkbox",
             name    = GetString(FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL),
             tooltip = GetString(FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL_TT),
-            getFunc = function() return settings.showUIAfterDiceRoll end,
-            setFunc = function(value) settings.showUIAfterDiceRoll = value end,
-            default = function() return defaults.showUIAfterDiceRoll end,
+            getFunc = function() return settings.showUIForDiceRollTypes[FCOGL_DICE_ROLL_TYPE_GENERIC] end,
+            setFunc = function(value) settings.showUIForDiceRollTypes[FCOGL_DICE_ROLL_TYPE_GENERIC] = value end,
+            default = function() return defaults.showUIForDiceRollTypes[FCOGL_DICE_ROLL_TYPE_GENERIC] end,
         },
 
         --==============================================================================
@@ -138,6 +138,14 @@ function FCOGuildLottery.buildAddonMenu()
             setFunc = function(value) settings.preFillChatEditBoxAfterDiceRollTextTemplates.normal[1] = value end,
             default = function() return defaults.preFillChatEditBoxAfterDiceRollTextTemplates.normal[1] end,
         },
+        {
+            type    = "checkbox",
+            name    = GetString(FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL),
+            tooltip = GetString(FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL_TT),
+            getFunc = function() return settings.showUIForDiceRollTypes[FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC] end,
+            setFunc = function(value) settings.showUIForDiceRollTypes[FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC] = value end,
+            default = function() return defaults.showUIForDiceRollTypes[FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC] end,
+        },
 
         --==============================================================================
         {
@@ -153,16 +161,6 @@ function FCOGuildLottery.buildAddonMenu()
             default = function() return defaults.cutOffGuildSalesHistoryCurrentDateMidnight end,
         },
         {
-            type    = "editbox",
-            name    = GetString(FCOGL_LAM_GUILD_DICE_ROLL_RESULT_TO_CHAT_EDIT),
-            tooltip = GetString(FCOGL_LAM_GUILD_LOTTERY_DICE_ROLL_RESULT_TO_CHAT_EDIT_TT),
-            isMultiline = false,
-            isExtraWide = true,
-            getFunc = function() return settings.preFillChatEditBoxAfterDiceRollTextTemplates.guilds[1] end,
-            setFunc = function(value) settings.preFillChatEditBoxAfterDiceRollTextTemplates.guilds[1] = value end,
-            default = function() return defaults.preFillChatEditBoxAfterDiceRollTextTemplates.guilds[1] end,
-        },
-        {
             type = 'datepicker',
             name = GetString(FCOGL_LAM_GUILD_LOTTERY_DATE_FROM),
             tooltip = GetString(FCOGL_LAM_GUILD_LOTTERY_DATE_FROM_TT),
@@ -173,6 +171,24 @@ function FCOGuildLottery.buildAddonMenu()
             end,
             width = "full",
             reference = "FCOGL_DatePickerFrom"
+        },
+        {
+            type    = "editbox",
+            name    = GetString(FCOGL_LAM_GUILD_DICE_ROLL_RESULT_TO_CHAT_EDIT),
+            tooltip = GetString(FCOGL_LAM_GUILD_LOTTERY_DICE_ROLL_RESULT_TO_CHAT_EDIT_TT),
+            isMultiline = false,
+            isExtraWide = true,
+            getFunc = function() return settings.preFillChatEditBoxAfterDiceRollTextTemplates.guilds[1] end,
+            setFunc = function(value) settings.preFillChatEditBoxAfterDiceRollTextTemplates.guilds[1] = value end,
+            default = function() return defaults.preFillChatEditBoxAfterDiceRollTextTemplates.guilds[1] end,
+        },
+        {
+            type    = "checkbox",
+            name    = GetString(FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL),
+            tooltip = GetString(FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL_TT),
+            getFunc = function() return settings.showUIForDiceRollTypes[FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY] end,
+            setFunc = function(value) settings.showUIForDiceRollTypes[FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY] = value end,
+            default = function() return defaults.showUIForDiceRollTypes[FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY] end,
         },
 
         --==============================================================================
