@@ -28,7 +28,7 @@ FCOGuildLottery.addonNamePre = addonNamePre
 FCOGL_DICE_ROLL_TYPE_GENERIC                = -100
 FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC          = 1
 FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY    = 2
-FCOGuildLottery.currentlyUsedDiceRollType = FCOGL_DICE_ROLL_TYPE_NO_GUILD
+FCOGuildLottery.currentlyUsedDiceRollType = FCOGL_DICE_ROLL_TYPE_GENERIC
 
 FCOGL_DICE_SIDES_NO_CHECK = -99999 --Do not do any checks against diceSide
 FCOGL_DICE_SIDES_DEFAULT = 6  --Standard D6/W6 (dice with 6 sides)

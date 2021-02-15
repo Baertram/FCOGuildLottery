@@ -46,7 +46,10 @@ function FCOGuildLottery.slashCommands()
         FCOGuildLottery.RememberCurrentGenericGuildDiceThrowData()
         local diceSides = FCOGuildLottery.parseSlashCommandArguments(params, "/dice")
         if diceSides == nil or diceSides <= 0 then
-            diceSides = FCOGL_MAX_DICE_SIDES
+            diceSides = FCOGuildLottery.settingsVars.settings.defaultDiceSides
+            if diceSides <= 0 or diceSides > FCOGL_MAX_DICE_SIDES then
+                diceSides = FCOGL_MAX_DICE_SIDES
+            end
         end
         FCOGuildLottery.currentlyUsedDiceRollType = FCOGL_DICE_ROLL_TYPE_GENERIC
         FCOGuildLottery.RollTheDiceAndUpdateUIIfShown(diceSides, false, FCOGL_DICE_ROLL_TYPE_GENERIC)

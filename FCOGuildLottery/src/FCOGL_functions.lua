@@ -115,21 +115,56 @@ function FCOGuildLottery.FormatDate(timeStamp)
     return os.date("%c", timeStamp)
 end
 
-local function checkIfUIShouldBeShownAndShow(diceRollType, showHistory)
+local function checkIfUIShouldBeShownOrUpdated(diceRollType, hideHistory, guildIndex)
+    df("checkIfUIShouldBeShownOrUpdated - diceRollType %s, hideHistory %s, guildIndex %s", tostring(diceRollType), tostring(hideHistory), tostring(guildIndex))
     if not diceRollType then return end
-    showHistory = showHistory or false
-    --Show the UI if enabled in the settings and if not already shown
-    local settings = FCOGuildLottery.settingsVars.settings
-    local showUIForDiceRollTypes = settings.showUIForDiceRollTypes
-    local showUIForDiceRollType = showUIForDiceRollTypes[diceRollType] or false
-    if not showUIForDiceRollType then return end
-    --Show the UI now if not already shown
+    hideHistory = hideHistory or false
+    --Is the UI already sown?
+    local showUINow = false
     local fcoglUI = FCOGuildLottery.UI
-    local fcoglUIwindow = fcoglUI and FCOGuildLottery.UI.window
-    if not fcoglUIwindow then return end
-    if not fcoglUIwindow:IsControlHidden() then return end
-    --Show the UI window, and the dice history according to setting
-    fcoglUI.Show(true, showHistory)
+
+    local function updateUIGuildsDropNow()
+df(">updateUIGuildsDropNow")
+        --Set the guilds dropdownbox at the UI, if no active guild sales lottery
+        if FCOGuildLottery.IsGuildSalesLotteryActive() then return end
+        if diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC and guildIndex ~= nil then
+            fcoglUI.ChangeGuildsDropSelectedByGuildIndex(guildIndex, false)
+        elseif diceRollType == FCOGL_DICE_ROLL_TYPE_GENERIC_GENERIC then
+            fcoglUI.ChangeGuildsDropSelectedByIndex(MAX_GUILDS + 1, false)
+        end
+    end
+
+
+    local fcoglUIwindow = fcoglUI and fcoglUI.window
+    local isWindowAlreadyShown = false
+    if fcoglUIwindow ~= nil then
+        if fcoglUIwindow.frame == nil then
+            showUINow = true
+        else
+            isWindowAlreadyShown = not fcoglUIwindow.frame:IsControlHidden()
+            if isWindowAlreadyShown == false then
+                showUINow = true
+            end
+        end
+    else
+        showUINow = true
+    end
+    if isWindowAlreadyShown == false and showUINow then
+        --Show the UI if enabled in the settings
+        local settings = FCOGuildLottery.settingsVars.settings
+        local showUIForDiceRollTypes = settings.showUIForDiceRollTypes
+        local showUIForDiceRollType = showUIForDiceRollTypes[diceRollType] or false
+df(">isWindowAlreadyShown: false, showUINow: true, showUIForDiceRollType: %s", tostring(showUIForDiceRollType))
+        if not showUIForDiceRollType then return end
+
+        --Create (if not exisitng yet) and show the UI window, and the dice history according to setting
+        fcoglUI.Show(true, hideHistory)
+
+        updateUIGuildsDropNow()
+    elseif isWindowAlreadyShown == true then
+df(">isWindowAlreadyShown: true")
+        updateUIGuildsDropNow()
+    end
 end
 
 function FCOGuildLottery.buildGuildsDropEntries()
@@ -183,6 +218,53 @@ function FCOGuildLottery.buildGuildsDropEntries()
     end
     ]]
     return guildsComboBoxEntryBase
+end
+
+function FCOGuildLottery.UpdateCurrentDiceRollType(uiWindow)
+df("UpdateCurrentDiceRollType")
+    local fcoglUI = FCOGuildLottery.UI
+    uiWindow = uiWindow or fcoglUI.window
+    if uiWindow.frame ~= nil then
+df(">frame found")
+        --The UI is shown?
+        if not uiWindow.frame:IsControlHidden() then
+            --Get the guilds dropdown selected data
+            local selectedGuildsDropdownData = fcoglUI.getSelectedGuildsDropEntry()
+            local selectedIndex = selectedGuildsDropdownData.selectedIndex
+            local isGuild = selectedGuildsDropdownData.isGuild
+            local guildIndex = selectedGuildsDropdownData.index
+            local guildId = selectedGuildsDropdownData.id
+            local isGuildSalesLotteryActive = FCOGuildLottery.IsGuildSalesLotteryActive()
+
+            local currentDiceRollType = FCOGuildLottery.currentlyUsedDiceRollType
+df(">frame not hidden - currentDiceRollType: %s, guildsDropSelectedIndex: %s", tostring(currentDiceRollType), tostring(selectedIndex))
+            local newDiceRolltype
+            if currentDiceRollType == FCOGL_DICE_ROLL_TYPE_GENERIC then
+                if IsGuildIndexValid(guildIndex) then
+                    if isGuildSalesLotteryActive then
+                        newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY
+                    else
+                        newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC
+                    end
+                end
+
+            elseif currentDiceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC or
+                    currentDiceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY then
+                if guildId ~= nil and IsGuildIndexValid(guildIndex) then
+                    if isGuildSalesLotteryActive then
+                        newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY
+                    else
+                        newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC
+                    end
+                else
+                    newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GENERIC
+                end
+            end
+
+df(">>newDiceRolltype: %s", tostring(newDiceRolltype))
+            FCOGuildLottery.currentlyUsedDiceRollType = newDiceRolltype
+        end
+    end
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -727,9 +809,9 @@ function FCOGuildLottery.GetGuildName(guildIndex, noChatOutput, shortChatOutput)
     local guildId, guildName = getGuildIdAndName(guildIndex)
     if not noChatOutput then
         if shortChatOutput == true then
-            dfe( "Guild name: %s", tostring(guildName))
+            dfa( "Guild name: %s", tostring(guildName))
         else
-            dfe( "Guild name of guild no %s (server-wide unique ID: %s): %s", tostring(guildIndex), tostring(guildId), tostring(guildName))
+            dfa( "Guild name of guild no %s (server-wide unique ID: %s): %s", tostring(guildIndex), tostring(guildId), tostring(guildName))
         end
     end
     return guildName, guildId
@@ -947,7 +1029,8 @@ df( "RollTheDice - sidesOfDice: %s, noChatOutput: %s, normalDiceRoll: %s", tostr
     end
     chatOutputRolledDice(diceSide, rolledName, guildIndex)
 
-    checkIfUIShouldBeShownAndShow(diceRollType, true)
+    --Show the UI now, and expand the dice roll history
+    checkIfUIShouldBeShownOrUpdated(diceRollType, false, guildIndex)
 
     return diceRollData
 end
@@ -1272,13 +1355,16 @@ function FCOGuildLottery.ResetCurrentGenericGuildDiceThrowData()
     local rememberedDiceRollType = FCOGuildLottery.rememberedCurrentUsedDiceRollType
     FCOGuildLottery.currentlyUsedDiceRollType = rememberedDiceRollType
     FCOGuildLottery.rememberedCurrentUsedDiceRollType = nil
+
+    --Update the currently used dice roll type as it could have been reset to "generic" via a slash command
+    FCOGuildLottery.UpdateCurrentDiceRollType()
 end
+
 function FCOGuildLottery.RememberCurrentGenericGuildDiceThrowData()
     FCOGuildLottery.currentlyUsedDiceRollGuildName = nil
     FCOGuildLottery.currentlyUsedDiceRollGuildId = nil
     FCOGuildLottery.rememberedCurrentUsedDiceRollType = FCOGuildLottery.currentlyUsedDiceRollType
 end
-
 
 
 function FCOGuildLottery.RollTheDiceNormalForGuildMemberCheck(guildIndex, noChatOutput)

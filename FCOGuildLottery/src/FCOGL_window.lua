@@ -1293,7 +1293,7 @@ function fcoglUI.createWindow()
 end
 
 local function showUIWindow(doShow, doShowDiceHistory)
-d(">showUIWindow: " ..tostring(doShow))
+df("showUIWindow: " ..tostring(doShow))
     local windowFrame = fcoglUIwindow.frame
     if windowFrame == nil then return end
     --Toggle show/hide
@@ -1307,7 +1307,6 @@ d(">showUIWindow: " ..tostring(doShow))
         FCOGuildLottery.UI.windowShown = doShow
         if doShow == true then
             setWindowPosition(windowFrame)
-d(">UpdateUI from showUIWindow")
             fcoglUIwindow:UpdateUI(FCOGL_TAB_STATE_LOADED, false, doShowDiceHistory)
         else
             local windowDiceRollFrame = fcoglUIDiceHistoryWindow.frame
@@ -1669,17 +1668,28 @@ df(">newStateVal: %s, newState: %s", tostring(newStateVal), tostring(newState))
 end
 
 --Toggle the dice roll history "attached" window part at the right
-function fcoglUI.ToggleDiceRollHistory(setHidden, blockToggle, diceHistoryOverride)
+function fcoglUI.ToggleDiceRollHistory(setHidden, blockToggle, diceHistoryHiddenOverride)
     blockToggle = blockToggle or false
-    df("[ToggleDiceRollHistory] - setHidden: %s, blockToggle: %s, override: %s", tostring(setHidden), tostring(blockToggle), tostring(diceHistoryOverride))
+    df("[ToggleDiceRollHistory] - setHidden: %s, blockToggle: %s, historyHiddenOverride: %s", tostring(setHidden), tostring(blockToggle), tostring(diceHistoryHiddenOverride))
     local frameControl = fcoglUIwindow and fcoglUIwindow.frame
+    --Update the currently used dice roll type as it could have been reset to "generic" via a slash command
+    FCOGuildLottery.UpdateCurrentDiceRollType(fcoglUIwindow)
+
     if frameControl == nil or frameControl:IsControlHidden() then return end
     local frameDiceHistoryControl = fcoglUIDiceHistoryWindow and fcoglUIDiceHistoryWindow.control
     if frameDiceHistoryControl == nil then return end
     local isHidden = frameDiceHistoryControl:IsControlHidden()
     local newState
-    if diceHistoryOverride == true then
-        newState = isHidden
+    if diceHistoryHiddenOverride ~= nil then
+        if diceHistoryHiddenOverride == true then
+            newState = isHidden
+        else
+            if isHidden == true then
+                newState = false
+            else
+                newState = true
+            end
+        end
     end
 df(">isHidden: %s, newState: %s", tostring(isHidden), tostring(newState))
     if newState == nil then newState = setHidden end
@@ -1700,7 +1710,7 @@ df(">>>>>>>>>>>Updating the UI of the DiceRollHistory now!")
     fcoglUIDiceHistoryWindow:UpdateUI(fcoglUI.CurrentState, false, nil)
 
     --Update the texture at the toggle button
-    if diceHistoryOverride == true or not blockToggle then
+    if diceHistoryHiddenOverride == true or not blockToggle then
         fcoglUI.setDiceRollHistoryButtonState(newState)
     end
 end
@@ -1715,22 +1725,19 @@ function fcoglUI.ResetWindowLists()
 end
 
 function fcoglUI.RefreshWindowLists()
-d("RefreshWindowLists")
+df("RefreshWindowLists")
     --Is the UI currently shown?
     if fcoglUIwindow ~= nil then
         local windowFrame = fcoglUIwindow.frame
         local diceHistoryWindowFrame = fcoglUIDiceHistoryWindow and fcoglUIDiceHistoryWindow.frame
         if windowFrame ~= nil then
-d(">RefreshWindowLists1")
             if windowFrame:IsControlHidden() then
-d(">RefreshWindowLists2")
                 --Setting "Show UI" -> Create UI now and show it
                 if FCOGuildLottery.settingsVars.settings.showUIAfterDiceRoll == true then
                     fcoglUI.Show(true, true)
                 end
             end
             if not windowFrame:IsControlHidden() then
-d(">RefreshWindowLists3")
                 --Set the UI tab to "Guild Sales Lottery" and refresh the data
                 fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true) --activate even if already shown, to update it
 --[[
@@ -1745,17 +1752,37 @@ d(">>DiceHistoryFrame is shown -> RefreshData()")
     end
 end
 
---Will be called from the slash commands, not from the UI window!
-function fcoglUI.ChangeGuildsDropSelectedIndex(guildIndex)
-df("fcoglUI.ChangeGuildsDropSelectedIndex - guildIndex: %s", tostring(guildIndex))
+local function checkComboBoxExistsAndGetSelectedEntry(comboBoxName)
     if fcoglUIwindow == nil then return end
-    if not FCOGuildLottery.IsGuildIndexValid(guildIndex) then return end
-    local guildsDrop = fcoglUIwindow.guildsDrop
-    if guildsDrop == nil then return end
-    local selectedIndex = guildsDrop:GetSelectedItemData().index
-    if selectedIndex == guildIndex or selectedIndex > MAX_GUILDS then return end
+    local comboBox = fcoglUIwindow[comboBoxName]
+    if comboBox == nil then return end
+    local selectedData = comboBox:GetSelectedItemData()
+    return comboBox, selectedData
+end
+
+--Will be called from the slash commands, not from the UI window!
+function fcoglUI.ChangeGuildsDropSelectedByIndex(newIndex, noCallback)
+    noCallback = noCallback or false
+    df("fcoglUI.ChangeGuildsDropSelectedByIndex - index: %s, noCallback: %s", tostring(newIndex), tostring(noCallback))
+    local guildsDrop, selectedData = checkComboBoxExistsAndGetSelectedEntry("guildsDrop")
+    local selectedIndex = selectedData.selectedIndex
+df(">selectedIndex: %s", tostring(selectedIndex))
+    if selectedIndex == newIndex then return true end
+    guildsDrop:SetSelectedItemByIndex(newIndex, noCallback)
+end
+
+--Will be called from the slash commands, not from the UI window!
+function fcoglUI.ChangeGuildsDropSelectedByGuildIndex(guildIndex, noCallback)
+    noCallback = noCallback or false
+    df("fcoglUI.ChangeGuildsDropSelectedByGuildIndex - guildIndex: %s, noCallback: %s", tostring(guildIndex), tostring(noCallback))
+    if guildIndex > MAX_GUILDS then return end
+    local guildsDrop, selectedData = checkComboBoxExistsAndGetSelectedEntry("guildsDrop")
+    local selectedIndex = selectedData.index
+df(">selectedIndex: %s", tostring(selectedIndex))
+    if selectedIndex == guildIndex then return end
     local function evalFuncGuildIndex(p_item)
-        if p_item.guildId ~= nil then
+        df(">>evalFuncGuildIndex - isGuild: %s, id: %s", tostring(p_item.isGuild), tostring(p_item.id))
+        if p_item.isGuild and p_item.id ~= nil then
             local lguildIndex = p_item.index
             if lguildIndex ~= nil and lguildIndex == guildIndex then
                 return true
@@ -1764,7 +1791,8 @@ df("fcoglUI.ChangeGuildsDropSelectedIndex - guildIndex: %s", tostring(guildIndex
         return false
     end
     --Supress the callback. Should be already checked and done before this function gets called from a slash command!
-    if guildsDrop:SetSelectedItemByEval(evalFuncGuildIndex, true) then
-df(">guildsDrop item for guildIndex %s was selected!", tostring(guildIndex))
+    if guildsDrop:SetSelectedItemByEval(evalFuncGuildIndex, noCallback) then
+        df(">guildsDrop item for guildIndex %s was selected!", tostring(guildIndex))
+        return true
     end
 end
