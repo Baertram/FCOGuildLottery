@@ -129,7 +129,7 @@ df(">updateUIGuildsDropNow")
         if FCOGuildLottery.IsGuildSalesLotteryActive() then return end
         if diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC and guildIndex ~= nil then
             fcoglUI.ChangeGuildsDropSelectedByGuildIndex(guildIndex, false)
-        elseif diceRollType == FCOGL_DICE_ROLL_TYPE_GENERIC_GENERIC then
+        elseif diceRollType == FCOGL_DICE_ROLL_TYPE_GENERIC then
             fcoglUI.ChangeGuildsDropSelectedByIndex(MAX_GUILDS + 1, false)
         end
     end

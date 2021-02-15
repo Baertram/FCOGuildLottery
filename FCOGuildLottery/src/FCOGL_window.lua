@@ -1768,7 +1768,7 @@ function fcoglUI.ChangeGuildsDropSelectedByIndex(newIndex, noCallback)
     local selectedIndex = selectedData.selectedIndex
 df(">selectedIndex: %s", tostring(selectedIndex))
     if selectedIndex == newIndex then return true end
-    guildsDrop:SetSelectedItemByIndex(newIndex, noCallback)
+    guildsDrop:SelectItemByIndex(newIndex, noCallback)
 end
 
 --Will be called from the slash commands, not from the UI window!
