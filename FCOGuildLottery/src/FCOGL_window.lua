@@ -1679,31 +1679,31 @@ function fcoglUI.ToggleDiceRollHistory(setHidden, blockToggle, diceHistoryHidden
     local frameDiceHistoryControl = fcoglUIDiceHistoryWindow and fcoglUIDiceHistoryWindow.control
     if frameDiceHistoryControl == nil then return end
     local isHidden = frameDiceHistoryControl:IsControlHidden()
-    local newState
+    local newHiddenState
     if diceHistoryHiddenOverride ~= nil then
         if diceHistoryHiddenOverride == true then
-            newState = isHidden
+            newHiddenState = isHidden
         else
             if isHidden == true then
-                newState = false
+                newHiddenState = false
             else
-                newState = true
+                newHiddenState = true
             end
         end
     end
-df(">isHidden: %s, newState: %s", tostring(isHidden), tostring(newState))
-    if newState == nil then newState = setHidden end
-df(">>newState2: %s", tostring(newState))
-    if newState == nil then
+df(">isHidden: %s, newState: %s", tostring(isHidden), tostring(newHiddenState))
+    if newHiddenState == nil then newHiddenState = setHidden end
+df(">>newState2: %s", tostring(newHiddenState))
+    if newHiddenState == nil then
         if isHidden == true then
-            newState = false
+            newHiddenState = false
         else
-            newState = true
+            newHiddenState = true
         end
     end
-    df(">newHiddenState: %s", tostring(newState))
+    df(">newHiddenState: %s", tostring(newHiddenState))
     if not blockToggle then
-        frameDiceHistoryControl:SetHidden(newState)
+        frameDiceHistoryControl:SetHidden(newHiddenState)
     end
     --Update the dice history list, showing it's entries
 df(">>>>>>>>>>>Updating the UI of the DiceRollHistory now!")
@@ -1711,7 +1711,7 @@ df(">>>>>>>>>>>Updating the UI of the DiceRollHistory now!")
 
     --Update the texture at the toggle button
     if diceHistoryHiddenOverride == true or not blockToggle then
-        fcoglUI.setDiceRollHistoryButtonState(newState)
+        fcoglUI.setDiceRollHistoryButtonState(newHiddenState)
     end
 end
 
@@ -1767,7 +1767,7 @@ function fcoglUI.ChangeGuildsDropSelectedByIndex(newIndex, noCallback)
     local guildsDrop, selectedData = checkComboBoxExistsAndGetSelectedEntry("guildsDrop")
     local selectedIndex = selectedData.selectedIndex
 df(">selectedIndex: %s", tostring(selectedIndex))
-    if selectedIndex == newIndex then return true end
+    if selectedIndex == newIndex and noCallback == true then return true end
     guildsDrop:SelectItemByIndex(newIndex, noCallback)
 end
 
@@ -1779,7 +1779,7 @@ function fcoglUI.ChangeGuildsDropSelectedByGuildIndex(guildIndex, noCallback)
     local guildsDrop, selectedData = checkComboBoxExistsAndGetSelectedEntry("guildsDrop")
     local selectedIndex = selectedData.index
 df(">selectedIndex: %s", tostring(selectedIndex))
-    if selectedIndex == guildIndex then return end
+    if selectedIndex == guildIndex and noCallback == true then end
     local function evalFuncGuildIndex(p_item)
         df(">>evalFuncGuildIndex - isGuild: %s, id: %s", tostring(p_item.isGuild), tostring(p_item.id))
         if p_item.isGuild and p_item.id ~= nil then

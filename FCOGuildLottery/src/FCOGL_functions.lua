@@ -163,6 +163,16 @@ df(">isWindowAlreadyShown: false, showUINow: true, showUIForDiceRollType: %s", t
         updateUIGuildsDropNow()
     elseif isWindowAlreadyShown == true then
 df(">isWindowAlreadyShown: true")
+        --Should the dice history be shown?
+        local diceHistoryWindow = fcoglUI.diceHistoryWindow
+        if diceHistoryWindow ~= nil and diceHistoryWindow.frame ~= nil then
+            local isDiceHistoryHidden = diceHistoryWindow.frame:IsControlHidden()
+            if isDiceHistoryHidden then
+                diceHistoryWindow.frame:SetHidden(false)
+                fcoglUI.setDiceRollHistoryButtonState(false)
+                FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden = false
+            end
+        end
         updateUIGuildsDropNow()
     end
 end
@@ -1350,20 +1360,28 @@ function FCOGuildLottery.StopGuildSalesLottery()
 end
 
 function FCOGuildLottery.ResetCurrentGenericGuildDiceThrowData()
-    FCOGuildLottery.currentlyUsedDiceRollGuildName = nil
-    FCOGuildLottery.currentlyUsedDiceRollGuildId = nil
+    local rememberedDiceRollGuildName = FCOGuildLottery.rememberedCurrentUsedDiceRollGuildName
+    FCOGuildLottery.currentlyUsedDiceRollGuildName  = rememberedDiceRollGuildName
+    FCOGuildLottery.rememberedCurrentUsedDiceRollGuildName = nil
+
+    local rememberedDiceRollGuildId = FCOGuildLottery.rememberedCurrentUsedDiceRollGuildId
+    FCOGuildLottery.currentlyUsedDiceRollGuildId  = rememberedDiceRollGuildId
+    FCOGuildLottery.rememberedCurrentUsedDiceRollGuildId = nil
+
     local rememberedDiceRollType = FCOGuildLottery.rememberedCurrentUsedDiceRollType
-    FCOGuildLottery.currentlyUsedDiceRollType = rememberedDiceRollType
+    FCOGuildLottery.currentlyUsedDiceRollType       = rememberedDiceRollType
     FCOGuildLottery.rememberedCurrentUsedDiceRollType = nil
+df("ResetCurrentGenericGuildDiceThrowData - diceRollType %s, guildId %s", tostring(rememberedDiceRollType), tostring(rememberedDiceRollGuildId))
 
     --Update the currently used dice roll type as it could have been reset to "generic" via a slash command
     FCOGuildLottery.UpdateCurrentDiceRollType()
 end
 
 function FCOGuildLottery.RememberCurrentGenericGuildDiceThrowData()
-    FCOGuildLottery.currentlyUsedDiceRollGuildName = nil
-    FCOGuildLottery.currentlyUsedDiceRollGuildId = nil
-    FCOGuildLottery.rememberedCurrentUsedDiceRollType = FCOGuildLottery.currentlyUsedDiceRollType
+    FCOGuildLottery.rememberedCurrentUsedDiceRollGuildName  = FCOGuildLottery.currentlyUsedDiceRollGuildName
+    FCOGuildLottery.rememberedCurrentUsedDiceRollGuildId    = FCOGuildLottery.currentlyUsedDiceRollGuildId
+    FCOGuildLottery.rememberedCurrentUsedDiceRollType       = FCOGuildLottery.currentlyUsedDiceRollType
+df("RememberCurrentGenericGuildDiceThrowData - diceRollType %s, guildId %s", tostring(FCOGuildLottery.rememberedCurrentUsedDiceRollType), tostring(FCOGuildLottery.rememberedCurrentUsedDiceRollGuildId))
 end
 
 
