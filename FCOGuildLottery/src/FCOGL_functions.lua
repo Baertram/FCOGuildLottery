@@ -221,11 +221,11 @@ function FCOGuildLottery.buildGuildsDropEntries()
 end
 
 function FCOGuildLottery.UpdateCurrentDiceRollType(uiWindow)
-df("UpdateCurrentDiceRollType")
+    df("UpdateCurrentDiceRollType")
     local fcoglUI = FCOGuildLottery.UI
     uiWindow = uiWindow or fcoglUI.window
+    if uiWindow == nil then return end
     if uiWindow.frame ~= nil then
-df(">frame found")
         --The UI is shown?
         if not uiWindow.frame:IsControlHidden() then
             --Get the guilds dropdown selected data
@@ -237,7 +237,7 @@ df(">frame found")
             local isGuildSalesLotteryActive = FCOGuildLottery.IsGuildSalesLotteryActive()
 
             local currentDiceRollType = FCOGuildLottery.currentlyUsedDiceRollType
-df(">frame not hidden - currentDiceRollType: %s, guildsDropSelectedIndex: %s", tostring(currentDiceRollType), tostring(selectedIndex))
+            df(">frame not hidden - currentDiceRollType: %s, guildsDropSelectedIndex: %s", tostring(currentDiceRollType), tostring(selectedIndex))
             local newDiceRolltype
             if currentDiceRollType == FCOGL_DICE_ROLL_TYPE_GENERIC then
                 if IsGuildIndexValid(guildIndex) then
@@ -261,7 +261,7 @@ df(">frame not hidden - currentDiceRollType: %s, guildsDropSelectedIndex: %s", t
                 end
             end
 
-df(">>newDiceRolltype: %s", tostring(newDiceRolltype))
+            df(">>newDiceRolltype: %s", tostring(newDiceRolltype))
             FCOGuildLottery.currentlyUsedDiceRollType = newDiceRolltype
         end
     end
@@ -1426,8 +1426,8 @@ function FCOGuildLottery.parseSlashCommandArguments(args, firstArg)
                 return intVal
             end
         else
-            --Default dice sides = FCOGL_MAX_DICE_SIDES (999)
-            return FCOGL_MAX_DICE_SIDES
+            --Default dice sides = dice sides set in settings
+            return FCOGuildLottery.settingsVars.settings.defaultDiceSides
         end
 
     elseif firstArg == "/newgsl" then
