@@ -173,7 +173,10 @@ function fcoglWindowClass:Setup(listType)
         self.editBoxDiceSides = self.frame:GetNamedChild("EditDiceSidesBox")
         self.editBoxDiceSides:SetTextType(TEXT_TYPE_NUMERIC_UNSIGNED_INT)
         FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
-        self.editBoxDiceSides:SetText(tostring(FCOGuildLottery.settingsVars.settings.defaultDiceSides))
+        local tempEditBoxNumDices = FCOGuildLottery.tempEditBoxNumDiceSides
+        local editBoxNewValue = tempEditBoxNumDices or FCOGuildLottery.settingsVars.settings.defaultDiceSides
+        FCOGuildLottery.tempEditBoxNumDiceSides = nil
+        self.editBoxDiceSides:SetText(tostring(editBoxNewValue))
 
         --Add the FCOGL scene
     --fcoglUI.scene = ZO_Scene:New(fcoglUI.SCENE_NAME, SCENE_MANAGER)
@@ -1549,6 +1552,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
     df("[window:UpdateUI] state: %s, currentTab: %s, listType: %s, blockDiceHistoryUpdate: %s, diceHistoryOverride: %s", tostring(state), tostring(fcoglUI.CurrentTab), tostring(listType), tostring(blockDiceHistoryUpdate), tostring(diceHistoryOverride))
     if listType == nil then return end
 
+    FCOGuildLottery.tempEditBoxNumDiceSides = nil
     --fcoglUI.saveSortGroupHeader(fcoglUI.CurrentTab)
 
     local frameControl = self.frame

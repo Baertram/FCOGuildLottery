@@ -1072,7 +1072,12 @@ function FCOGuildLottery.IsGuildSalesLotteryActive()
 end
 
 function FCOGuildLottery.UpdateMaxDiceSidesForGuildLottery(numDiceSides)
-df("UpdateMaxDiceSidesForGuildLottery - numDiceSides: %s", tostring(numDiceSides))
+    df("UpdateMaxDiceSidesForGuildLottery - numDiceSides: %s", tostring(numDiceSides))
+    if FCOGuildLottery.UI == nil or FCOGuildLottery.UI.window == nil then
+        FCOGuildLottery.tempEditBoxNumDiceSides = numDiceSides
+        return
+    end
+    FCOGuildLottery.tempEditBoxNumDiceSides = nil
     if numDiceSides == nil then return end
     FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
     FCOGuildLottery.UI.window.editBoxDiceSides:SetText(tostring(numDiceSides))
@@ -1233,13 +1238,9 @@ df( "RollTheDiceForGuildSalesLottery - noChatOutput: %s", tostring(noChatOutput)
         )
     end
     if countMembersAtRank ~= nil and countMembersAtRank > 0 then
-        FCOGuildLottery.UpdateMaxDiceSidesForGuildLottery(countMembersAtRank)
-
         --Roll the dice with the number of guild sales members rank of that guildId
         rolledData = FCOGuildLottery.RollTheDice(countMembersAtRank, noChatOutput)
-df(">>after rolled the dice, rolledData found: %s", tostring(rolledData ~= nil))
         if rolledData ~= nil and rolledData.timestamp ~= nil then
-df(">>>rolleData found")
             FCOGuildLottery.diceRollGuildLotteryHistory[guildId] = FCOGuildLottery.diceRollGuildLotteryHistory[guildId] or {}
             local currentlyUsedGuildSalesLotteryUniqueIdentifier = FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier
             local currentlyUsedGuildSalesLotteryTimestamp = FCOGuildLottery.currentlyUsedGuildSalesLotteryTimestamp
@@ -1248,6 +1249,7 @@ df(">>>rolleData found")
             FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentlyUsedGuildSalesLotteryUniqueIdentifier][currentlyUsedGuildSalesLotteryTimestamp][rolledData.timestamp] = rolledData
 
             FCOGuildLottery.UI.RefreshWindowLists()
+            FCOGuildLottery.UpdateMaxDiceSidesForGuildLottery(countMembersAtRank)
         end
     else
         resetCurrentGuildSalesLotteryData()
