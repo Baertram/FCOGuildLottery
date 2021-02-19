@@ -62,6 +62,7 @@ function FCOGuildLottery.getSettings()
         --Date & time
         use24hFormat        = false,
         useCustomDateFormat = "",
+        guildLotteryDaysBefore = 7,
         guildLotteryDateStart = 0,
         guildLotteryDateStartSet = false,
 
@@ -117,12 +118,13 @@ function FCOGuildLottery.getSettings()
     FCOGuildLottery.diceRollGuildsHistory       = FCOGuildLottery.settingsVars.settings.diceRollGuildsHistory
     FCOGuildLottery.diceRollGuildLotteryHistory = FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory
 
-    if FCOGuildLottery.settingsVars.settings.guildLotteryDateStartSet == false then
+    --For the moment do not check if any date was manually chosen! Just use -7 days
+    --if FCOGuildLottery.settingsVars.settings.guildLotteryDateStartSet == false then
         local currentDateTable = os.date("*t", os.time())
         local day = currentDateTable.day - 7
         local currentDateMinusSevenDayTimeStamp = os.time({year=currentDateTable.year, month=currentDateTable.month, day=day, hour=0, minute=0, seconds=0})
         FCOGuildLottery.settingsVars.settings.guildLotteryDateStart = currentDateMinusSevenDayTimeStamp
-    end
+    --end
 
     --[[
     if GetDisplayName() == "@Baertram" then

@@ -1728,16 +1728,18 @@ function fcoglUI.ResetWindowLists()
     fcoglUIDiceHistoryWindow.masterList = {}
 end
 
-function fcoglUI.RefreshWindowLists()
-df("RefreshWindowLists")
-    --Is the UI currently shown?
+function fcoglUI.RefreshWindowLists(showUIifHidden)
+    showUIifHidden = showUIifHidden or false
+df("RefreshWindowLists - showUIifHidden: %s", tostring(showUIifHidden))
+    --Is the UI existing already?
     if fcoglUIwindow ~= nil then
         local windowFrame = fcoglUIwindow.frame
         local diceHistoryWindowFrame = fcoglUIDiceHistoryWindow and fcoglUIDiceHistoryWindow.frame
         if windowFrame ~= nil then
+            --Is the UI currently shown?
             if windowFrame:IsControlHidden() then
                 --Setting "Show UI" -> Create UI now and show it
-                if FCOGuildLottery.settingsVars.settings.showUIAfterDiceRoll == true then
+                if showUIifHidden == true then
                     fcoglUI.Show(true, true)
                 end
             end

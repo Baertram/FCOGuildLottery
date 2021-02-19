@@ -207,7 +207,7 @@
 			</OnMouseExit>
 		</Button>
 		<Button name="FCOGLButtonClose" virtual="true">
-			<Dimensions x="20" y="20" />
+			<Dimensions x="32" y="32" />
 			<Textures normal="/esoui/art/buttons/closebutton_up.dds"
 					  pressed="/esoui/art/buttons/closebutton_down.dds"
 					  mouseOver="/esoui/art/buttons/closebutton_mouseOver.dds"
@@ -470,7 +470,7 @@
 				</Button>
 				<Button name="$(parent)TabClose" inherits="FCOGLButtonClose">
 					<Anchor point="BOTTOMRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT"
-							offsetX="-2"  offsetY="-2" />
+							offsetX="8"  offsetY="6" />
 				</Button>
 
 				<!-- Normal buttons at the tabs, left side e.g -->

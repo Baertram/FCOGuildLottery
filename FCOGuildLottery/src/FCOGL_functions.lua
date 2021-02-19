@@ -26,6 +26,13 @@ local function diffInDays(startTimestamp, endTimestamp)
     return math.floor(daysDiff)
 end
 
+local function getCurrentlyUsedDiceRollType(diceRollTypeOverride)
+    if diceRollTypeOverride ~= nil then
+        return FCOGuildLottery.settingsVars.settings.showUIForDiceRollTypes[diceRollTypeOverride]
+    else
+        return FCOGuildLottery.settingsVars.settings.showUIForDiceRollTypes[FCOGuildLottery.currentlyUsedDiceRollType]
+    end
+end
 
 --Guild functions
 local function resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex, daysBefore)
@@ -296,18 +303,22 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
 --Slash command functions
-local function showNewGSLSlashCommandHelp(noGuildSelected)
+local function showNewGSLSlashCommandHelp(noGuildSelected, guildSalesLotteryActive)
     noGuildSelected = noGuildSelected or false
     local newGSLChatErrorMessage
     local uiWindow = FCOGuildLottery.UI and FCOGuildLottery.UI.window and FCOGuildLottery.UI.window.control
     if uiWindow ~= nil and uiWindow:IsControlHidden() == false then
         if noGuildSelected == true then
-            newGSLChatErrorMessage = "Please select a guild from the guilds dropdown box!\nElse you are only able to use the dice button to throw a random dice throw with the sides you have defined with the editbox next to the button."
+            newGSLChatErrorMessage = GetString(FCOGL_ERROR_NO_GUILD_ONLY_GENERIC_DICE_THROW)
         else
-            newGSLChatErrorMessage = "The selected guild does not seem be valid. Please select the guild from the guilds dropdown box."
+            if not guildSalesLotteryActive then
+                newGSLChatErrorMessage = GetString(FCOGL_ERROR_GUILD_SALES_LOTTERY_PARAMETERS_MISSING)
+            else
+                newGSLChatErrorMessage = GetString(FCOGL_ERROR_SELECTED_GUILD_INVALID)
+            end
         end
     else
-        newGSLChatErrorMessage = "Please use the slash command /newgsl <guildIndex> <daysBeforeCurrent> to start a new guild sales lottery.\nReplace <guildIndex> with the index 81 to 5) of your guilds, and optinally replace <daysBeforeCurrent> with the count of days you want to check the guild sales history for.\nIf this 2nd parameter is left empty " ..tostring(FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS) .. " days will be used as default value.\n\nAfter starting a new guild sales lottery via /newgsl you can use /gsl to throw the next dice."
+        newGSLChatErrorMessage = string.format(GetString(FCOGL_ERROR_GUILD_SALES_LOTTERY_PARAMETERS_MISSING), tostring(FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS))
     end
     dfa(newGSLChatErrorMessage)
 end
@@ -873,7 +884,8 @@ end
 function FCOGuildLottery.RollTheDiceAndUpdateUIIfShown(sidesOfDice, noChatOutput, diceRollTypeOverride)
     local diceRollData = FCOGuildLottery.RollTheDice(sidesOfDice, noChatOutput, diceRollTypeOverride)
     if diceRollData ~= nil then
-        FCOGuildLottery.UI.RefreshWindowLists()
+        local showUiIfHidden = getCurrentlyUsedDiceRollType(diceRollTypeOverride)
+        FCOGuildLottery.UI.RefreshWindowLists(showUiIfHidden)
     end
 end
 local rollTheDiceAndUpdateUIIfShown = FCOGuildLottery.RollTheDiceAndUpdateUIIfShown
@@ -1248,7 +1260,8 @@ df( "RollTheDiceForGuildSalesLottery - noChatOutput: %s", tostring(noChatOutput)
             FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentlyUsedGuildSalesLotteryUniqueIdentifier][currentlyUsedGuildSalesLotteryTimestamp] = FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentlyUsedGuildSalesLotteryUniqueIdentifier][currentlyUsedGuildSalesLotteryTimestamp] or {}
             FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentlyUsedGuildSalesLotteryUniqueIdentifier][currentlyUsedGuildSalesLotteryTimestamp][rolledData.timestamp] = rolledData
 
-            FCOGuildLottery.UI.RefreshWindowLists()
+            local showUiIfHidden = getCurrentlyUsedDiceRollType()
+            FCOGuildLottery.UI.RefreshWindowLists(showUiIfHidden)
             FCOGuildLottery.UpdateMaxDiceSidesForGuildLottery(countMembersAtRank)
         end
     else
@@ -1331,7 +1344,7 @@ end
 function FCOGuildLottery.StartNewGuildSalesLottery(guildIndex, daysBefore, dataWasResetAlready)
 df("[FCOGuildLottery.StartNewGuildSalesLottery] - index: %s, daysBefore: %s, dataWasResetAlready: %s", tostring(guildIndex), tostring(daysBefore), tostring(dataWasResetAlready))
     if not IsGuildIndexValid(guildIndex) or daysBefore == nil then
-        showNewGSLSlashCommandHelp((FCOGuildLottery.noGuildIndex ~= nil and guildIndex == FCOGuildLottery.noGuildIndex) or false)
+        showNewGSLSlashCommandHelp((FCOGuildLottery.noGuildIndex ~= nil and guildIndex == FCOGuildLottery.noGuildIndex) or false, nil)
         return
     end
     if checkAndShowNoTraderMessage(guildIndex) == true then
@@ -1483,11 +1496,11 @@ end
 
 --Start (if not started yet) or roll a dice for the current guild sales lottery, via slash command
 function FCOGuildLottery.GuildSalesLotterySlashCommand(args)
-    --Are we starting a new guild sales lottery with this "dice roll"?
+    --Is a guild sales lottery active so we can go on with this "dice roll"?
     if not FCOGuildLottery.IsGuildSalesLotteryActive() then
-        showNewGSLSlashCommandHelp()
+        showNewGSLSlashCommandHelp(nil, false)
     else
-        --Just roll next dice
+        --Just roll next guild sales lottery dice
         FCOGuildLottery.RollTheDiceForGuildSalesLottery()
     end
 end
@@ -1499,6 +1512,13 @@ function FCOGuildLottery.NewGuildSalesLotterySlashCommand(args)
 --d("GuildIndex: " .. guildIndex .. ", daysBefore: " .. daysBefore)
     FCOGuildLottery.StartNewGuildSalesLottery(guildIndex, daysBefore, false)
 end
+
+--Stop the currently active guild sales lottery, via slash command
+function FCOGuildLottery.StopGuildSalesLotterySlashCommand()
+    FCOGuildLottery.StopGuildSalesLottery()
+end
+
+
 
 --Show the last rolled chat output again
 function FCOGuildLottery.GuildSalesLotteryLastRolledSlashCommand()

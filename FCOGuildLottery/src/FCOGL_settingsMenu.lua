@@ -160,17 +160,32 @@ function FCOGuildLottery.buildAddonMenu()
             setFunc = function(value) settings.cutOffGuildSalesHistoryCurrentDateMidnight = value end,
             default = function() return defaults.cutOffGuildSalesHistoryCurrentDateMidnight end,
         },
+
+        {
+            type    = "slider",
+            name    = GetString(FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE),
+            tooltip = GetString(FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE_TT),
+            min = 1,
+            max = 100,
+            step = 1,
+            getFunc = function() return settings.guildLotteryDaysBefore end,
+            setFunc = function(value) settings.guildLotteryDaysBefore = value end,
+            default = function() return defaults.guildLotteryDaysBefore end,
+        },
+
         {
             type = 'datepicker',
             name = GetString(FCOGL_LAM_GUILD_LOTTERY_DATE_FROM),
             tooltip = GetString(FCOGL_LAM_GUILD_LOTTERY_DATE_FROM_TT),
-            getFunc = function() return FCOGuildLottery.settingsVars.settings.guildLotteryDateStart end,
+            getFunc = function() return settings.guildLotteryDateStart end,
             setFunc = function(dateTimeStampPicked)
-                FCOGuildLottery.settingsVars.settings.guildLotteryDateStart = dateTimeStampPicked
-                FCOGuildLottery.settingsVars.settings.guildLotteryDateStartSet = true
+                settings.guildLotteryDateStart = dateTimeStampPicked
+                settings.guildLotteryDateStartSet = true
             end,
+            default = function() return defaults.guildLotteryDateStart end,
             width = "full",
-            reference = "FCOGL_DatePickerFrom"
+            reference = "FCOGL_DatePickerFrom",
+            disabled = function() return true  end
         },
         {
             type    = "editbox",
