@@ -312,7 +312,7 @@ local function showNewGSLSlashCommandHelp(noGuildSelected, guildSalesLotteryActi
             newGSLChatErrorMessage = GetString(FCOGL_ERROR_NO_GUILD_ONLY_GENERIC_DICE_THROW)
         else
             if not guildSalesLotteryActive then
-                newGSLChatErrorMessage = GetString(FCOGL_ERROR_GUILD_SALES_LOTTERY_PARAMETERS_MISSING)
+                newGSLChatErrorMessage = string.format(GetString(FCOGL_ERROR_GUILD_SALES_LOTTERY_PARAMETERS_MISSING), tostring(FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS))
             else
                 newGSLChatErrorMessage = GetString(FCOGL_ERROR_SELECTED_GUILD_INVALID)
             end
