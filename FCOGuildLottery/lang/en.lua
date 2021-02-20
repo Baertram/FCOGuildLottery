@@ -3,7 +3,11 @@ local FCOGuildLottery = FCOGL
 
 FCOGuildLottery.lang["en"] = {
     --1st entry in the search dropdown
-    [FCOGL_SEARCHDROP_PREFIX .."1"]             = "Name",
+    [FCOGL_SEARCHDROP_PREFIX .."1"]             = "Name / Rank",
+
+    --1st entry in the history search dropdown
+    [FCOGL_HISTORY_SEARCHDROP_PREFIX .."1"]     = "Name / #",
+
     --The sort headers
     FCOGL_HEADER_RANK                           = "Rank",
     FCOGL_HEADER_NAME                           = "Seller",
@@ -42,6 +46,11 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_CURRENTGUILSALESLOTTERY_TEXT              = "Start: %s / End: %s",
     FCOGL_CURRENTGUILSALESLOTTERY_DICEHISTORY_TEXT  = "From: %s / -%s days",
     FCOGL_GUILDSALESLOTTERY_HISTORY_DROP_TT         = "Select from saved guild sales lottery histories, by date & time",
+
+    FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_TITLE    = "Reset guild sales lottery",
+    FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_QUESTION = "Do you want to reset the currently\nactive guild sales lottery?",
+    FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_TITLE     = "Stop guild sales lottery",
+    FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_QUESTION  = "Do you want to stop the currently\nactive guild sales lottery?",
 
     --LAM settings menu
     --Description

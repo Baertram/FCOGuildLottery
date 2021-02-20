@@ -712,7 +712,7 @@ df("initializeSearchDropdown - listType: %s, searchBoxType: %s", tostring(curren
                 },
             },
             [FCOGL_LISTTYPE_ROLLED_DICE_HISTORY] = {
-                ["name"] = {dropdown=self.searchDrop,  prefix=FCOGL_SEARCHDROP_PREFIX,  entryCount=FCOGL_SEARCH_TYPE_ITERATION_END,
+                ["name"] = {dropdown=self.searchDrop,  prefix=FCOGL_HISTORY_SEARCHDROP_PREFIX,  entryCount=FCOGL_HISTORY_SEARCH_TYPE_ITERATION_END,
                             exclude = {
                                 [FCOGL_SEARCH_TYPE_NAME]     = false,
                             }, --exclude the search entries from the set search

@@ -1127,7 +1127,7 @@ end
 
 --Reset the stored / last used data and enable a new lottery dice throw, where the popups of guild and timeFrame selection
 --are showing up again
-function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, startingNewLottery, guildIndex, daysBefore, callbackYes, callbackNo)
+function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, startingNewLottery, guildIndex, daysBefore, callbackYes, callbackNo, dialogTextsTable)
     df("FCOGuildLottery.ResetCurrentGuildSalesLotteryData - noSecurityQuestion: %s, startingNewLottery: %s, guildIndex: %s, daysBefore: %s, guildSalesLotteryIdActive: %s", tostring(noSecurityQuestion), tostring(startingNewLottery), tostring(guildIndex), tostring(daysBefore), tostring(FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier))
     noSecurityQuestion = noSecurityQuestion or false
     local resetDataNow = false
@@ -1142,9 +1142,11 @@ function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, s
                 local resetGuildSalesLotteryDialogName = FCOGuildLottery.getDialogName("resetGuildSalesLottery")
                 df("dialogName: %s", tostring(resetGuildSalesLotteryDialogName))
                 if resetGuildSalesLotteryDialogName ~= nil and not ZO_Dialogs_IsShowingDialog(resetGuildSalesLotteryDialogName) then
+                    local titleText = (dialogTextsTable ~= nil and dialogTextsTable.title ~= nil and dialogTextsTable.title) or GetString(FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_TITLE)
+                    local questionText = (dialogTextsTable ~= nil and dialogTextsTable.question ~= nil and dialogTextsTable.question) or GetString(FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_QUESTION)
                     local data = {
-                        title       = "Reset guild sales lottery",
-                        question    = "Do you want to reset the currently\nactive guild sales lottery?",
+                        title       = titleText,
+                        question    = questionText,
                         callbackData = {
                             yes = function()
                                 resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex, daysBefore)
@@ -1395,7 +1397,8 @@ function FCOGuildLottery.StopGuildSalesLottery()
         callbackYes = function() FCOGuildLottery.UI.resetGuildDropDownToNone() end
     end
     FCOGuildLottery.ResetCurrentGuildSalesLotteryData(false, false, nil, nil,
-        callbackYes, nil
+        callbackYes, nil,
+        {title=GetString(FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_TITLE), question=GetString(FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_QUESTION)}
     )
 end
 
