@@ -38,12 +38,23 @@ local SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY   = fcoglUI.SCROLLLIST_DATATYPE_RO
 
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
+local function updateDiceSidesEditControl(value, isEnabled)
+    local editBoxDiceSides = fcoglUIwindow.editBoxDiceSides
+    editBoxDiceSides:SetText(tostring(value))
+    editBoxDiceSides:SetMouseEnabled(isEnabled)
+    editBoxDiceSides:SetKeyboardEnabled(isEnabled)
+end
+
 local function updateMaxDefaultDiceSides()
     local defaultSidesOfDice = FCOGuildLottery.settingsVars.settings.defaultDiceSides
     FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
-    fcoglUIwindow.editBoxDiceSides:SetText(tostring(defaultSidesOfDice))
+    updateDiceSidesEditControl(defaultSidesOfDice, true)
 end
 
+local function updateMaxGuildDiceSides(numDiceSides)
+    FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
+    updateDiceSidesEditControl(numDiceSides, false)
+end
 
 --FCOGuildLottery window - The UI
 FCOGuildLottery.UI.windowClass = ZO_SortFilterList:Subclass()
@@ -802,8 +813,7 @@ function fcoglUI.resetGuildDropDownToGuild(guildIndex)
     --Update the maximum number of the dice sides to the current guild's member #
     local diceSidesGuild = FCOGuildLottery.RollTheDiceNormalForGuildMemberCheck(guildIndex, true)
     if diceSidesGuild and diceSidesGuild > 0 then
-        FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
-        fcoglUIwindow.editBoxDiceSides:SetText(tostring(diceSidesGuild))
+        updateMaxGuildDiceSides(tostring(diceSidesGuild))
     else
         updateMaxDefaultDiceSides()
     end
