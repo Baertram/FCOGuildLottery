@@ -140,19 +140,16 @@ local function updateUIGuildsDropNow(diceRollType, guildIndex, updateIfGuildSale
         end
     end
 end
-FCOGuildLottery.updateUIGuildsDropNow = updateUIGuildsDropNow
+FCOGuildLottery.UI.updateUIGuildsDropNow = updateUIGuildsDropNow
 
-
-local function checkIfUIShouldBeShownOrUpdated(diceRollType, hideHistory, guildIndex)
-    df("checkIfUIShouldBeShownOrUpdated - diceRollType %s, hideHistory %s, guildIndex %s", tostring(diceRollType), tostring(hideHistory), tostring(guildIndex))
-    if not diceRollType then return end
-    hideHistory = hideHistory or false
-    --Is the UI already sown?
-    local showUINow = false
+local function isUICreatedAndShown()
+    df("isUICreatedAndShown")
     local fcoglUI = FCOGuildLottery.UI
-
     local fcoglUIwindow = fcoglUI and fcoglUI.window
+
+    local showUINow = false
     local isWindowAlreadyShown = false
+
     if fcoglUIwindow ~= nil then
         if fcoglUIwindow.frame == nil then
             showUINow = true
@@ -165,6 +162,19 @@ local function checkIfUIShouldBeShownOrUpdated(diceRollType, hideHistory, guildI
     else
         showUINow = true
     end
+    return isWindowAlreadyShown, showUINow
+end
+FCOGuildLottery.UI.isUICreatedAndShown = isUICreatedAndShown()
+
+
+local function checkIfUIShouldBeShownOrUpdated(diceRollType, hideHistory, guildIndex)
+    df("checkIfUIShouldBeShownOrUpdated - diceRollType %s, hideHistory %s, guildIndex %s", tostring(diceRollType), tostring(hideHistory), tostring(guildIndex))
+    if not diceRollType then return end
+    hideHistory = hideHistory or false
+    --Is the UI already shown?
+    local fcoglUI = FCOGuildLottery.UI
+    local isWindowAlreadyShown, showUINow = isUICreatedAndShown()
+
     if isWindowAlreadyShown == false and showUINow then
         --Show the UI if enabled in the settings
         local settings = FCOGuildLottery.settingsVars.settings
@@ -1546,13 +1556,112 @@ function FCOGuildLottery.StopGuildSalesLotterySlashCommand()
     FCOGuildLottery.StopGuildSalesLottery()
 end
 
-
-
 --Show the last rolled chat output again
 function FCOGuildLottery.GuildSalesLotteryLastRolledSlashCommand()
     if FCOGuildLottery.currentlyUsedGuildSalesLotteryLastRolledChatOutput == nil then return end
     dfa( FCOGuildLottery.currentlyUsedGuildSalesLotteryLastRolledChatOutput )
 end
+
+
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+--History
+
+function FCOGuildLottery.ShowClearCurrentHistoryDialog(questionHistoryName)
+    --Show security question dialog
+    --Do you really want to reset... ?
+    local clearHistoryDialogName = FCOGuildLottery.getDialogName("resetGuildSalesLottery")
+    if clearHistoryDialogName ~= nil and not ZO_Dialogs_IsShowingDialog(clearHistoryDialogName) then
+        local titleText = GetString(FCOGL_CLEAR_HISTORY_DIALOG_TITLE)
+        local questionText = string.format(GetString(FCOGL_CLEAR_HISTORY_DIALOG_QUESTION), questionHistoryName)
+        local data = {
+            title       = titleText,
+            question    = questionText,
+            callbackData = {
+                yes = function()
+                    FCOGuildLottery.UI.ClearCurrentHistory()
+                end,
+                no  = function()
+                end
+            },
+        }
+        ZO_Dialogs_ShowDialog(clearHistoryDialogName, data, nil, nil)
+    end
+end
+
+function FCOGuildLottery.ClearCurrentHistoryCheck()
+    local questionHistoryName
+    local isEnabled = FCOGuildLottery.UI.UpdateClearCurrentHistoryButton()
+    if not isEnabled then return end
+
+    if FCOGuildLottery.IsGuildSalesLotteryActive() then
+        questionHistoryName = GetString(FCOGL_GUILD_SALES_LOTTERY_HISTORY)
+    else
+        if FCOGuildLottery.currentlyUsedDiceRollGuildId ~= nil then
+            questionHistoryName = GetString(FCOGL_GUILD_HISTORY)
+        else
+            questionHistoryName = GetString(FCOGL_HISTORY)
+        end
+    end
+    FCOGuildLottery.ShowClearCurrentHistoryDialog(questionHistoryName)
+end
+
+
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+--Date & time functions
+function FCOGuildLottery.getDateTimeFormatted(dateTimeStamp)
+    local dateTimeStr = ""
+    if dateTimeStamp ~= nil then
+        --Format the timestamp to the output version again
+        if os and os.date then
+            local settings = FCOGuildLottery.settingsVars.settings
+            if settings.useCustomDateFormat ~= nil and settings.useCustomDateFormat ~= "" then
+                dateTimeStr = os.date(settings.useCustomDateFormat, dateTimeStamp)
+            else
+                if settings.use24hFormat then
+                    dateTimeStr = os.date("%d.%m.%y, %H:%M:%S", dateTimeStamp)
+                else
+                    dateTimeStr = os.date("%y-%m-%d, %I:%M:%S %p", dateTimeStamp)
+                end
+
+            end
+        end
+    end
+    return dateTimeStr
+end
+
+
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+--Character & account functions
+local function buildCharacterData(keyIsCharName)
+    keyIsCharName = keyIsCharName or false
+    local charactersOfAccount
+    --Check all the characters of the account
+    for i = 1, GetNumCharacters() do
+        local name, _, _, _, _, _, characterId = GetCharacterInfo(i)
+        local charName = ZO_CachedStrFormat(SI_UNIT_NAME, name)
+        if characterId ~= nil and charName ~= "" then
+            if charactersOfAccount == nil then charactersOfAccount = {} end
+            if keyIsCharName == true then
+                charactersOfAccount[charName]   = characterId
+            else
+                charactersOfAccount[characterId] = charName
+            end
+        end
+    end
+    return charactersOfAccount
+end
+
+function FCOGuildLottery.GetCharacterName(characterId)
+    if FCOGuildLottery.characterData == nil then
+        FCOGuildLottery.characterData = buildCharacterData(false)
+    end
+    local characterName = FCOGuildLottery.characterData[characterId]
+    return characterName
+end
+
 
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
@@ -1591,59 +1700,4 @@ end
 
 function FCOGuildLottery.HideTooltip()
     ZO_Tooltips_HideTextTooltip()
-end
-
-
-------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------
---Date & time functions
-function FCOGuildLottery.getDateTimeFormatted(dateTimeStamp)
-    local dateTimeStr = ""
-    if dateTimeStamp ~= nil then
-        --Format the timestamp to the output version again
-        if os and os.date then
-            local settings = FCOGuildLottery.settingsVars.settings
-            if settings.useCustomDateFormat ~= nil and settings.useCustomDateFormat ~= "" then
-                dateTimeStr = os.date(settings.useCustomDateFormat, dateTimeStamp)
-            else
-                if settings.use24hFormat then
-                    dateTimeStr = os.date("%d.%m.%y, %H:%M:%S", dateTimeStamp)
-                else
-                    dateTimeStr = os.date("%y-%m-%d, %I:%M:%S %p", dateTimeStamp)
-                end
-
-            end
-        end
-    end
-    return dateTimeStr
-end
-
-------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------
---Character & account functions
-local function buildCharacterData(keyIsCharName)
-    keyIsCharName = keyIsCharName or false
-    local charactersOfAccount
-    --Check all the characters of the account
-    for i = 1, GetNumCharacters() do
-        local name, _, _, _, _, _, characterId = GetCharacterInfo(i)
-        local charName = ZO_CachedStrFormat(SI_UNIT_NAME, name)
-        if characterId ~= nil and charName ~= "" then
-            if charactersOfAccount == nil then charactersOfAccount = {} end
-            if keyIsCharName == true then
-                charactersOfAccount[charName]   = characterId
-            else
-                charactersOfAccount[characterId] = charName
-            end
-        end
-    end
-    return charactersOfAccount
-end
-
-function FCOGuildLottery.GetCharacterName(characterId)
-    if FCOGuildLottery.characterData == nil then
-        FCOGuildLottery.characterData = buildCharacterData(false)
-    end
-    local characterName = FCOGuildLottery.characterData[characterId]
-    return characterName
 end

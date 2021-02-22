@@ -36,13 +36,14 @@ local buttonNewStateVal = {
 local SCROLLLIST_DATATYPE_GUILDSALESRANKING     = fcoglUI.SCROLLLIST_DATATYPE_GUILDSALESRANKING
 local SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY   = fcoglUI.SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY
 
+
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
 local function updateDiceSidesEditControl(value, isEnabled)
     local editBoxDiceSides = fcoglUIwindow.editBoxDiceSides
+    if not editBoxDiceSides then return end
     editBoxDiceSides:SetText(tostring(value))
     editBoxDiceSides:SetMouseEnabled(isEnabled)
-    editBoxDiceSides:SetKeyboardEnabled(isEnabled)
 end
 
 local function updateMaxDefaultDiceSides()
@@ -55,10 +56,6 @@ local function updateMaxGuildDiceSides(numDiceSides)
     FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
     updateDiceSidesEditControl(numDiceSides, false)
 end
-
---FCOGuildLottery window - The UI
-FCOGuildLottery.UI.windowClass = ZO_SortFilterList:Subclass()
-local fcoglWindowClass = FCOGuildLottery.UI.windowClass
 
 local function setWindowPosition(windowFrame)
     if not windowFrame or (windowFrame and not windowFrame.SetAnchor) then return end
@@ -102,6 +99,13 @@ local function updateSceneFragmentTitle(sceneName, fragment, childName, newTitle
     return false
 end
 ]]
+
+
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+--FCOGuildLottery window - The UI
+FCOGuildLottery.UI.windowClass = ZO_SortFilterList:Subclass()
+local fcoglWindowClass = FCOGuildLottery.UI.windowClass
 
 function fcoglWindowClass:New(control, listType)
 	local list = ZO_SortFilterList.New(self, control)
@@ -261,6 +265,8 @@ function fcoglWindowClass:Setup(listType)
         self.guildSalesHistoryInfoLabel = self.frame:GetNamedChild("GuildSalesHistoryInfoLabel")
         self.guildHistoryDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("GuildHistoryDrop"))
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "GuildSalesHistory")
+
+        self.clearHistoryButton = self.frame:GetNamedChild("ClearHistory")
     end
 
     fcoglUI.enableSaveSortGroupHeaders(self.headers)
@@ -312,6 +318,7 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
 
             end
         end
+------------------------------------------------------------------------------------------------------------------------
         --Dice history is shown?
         if listType == FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
             self.masterList = {}
@@ -321,7 +328,7 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
             local currentGuildSalesLotteryUniqueId = FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier
             if guildSalesLotteryActive == true then
                 if not currentGuildSalesLotteryGuildId or not currentGuildSalesLotteryUniqueId then
-                    df("<<<ERROR: Current Guild Sales Lottery guildId or uniqueId missing!")
+                    df("<<<ERROR: Current guild sales lottery guildId or uniqueId missing!")
                 end
                 tableWithLastDiceThrows = FCOGuildLottery.diceRollGuildLotteryHistory[currentGuildSalesLotteryGuildId][currentGuildSalesLotteryUniqueId]
             else
@@ -777,6 +784,15 @@ local function abortUpdateNow(p_searchBoxType, p_lastIndex)
     fcoglUI.SelectLastDropdownEntry(p_searchBoxType, p_lastIndex, false)
 end
 
+function fcoglUI.updateGuildDiceSidesEditBox(guildIndex)
+    local diceSidesGuild = FCOGuildLottery.RollTheDiceNormalForGuildMemberCheck(guildIndex, true)
+    if diceSidesGuild and diceSidesGuild > 0 then
+        updateMaxGuildDiceSides(tostring(diceSidesGuild))
+        return true
+    end
+    return false
+end
+
 function fcoglUI.getSelectedGuildsDropEntry()
     return fcoglUIwindow.guildsDrop:GetSelectedItemData()
 end
@@ -811,10 +827,7 @@ function fcoglUI.resetGuildDropDownToGuild(guildIndex)
     FCOGuildLottery.currentlyUsedDiceRollGuildId = GetGuildId(guildIndex)
 
     --Update the maximum number of the dice sides to the current guild's member #
-    local diceSidesGuild = FCOGuildLottery.RollTheDiceNormalForGuildMemberCheck(guildIndex, true)
-    if diceSidesGuild and diceSidesGuild > 0 then
-        updateMaxGuildDiceSides(tostring(diceSidesGuild))
-    else
+    if fcoglUI.updateGuildDiceSidesEditBox() == false then
         updateMaxDefaultDiceSides()
     end
 
@@ -1590,9 +1603,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 --Update the guild's dropdown box to select the currently active entry (if it was updated via slash commands)
                 -->Alsoupdate if guild sales lottery is enabled, but do not run the callback of the dropdown -> Just the visual update
                 local diceRollType, guildIndex = FCOGuildLottery.getCurrentDiceRollTypeAndGuildIndex()
-d(">>>===============================================================>>>")
-                FCOGuildLottery.updateUIGuildsDropNow(diceRollType, guildIndex, true, true)
-d("<<<===============================================================<<<")
+                fcoglUI.updateUIGuildsDropNow(diceRollType, guildIndex, true, true)
 
                 self.frame:GetNamedChild("NewGuildSalesLottery"):SetHidden(false)
                 --self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetHidden(false)
@@ -1649,6 +1660,10 @@ d("<<<===============================================================<<<")
             --self:resetSortGroupHeader(fcoglUI.CurrentTab, listType)
 
             self:RefreshData()
+
+            if listType == FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
+                fcoglUI.UpdateClearCurrentHistoryButton(self.masterList)
+            end
         end
         ------------------------------------------------------------------------------------------------------------------------
     end
@@ -1734,13 +1749,70 @@ df(">>>>>>>>>>>Updating the UI of the DiceRollHistory now!")
     end
 end
 
+function fcoglUI.ResetDiceHistoryList(clearSV)
+    if not fcoglUIwindow then return end
+    clearSV = clearSV or false
+    --Delete SavedVariables of the history list?
+    local wasDeleted = true
+    if clearSV == true then
+        wasDeleted = false
+        local guildId
+        --Check which list is currently active
+        if FCOGuildLottery.IsGuildSalesLotteryActive() then
+            guildId = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId
+            local currentGuildSalesLotteryUniqueId = FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier
+            if FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId] ~= nil and
+                    FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId] ~= nil then
+                if FCOGuildLottery.diceRollGuildLotteryHistory[guildId] ~= nil and
+                        FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId] ~= nil then
+                    FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId] = { }
+                end
+                FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId] = { }
+                df("Guild sales lottery history data deleted, guildId %s, uniqueId %s", tostring(guildId), tostring(currentGuildSalesLotteryUniqueId))
+                wasDeleted = true
+            end
+        else
+            guildId = FCOGuildLottery.currentlyUsedDiceRollGuildId
+            if guildId ~= nil then
+                if FCOGuildLottery.settingsVars.settings.diceRollGuildsHistory[guildId] ~= nil then
+                    if FCOGuildLottery.diceRollGuildsHistory[guildId] ~= nil then
+                        FCOGuildLottery.diceRollGuildsHistory[guildId] = { }
+                    end
+                    FCOGuildLottery.settingsVars.settings.diceRollGuildsHistory[guildId] = { }
+                    df("Guild history data deleted, guildId %s", tostring(guildId))
+                    wasDeleted = true
+                end
+            else
+                if FCOGuildLottery.settingsVars.settings.diceRollHistory ~= nil then
+                    if FCOGuildLottery.diceRollHistory ~= nil then
+                        FCOGuildLottery.diceRollHistory = { }
+                    end
+                    FCOGuildLottery.settingsVars.settings.diceRollHistory = { }
+                    df("History data deleted")
+                    wasDeleted = true
+                end
+            end
+        end
+        if wasDeleted == true then
+            dfa(string.format(GetString(FCOGL_CLEARED_HISTORY_COUNT), tostring(#fcoglUIDiceHistoryWindow.masterList)))
+        end
+    end
+    if wasDeleted == true then
+        ZO_ScrollList_Clear(fcoglUIDiceHistoryWindow.list)
+        fcoglUIDiceHistoryWindow.masterList = {}
+        if clearSV == true then
+            fcoglUIDiceHistoryWindow:RefreshData()
+        end
+    end
+end
+
 function fcoglUI.ResetWindowLists()
     if not fcoglUIwindow then return end
     --Clear the master list of the currently shown ZO_SortFilterLists
     ZO_ScrollList_Clear(fcoglUIwindow.list)
     fcoglUIwindow.masterList = {}
-    ZO_ScrollList_Clear(fcoglUIDiceHistoryWindow.list)
-    fcoglUIDiceHistoryWindow.masterList = {}
+
+    fcoglUI.ResetDiceHistoryList(false)
 end
 
 function fcoglUI.RefreshWindowLists(showUIifHidden)
@@ -1814,6 +1886,44 @@ df(">selectedIndex: %s", tostring(selectedIndex))
     --Supress the callback. Should be already checked and done before this function gets called from a slash command!
     if guildsDrop:SetSelectedItemByEval(evalFuncGuildIndex, noCallback) then
         df(">guildsDrop item for guildIndex %s was selected!", tostring(guildIndex))
+        return true
+    end
+end
+
+local function getHistoryList()
+    local fcoglUI = FCOGuildLottery.UI
+    if not fcoglUI then return end
+    local fcoglUIdiceHistoryWindow = fcoglUI.diceHistoryWindow
+    if not fcoglUIdiceHistoryWindow then return end
+    return fcoglUIdiceHistoryWindow.masterList, fcoglUIdiceHistoryWindow
+end
+
+
+function fcoglUI.ClearCurrentHistory()
+    local listToCheck, fcoglUIdiceHistoryWindow = getHistoryList()
+    if listToCheck and #listToCheck > 0 then
+        fcoglUI.ResetDiceHistoryList(true)
+        fcoglUI.UpdateClearCurrentHistoryButton()
+    end
+end
+
+
+function fcoglUI.UpdateClearCurrentHistoryButton(listToCheck)
+    local fcoglUIdiceHistoryWindow
+    local blubb
+    if listToCheck == nil then
+        listToCheck, fcoglUIdiceHistoryWindow = getHistoryList()
+    else
+        blubb, fcoglUIdiceHistoryWindow = getHistoryList()
+    end
+    local clearHistoryButton = fcoglUIdiceHistoryWindow.clearHistoryButton
+    if listToCheck == nil or #listToCheck == 0 then
+        clearHistoryButton:SetMouseEnabled(false)
+        clearHistoryButton:SetHidden(true)
+        return false
+    else
+        clearHistoryButton:SetMouseEnabled(true)
+        clearHistoryButton:SetHidden(false)
         return true
     end
 end

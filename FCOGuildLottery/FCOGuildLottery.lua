@@ -41,12 +41,26 @@ local function checkForHistyIsInitialized(isInitialCall)
 end
 
 --Player activated function
-local function playerActivated(eventId, isInitialCall)
+local function eventPlayerActivated(eventId, isInitialCall)
     df( "EVENT_PLAYER_ACTIVATED - initial: %s", tostring(isInitialCall))
 
     checkForHistyIsInitialized(isInitialCall)
 
     FCOGuildLottery.playerActivatedDone = true
+end
+
+local function eventGuildMember(eventId, guildId, displayName)
+    --GuildId is the currently selected one at the UI?
+    if not FCOGuildLottery.UI or FCOGuildLottery.currentlyUsedDiceRollGuildId == nil or
+            guildId ~= FCOGuildLottery.currentlyUsedDiceRollGuildId then
+        return
+    end
+    local guildIndex = FCOGuildLottery.GetGuildIndexById(guildId)
+    if not FCOGuildLottery.IsGuildIndexValid(guildIndex) then return end
+    --UI is created and shown?
+    local isWindowAlreadyShown, _ = FCOGuildLottery.UI.isUICreatedAndShown()
+    if not isWindowAlreadyShown then return end
+    FCOGuildLottery.UI.updateGuildDiceSidesEditBox(guildIndex)
 end
 
 local function addonLoaded(eventName, addon)
@@ -74,7 +88,10 @@ local function addonLoaded(eventName, addon)
 
     --EVENTS
     --Register for the zone change/player ready event
-    em:RegisterForEvent(addonName .. "EVENT_PLAYER_ACTIVATED", EVENT_PLAYER_ACTIVATED, playerActivated)
+    em:RegisterForEvent(addonName .. "EVENT_PLAYER_ACTIVATED",      EVENT_PLAYER_ACTIVATED,      eventPlayerActivated)
+
+    em:RegisterForEvent(addonName .. "EVENT_GUILD_MEMBER_ADDED",    EVENT_GUILD_MEMBER_ADDED,    eventGuildMember)
+    em:RegisterForEvent(addonName .. "EVENT_GUILD_MEMBER_REMOVED",  EVENT_GUILD_MEMBER_REMOVED,  eventGuildMember)
 end
 
 function FCOGuildLottery.initialize()
