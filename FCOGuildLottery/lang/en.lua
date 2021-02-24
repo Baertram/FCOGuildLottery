@@ -65,6 +65,8 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_CLEAR_HISTORY                             = "Clear the shown history list",
     FCOGL_CLEAR_HISTORY_DIALOG_TITLE                = "Clear history list?",
     FCOGL_CLEAR_HISTORY_DIALOG_QUESTION             = "Do you want to clear the shown \'%s\'\nhistory list? This will delete all entries!",
+    FCOGL_DELETE_HISTORY_ENTRIES_DIALOG_TITLE       = "Delete selected history entries?",
+    FCOGL_DELETE_HISTORY_ENTRIES_DIALOG_QUESTION    = "Do you want to delete the selected #\'%s\'\nhistory entries?",
 
     FCOGL_HISTORY                               = "Normal roll",
     FCOGL_GUILD_HISTORY                         = "Guild roll",

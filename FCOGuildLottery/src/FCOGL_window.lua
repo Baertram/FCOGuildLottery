@@ -1127,6 +1127,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
             for timeStampOfGuildSalesLotteryHistoryEntry, guildSalesLotteryHistoryEntryData in pairs(guildSalesLotteryHistoriesSaved) do
                 if timeStampOfGuildSalesLotteryHistoryEntry ~= "daysBefore" then
                     local countDiceThrowData = NonContiguousCount(guildSalesLotteryHistoryEntryData)
+                    if countDiceThrowData > 1 then countDiceThrowData = countDiceThrowData -1 end --subtract 1 because of the "daysBefore" entry
                     local dateTimeString = string.format(FCOGuildLottery.FormatDate(timeStampOfGuildSalesLotteryHistoryEntry) .. " (#%s)", tostring(countDiceThrowData))
                     entry = ZO_ComboBox:CreateItemEntry(dateTimeString, entryCallbackGuildLotteryHistory)
                     entry.guildId       = selectedGuildId
@@ -2185,15 +2186,7 @@ function fcoglUI.updateDeleteSelectedGuildSalesLotteryHistoryButton(comboBoxDrop
     fcoglUIDiceHistoryWindow.guildHistoryDeleteSelectedButton:SetMouseEnabled(doEnable)
 end
 
-function fcoglUI.checkDeleteSelectedGuildSalesLotteryHistoryEntries()
-    df("checkDeleteSelectedGuildSalesLotteryHistoryEntries")
-    local comboBoxDropdown = fcoglUIDiceHistoryWindow.guildHistoryDeleteDrop
-    if not comboBoxDropdown then return end
-    local numSelectedEntries = comboBoxDropdown:GetNumSelectedEntries()
-    if numSelectedEntries <= 0 then return end
-
-    --df(">selected %s entries!", tostring(numSelectedEntries))
-
+local function deleteSelectedGuildSalesLotteryHistoryEntriesNow(comboBoxDropdown)
     local guildSalesLotteryHistoryEntriesToDelete = {}
     for _, item in ipairs(comboBoxDropdown:GetItems()) do
         if comboBoxDropdown:IsItemSelected(item) then
@@ -2206,4 +2199,26 @@ function fcoglUI.checkDeleteSelectedGuildSalesLotteryHistoryEntries()
         fcoglUI.updateDeleteSelectedGuildSalesLotteryHistoryButton(comboBoxDropdown)
         fcoglUI.UpdateClearCurrentHistoryButton()
     end
+end
+
+function fcoglUI.checkDeleteSelectedGuildSalesLotteryHistoryEntries()
+    df("checkDeleteSelectedGuildSalesLotteryHistoryEntries")
+    local comboBoxDropdown = fcoglUIDiceHistoryWindow.guildHistoryDeleteDrop
+    if not comboBoxDropdown then return end
+    local numSelectedEntries = comboBoxDropdown:GetNumSelectedEntries()
+    if numSelectedEntries <= 0 then return end
+    --df(">selected %s entries!", tostring(numSelectedEntries))
+
+    --Show dialog asking if you really want to delete the entries
+    FCOGuildLottery.showAskDialogNow(nil, nil, false,
+        function()
+            deleteSelectedGuildSalesLotteryHistoryEntriesNow(comboBoxDropdown)
+        end,
+        function()  end,
+        {
+            title       = GetString(FCOGL_DELETE_HISTORY_ENTRIES_DIALOG_TITLE),
+            question    = string.format(GetString(FCOGL_DELETE_HISTORY_ENTRIES_DIALOG_QUESTION), tostring(numSelectedEntries)),
+        },
+        true
+    )
 end

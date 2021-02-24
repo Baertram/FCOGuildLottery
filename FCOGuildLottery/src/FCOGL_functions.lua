@@ -1164,6 +1164,37 @@ function FCOGuildLottery.ReloadGuildSalesLotteryRanks()
     if not FCOGuildLottery.IsGuildSalesLotteryActive() then return end
 end
 
+local function showAskDialogNow(guildIndex, daysBefore, startingNewLottery, callbackYes, callbackNo, dialogTextsTable, noStandardYesCallback)
+    noStandardYesCallback = noStandardYesCallback or false
+    local resetGuildSalesLotteryDialogName = FCOGuildLottery.getDialogName("resetGuildSalesLottery")
+    df("dialogName: %s", tostring(resetGuildSalesLotteryDialogName))
+    if resetGuildSalesLotteryDialogName ~= nil and not ZO_Dialogs_IsShowingDialog(resetGuildSalesLotteryDialogName) then
+        local titleText = (dialogTextsTable ~= nil and dialogTextsTable.title ~= nil and dialogTextsTable.title) or GetString(FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_TITLE)
+        local questionText = (dialogTextsTable ~= nil and dialogTextsTable.question ~= nil and dialogTextsTable.question) or GetString(FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_QUESTION)
+        local data = {
+            title       = titleText,
+            question    = questionText,
+            callbackData = {
+                yes = function()
+                    if not noStandardYesCallback then
+                        resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex, daysBefore)
+                    end
+                    if callbackYes ~= nil and type(callbackYes) == "function" then
+                        callbackYes(guildIndex, daysBefore)
+                    end
+                end,
+                no  = function()
+                    if callbackNo ~= nil and type(callbackNo) == "function" then
+                        callbackNo(guildIndex, daysBefore)
+                    end
+                end
+            },
+        }
+        ZO_Dialogs_ShowDialog(resetGuildSalesLotteryDialogName, data, nil, nil)
+    end
+end
+FCOGuildLottery.showAskDialogNow = showAskDialogNow
+
 --Reset the stored / last used data and enable a new lottery dice throw, where the popups of guild and timeFrame selection
 --are showing up again
 function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, startingNewLottery, guildIndex, daysBefore, callbackYes, callbackNo, dialogTextsTable)
@@ -1178,30 +1209,7 @@ function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, s
             if not noSecurityQuestion then
                 --Show security question dialog
                 --Do you really want to reset... ?
-                local resetGuildSalesLotteryDialogName = FCOGuildLottery.getDialogName("resetGuildSalesLottery")
-                df("dialogName: %s", tostring(resetGuildSalesLotteryDialogName))
-                if resetGuildSalesLotteryDialogName ~= nil and not ZO_Dialogs_IsShowingDialog(resetGuildSalesLotteryDialogName) then
-                    local titleText = (dialogTextsTable ~= nil and dialogTextsTable.title ~= nil and dialogTextsTable.title) or GetString(FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_TITLE)
-                    local questionText = (dialogTextsTable ~= nil and dialogTextsTable.question ~= nil and dialogTextsTable.question) or GetString(FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_QUESTION)
-                    local data = {
-                        title       = titleText,
-                        question    = questionText,
-                        callbackData = {
-                            yes = function()
-                                resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex, daysBefore)
-                                if callbackYes ~= nil and type(callbackYes) == "function" then
-                                    callbackYes(guildIndex, daysBefore)
-                                end
-                            end,
-                            no  = function()
-                                if callbackNo ~= nil and type(callbackNo) == "function" then
-                                    callbackNo(guildIndex, daysBefore)
-                                end
-                            end
-                        },
-                    }
-                    ZO_Dialogs_ShowDialog(resetGuildSalesLotteryDialogName, data, nil, nil)
-                end
+                showAskDialogNow(guildIndex, daysBefore, startingNewLottery, callbackYes, callbackNo, dialogTextsTable, false)
             else
                 resetDataNow = true
             end
