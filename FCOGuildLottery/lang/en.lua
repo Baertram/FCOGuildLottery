@@ -29,6 +29,9 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_DICE_TYPE_STRING_GUILD                = "Guild's \'%s\' member index ",
     FCOGL_DICE_TYPE_STRING_GUILDSALESLOTTERY    = "Guild's \'%s\' sales lottery rank ",
 
+    FCOGL_DICE_HISTORY_NORMAL                   = "Normal rolls history",
+    FCOGL_DICE_HISTORY_GUILD                    = "Guild rolls history",
+
     FCOGL_LASTROLLED_DICE_CHAT_OUTPUT           = "%s dice roll (D%s) =   %s",
     FCOGL_LASTROLLED_DICE_FOUND_MEMBER_SOLD_CHAT_OUTPUT = ">>Found member \'%s\' at rank: %s, with sold sum: %s",
     FCOGL_LASTROLLED_DICE_FOUND_MEMBER_CHAT_OUTPUT = ">>Found member \'%s\'",

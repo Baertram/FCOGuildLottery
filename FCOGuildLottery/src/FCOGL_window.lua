@@ -118,6 +118,8 @@ df("updateDropdownEntries")
     dropdown:ClearItems()
     for _, entryData in ipairs(tabOfEntries) do
         local entry = dropdown:CreateItemEntry(entryData.name)
+        entry.guildId   = entryData.guildId
+        entry.timestamp = entryData.timestamp
         entry.entryData = entryData
         dropdown:AddItem(entry)
     end
@@ -1622,6 +1624,7 @@ function fcoglWindowClass:UpdateDiceHistoryGuildSalesDrop()
 end
 
 function fcoglWindowClass:UpdateDiceHistoryInfoLabel()
+df("fcoglWindowClass:UpdateDiceHistoryInfoLabel")
     if not self.historyTypeLabel then return end
     self.historyTypeLabel:SetHidden(false)
     self.historyTypeLabel:SetText("")
@@ -1645,9 +1648,9 @@ function fcoglWindowClass:UpdateDiceHistoryInfoLabel()
         self.guildSalesHistoryInfoLabel:SetHidden(true)
         self.guildSalesHistoryInfoLabel:SetText("")
         if FCOGuildLottery.currentlyUsedDiceRollGuildId ~= nil then
-            self.historyTypeLabel:SetText("Guild rolls history")
+            self.historyTypeLabel:SetText(GetString(FCOGL_DICE_HISTORY_GUILD))
         else
-            self.historyTypeLabel:SetText("Normal history")
+            self.historyTypeLabel:SetText(GetString(FCOGL_DICE_HISTORY_NORMAL))
         end
     end
     self.historyTypeLabel:SetResizeToFitDescendents(true)
@@ -1958,6 +1961,7 @@ d(">>sv 1 set = {}")
 end
 
 function fcoglUI.DeleteDiceHistoryList(alsoDeleteSV, entryData, entriesTable)
+df("DeleteDiceHistoryList - alsoDeleteSV: %s", tostring(alsoDeleteSV))
     if not fcoglUIwindow then return end
     alsoDeleteSV            = alsoDeleteSV or false
     --Delete SavedVariables of the history list?
@@ -1981,6 +1985,7 @@ function fcoglUI.DeleteDiceHistoryList(alsoDeleteSV, entryData, entriesTable)
     if wasDeleted == true and countDeletedItems > 0 then
         updateListNow = true
     end
+df(">updateListNow: %s", tostring(updateListNow))
 
     --Something got deleted? Do we need an update of the lists?
     if updateListNow == true then
@@ -1988,6 +1993,8 @@ function fcoglUI.DeleteDiceHistoryList(alsoDeleteSV, entryData, entriesTable)
         fcoglUIDiceHistoryWindow.masterList = {}
         if alsoDeleteSV == true then
             fcoglUIDiceHistoryWindow:RefreshData()
+
+            fcoglUIDiceHistoryWindow:UpdateDiceHistoryInfoLabel()
         end
     end
 end
@@ -1998,7 +2005,7 @@ function fcoglUI.ResetWindowLists()
     ZO_ScrollList_Clear(fcoglUIwindow.list)
     fcoglUIwindow.masterList = {}
 
-    fcoglUI.DeleteDiceHistoryList(false, nil)
+    fcoglUI.DeleteDiceHistoryList(false, nil, nil)
 end
 
 function fcoglUI.RefreshWindowLists(showUIifHidden)
@@ -2088,7 +2095,7 @@ end
 function fcoglUI.ClearCurrentHistory()
     local listToCheck, fcoglUIdiceHistoryWindow = getHistoryList()
     if listToCheck and #listToCheck > 0 then
-        fcoglUI.DeleteDiceHistoryList(true, nil)
+        fcoglUI.DeleteDiceHistoryList(true, nil, nil)
         fcoglUI.UpdateClearCurrentHistoryButton()
     end
 end
@@ -2101,7 +2108,7 @@ function fcoglUI.deleteGuildSalesLotteryHistoryTimestamp(entry)
         entry.guildId == FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId then
         stopNow = true
     end
-    fcoglUI.DeleteDiceHistoryList(true, entry)
+    fcoglUI.DeleteDiceHistoryList(true, entry, nil)
     fcoglUI.UpdateClearCurrentHistoryButton()
 
     if stopNow == true then
@@ -2131,8 +2138,6 @@ function fcoglUI.updateGuildSalesLotteryHistoryDeleteDropdownEntries(guildHistor
         end
         local currentGuildSalesLotteryHistoryEntries = FCOGuildLottery.diceRollGuildLotteryHistory[currentGuildSalesLotteryGuildId][currentGuildSalesLotteryUniqueId]
         for timeStamp, dataOfGuildSalesLotteryRolls in pairs(currentGuildSalesLotteryHistoryEntries) do
-            d(">>timestamp: " ..tostring(timeStamp))
-            d(">>>2")
             local countDiceThrowData = NonContiguousCount(currentGuildSalesLotteryHistoryEntries)
             if countDiceThrowData > 1 then countDiceThrowData = countDiceThrowData -1 end --remove 1 because of the "daysBefore" entry
             local dataEntry = {}
@@ -2191,10 +2196,12 @@ function fcoglUI.checkDeleteSelectedGuildSalesLotteryHistoryEntries()
     local guildSalesLotteryHistoryEntriesToDelete = {}
     for _, item in ipairs(comboBoxDropdown:GetItems()) do
         if comboBoxDropdown:IsItemSelected(item) then
-            table.insert(guildSalesLotteryHistoryEntriesToDelete, item)
+            table.insert(guildSalesLotteryHistoryEntriesToDelete, item.entryData)
         end
     end
     if #guildSalesLotteryHistoryEntriesToDelete > 0 then
         fcoglUI.DeleteDiceHistoryList(true, nil, guildSalesLotteryHistoryEntriesToDelete)
+        comboBoxDropdown:ClearAllSelections()
+        fcoglUI.updateDeleteSelectedGuildSalesLotteryHistoryButton(comboBoxDropdown)
     end
 end
