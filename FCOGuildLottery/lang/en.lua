@@ -47,12 +47,17 @@ FCOGuildLottery.lang["en"] = {
 
     FCOGL_CURRENTGUILSALESLOTTERY_TEXT              = "Start: %s / End: %s",
     FCOGL_CURRENTGUILSALESLOTTERY_DICEHISTORY_TEXT  = "From: %s / -%s days",
-    FCOGL_GUILDSALESLOTTERY_HISTORY_DROP_TT         = "Select from saved guild sales lottery histories, by date & time",
+    FCOGL_GUILDSALESLOTTERY_HISTORY_DROP_TT         = "Select a saved guild sales lottery history.\nThis will re-open this sales lottery for new dice throws.\nA currently active guild sales lottery will be stopped!",
+    FCOGL_GUILDSALESLOTTERY_DELETE_HISTORY_DROP_TT  = "Select saved guild sales lottery history entries that you would like to delete, then click on the delete button at the right side of the selection box",
+    FCOGL_GUILDSALESLOTTERY_DELETE_SELECTED         = "Delete selected saved guild sales lottery history entries",
+
+    FCOGL_DELETE_HISTORY_NONE_SELECTED              = "",
+    FCOGL_DELETE_HISTORY_SOME_SELECTED              = "<<1>> selected, click button |t24:24:/esoui/art/tutorial/inventory_tabicon_junk_up.dds|t ->",
 
     FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_TITLE    = "Reset guild sales lottery",
-    FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_QUESTION = "Do you want to reset the currently\nactive guild sales lottery?",
+    FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_QUESTION = "Do you want to reset the currently active guild\n sales lottery?\nThis will start a new lottery!",
     FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_TITLE     = "Stop guild sales lottery",
-    FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_QUESTION  = "Do you want to stop the currently\nactive guild sales lottery?",
+    FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_QUESTION  = "Do you want to stop the currently active guild\nsales lottery?\nThis will enable the guild dice throws for the\nselected guild again.",
 
     FCOGL_CLEAR_HISTORY                             = "Clear the shown history list",
     FCOGL_CLEAR_HISTORY_DIALOG_TITLE                = "Clear history list?",

@@ -13,7 +13,19 @@ local alwaysShowInChatToo = false
 ------------------------------------------------------------------------------------------------------------------------
 --DEBUG FUNCTIONS
 
+local function isNoDebugLogViewerLoaded()
+    alwaysShowInChatToo = false
+
+    --Is the DebugLogViewer UI addon not activated?
+    --Then output some messages to chat as well!
+    if DebugLogViewer == nil then
+        alwaysShowInChatToo = true
+    end
+end
+
 local function isDebuggingEnabled()
+    isNoDebugLogViewerLoaded()
+
     local settings = FCOGuildLottery.settingsVars.settings
     return settings.debug
 end
@@ -36,11 +48,7 @@ local function createLogger()
 
     FCOGuildLottery.logger = logger
 
-    --Is the DebugLogViewer UI addon not activated?
-    --Then output some messages to chat as well!
-    if DebugLogViewer == nil then
-        alwaysShowInChatToo = true
-    end
+    isNoDebugLogViewerLoaded()
 end
 
 local function checkLogger(isFirst)
@@ -67,12 +75,13 @@ checkLogger(true)
 
 --Info message
 local function dfa(str, ...)
+    isNoDebugLogViewerLoaded()
     local noLogger = true
     if logger ~= nil then
         logger:Info(string.format(str, ...))
         noLogger = false
     end
-    if alwaysShowInChatToo or noLogger == true or isExtraChatOutputEnabled() then
+    if alwaysShowInChatToo == true or noLogger == true or isExtraChatOutputEnabled() then
         d(addonNamePre .. " " .. string.format(str, ...))
     end
 end
@@ -80,12 +89,13 @@ FCOGuildLottery.dfa = dfa
 
 --Error message
 local function dfe(str, ...)
+    isNoDebugLogViewerLoaded()
     local noLogger = true
     if logger ~= nil then
         logger:Error(string.format(str, ...))
         noLogger = false
     end
-    if alwaysShowInChatToo or noLogger == true or isExtraChatOutputEnabled() then
+    if alwaysShowInChatToo == true or noLogger == true or isExtraChatOutputEnabled() then
         d(addonNamePre .. " ERROR " .. string.format(str, ...))
     end
 end
@@ -99,7 +109,7 @@ local function dfw(str, ...)
         logger:Warn(string.format(str, ...))
         noLogger = false
     end
-    if alwaysShowInChatToo or noLogger == true or isExtraChatOutputEnabled() then
+    if alwaysShowInChatToo == true or noLogger == true or isExtraChatOutputEnabled() then
         d(addonNamePre .. " WARNING " .. string.format(str, ...))
     end
 end
@@ -129,7 +139,7 @@ local function df(str, ...)
         logger:Debug(string.format(str, ...))
         noLogger = false
     end
-    if alwaysShowInChatToo or noLogger == true or isExtraChatOutputEnabled() then
+    if alwaysShowInChatToo == true or noLogger == true or isExtraChatOutputEnabled() then
         d(addonNamePre .. " " .. string.format(str, ...))
     end
 end

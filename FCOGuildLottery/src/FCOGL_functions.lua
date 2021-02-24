@@ -26,6 +26,60 @@ local function diffInDays(startTimestamp, endTimestamp)
     return math.floor(daysDiff)
 end
 
+local function minusNDays(endTimestamp, daysBefore)
+    endTimestamp = endTimestamp or GetTimeStamp()
+    daysBefore = daysBefore or FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS
+
+    local endTimeStampTable = os.date("*t", endTimestamp)
+    endTimeStampTable.hour = 0
+    endTimeStampTable.min = 0
+    endTimeStampTable.sec = 0
+    local endDayMidnight = os.time(endTimeStampTable)
+
+    local timeStart = endDayMidnight - (daysBefore * (24 * 60 * 60)) --86400 seconds a day * <daysToGetBefore> days
+    local timeEnd = endTimestamp
+
+    local settings = FCOGuildLottery.settingsVars.settings
+    if settings.cutOffGuildSalesHistoryCurrentDateMidnight == true then
+        timeEnd = endDayMidnight
+    end
+    return timeStart, timeEnd
+end
+FCOGuildLottery.minusNDays = minusNDays
+
+local function getDateMinusXDays(daysToGetBefore)
+    --[[
+    -MasterMerchant_Guild.lua -> Get guild trader change time (Start of the day)
+    -- Calc Day Cutoff in Local Time
+      local dayCutoff = GetTimeStamp() - GetSecondsSinceMidnight()
+      (...)
+      o.eightStart    = dayCutoff - 7 * 86400 -- last 7 days
+
+    o.eightStart is the cutoff for sales to that filter, i.e. older sales are rejected. So it's start of current day minus 7 days, which matches my experience. It doesn't reset on Tuesday 15h00.
+    ]]
+    daysToGetBefore = daysToGetBefore or FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS --7
+    if daysToGetBefore <= 0 then daysToGetBefore = 1 end
+    local currentDayCurrentTime = GetTimeStamp()
+
+    local timeStampStart, timeStampEnd = minusNDays(currentDayCurrentTime, daysToGetBefore)
+
+--[[
+    local currentDayMidnight = currentDayCurrentTime - GetSecondsSinceMidnight()
+    local timeStart = currentDayMidnight - (daysToGetBefore * (24 * 60 * 60)) --86400 seconds a day * <daysToGetBefore> days
+    local timeEnd = currentDayCurrentTime
+
+    local settings = FCOGuildLottery.settingsVars.settings
+    if settings.cutOffGuildSalesHistoryCurrentDateMidnight == true then
+        timeEnd = currentDayMidnight
+    end
+--d(">getDateMinusXDays - startDate: " .. tostring(timeStart) .. ", endDate: " ..tostring(timeEnd))
+
+    return timeStart, timeEnd
+    ]]
+    return timeStampStart, timeStampEnd
+end
+
+
 local function getSettingsForCurrentlyUsedDiceRollType(diceRollTypeOverride)
     if diceRollTypeOverride ~= nil then
         return FCOGuildLottery.settingsVars.settings.showUIForDiceRollTypes[diceRollTypeOverride]
@@ -63,6 +117,7 @@ local function resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex,
     FCOGuildLottery.currentlyUsedDiceRollType = FCOGL_DICE_ROLL_TYPE_GENERIC
     if startingNewLottery == false then
         df("<END: guild sales lottery data was deleted <<<<<<<<<<<<<<<<<<<<<")
+        FCOGuildLottery.currentlyUsedGuildSalesLotteryChosenTimestamp = nil
     else
         df("<OLD guild sales lottery data was deleted - STARTING a new lottery now >>>>>>>>>>>>>>>>>>>>")
         if guildIndex ~= nil and daysBefore ~= nil then
@@ -650,32 +705,6 @@ local function buildUniqueId(guildId, daysToGetBefore)
 end
 FCOGuildLottery.BuildUniqueId = buildUniqueId
 
-local function getDateMinusXDays(daysToGetBefore)
-    --[[
-    -MasterMerchant_Guild.lua -> Get guild trader change time (Start of the day)
-    -- Calc Day Cutoff in Local Time
-      local dayCutoff = GetTimeStamp() - GetSecondsSinceMidnight()
-      (...)
-      o.eightStart    = dayCutoff - 7 * 86400 -- last 7 days
-
-    o.eightStart is the cutoff for sales to that filter, i.e. older sales are rejected. So it's start of current day minus 7 days, which matches my experience. It doesn't reset on Tuesday 15h00.
-    ]]
-    daysToGetBefore = daysToGetBefore or FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS --7
-    if daysToGetBefore <= 0 then daysToGetBefore = 1 end
-    local currentDayCurrentTime = GetTimeStamp()
-    local currentDayMidnight = currentDayCurrentTime - GetSecondsSinceMidnight()
-    local timeStart = currentDayMidnight - (daysToGetBefore * (24 * 60 * 60)) --86400 seconds a day * <daysToGetBefore> days
-    local timeEnd = currentDayCurrentTime
-
-    local settings = FCOGuildLottery.settingsVars.settings
-    if settings.cutOffGuildSalesHistoryCurrentDateMidnight == true then
-        timeEnd = currentDayMidnight
-    end
---d(">getDateMinusXDays - startDate: " .. tostring(timeStart) .. ", endDate: " ..tostring(timeEnd))
-
-    return timeStart, timeEnd
-end
-
 
 --Guild store sell statistics from now to - daysToGetBefore days
 function FCOGuildLottery.PrepareSellStatsOfGuild(guildId, daysToGetBefore)
@@ -1240,7 +1269,16 @@ df( "RollTheDiceForGuildSalesLottery - noChatOutput: %s", tostring(noChatOutput)
             return
         end
 
-        FCOGuildLottery.currentlyUsedGuildSalesLotteryTimestamp = GetTimeStamp()
+        if FCOGuildLottery.currentlyUsedGuildSalesLotteryChosenData ~= nil then
+            local chosenTimeStampFromDropdownHistoryUI = FCOGuildLottery.currentlyUsedGuildSalesLotteryChosenData.timestamp
+            FCOGuildLottery.currentlyUsedGuildSalesLotteryTimestamp = chosenTimeStampFromDropdownHistoryUI
+            local chosenDaysBeforeFromDropdownHistoryUI = FCOGuildLottery.currentlyUsedGuildSalesLotteryChosenData.daysBefore or FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS
+            FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore = chosenDaysBeforeFromDropdownHistoryUI
+
+            FCOGuildLottery.currentlyUsedGuildSalesLotteryChosenData = nil
+        else
+            FCOGuildLottery.currentlyUsedGuildSalesLotteryTimestamp = GetTimeStamp()
+        end
         df(">START: New guild sales lottery initiated at \'%s\' >>>>>>>>>>>>>>>>>>>>", os.date("%c", FCOGuildLottery.currentlyUsedGuildSalesLotteryTimestamp))
 
         FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex    = guildIndex
@@ -1295,6 +1333,7 @@ df( "RollTheDiceForGuildSalesLottery - noChatOutput: %s", tostring(noChatOutput)
             local currentlyUsedGuildSalesLotteryTimestamp = FCOGuildLottery.currentlyUsedGuildSalesLotteryTimestamp
             FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentlyUsedGuildSalesLotteryUniqueIdentifier] = FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentlyUsedGuildSalesLotteryUniqueIdentifier] or {}
             FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentlyUsedGuildSalesLotteryUniqueIdentifier][currentlyUsedGuildSalesLotteryTimestamp] = FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentlyUsedGuildSalesLotteryUniqueIdentifier][currentlyUsedGuildSalesLotteryTimestamp] or {}
+            FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentlyUsedGuildSalesLotteryUniqueIdentifier][currentlyUsedGuildSalesLotteryTimestamp]["daysBefore"] = FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore
             FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentlyUsedGuildSalesLotteryUniqueIdentifier][currentlyUsedGuildSalesLotteryTimestamp][rolledData.timestamp] = rolledData
 
             local showUiIfHidden = getSettingsForCurrentlyUsedDiceRollType()
@@ -1397,7 +1436,7 @@ df("[FCOGuildLottery.StartNewGuildSalesLottery] - index: %s, daysBefore: %s, dat
     end
 end
 
-function FCOGuildLottery.StopGuildSalesLottery()
+function FCOGuildLottery.StopGuildSalesLottery(override)
     if not FCOGuildLottery.IsGuildSalesLotteryActive() then return end
     local callbackYes
     local guildIndex = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex
@@ -1406,7 +1445,11 @@ function FCOGuildLottery.StopGuildSalesLottery()
     else
         callbackYes = function() FCOGuildLottery.UI.resetGuildDropDownToNone() end
     end
-    FCOGuildLottery.ResetCurrentGuildSalesLotteryData(false, false, nil, nil,
+    local skipAskDialog = false
+    if override ~= nil and override == true then
+        skipAskDialog = true
+    end
+    FCOGuildLottery.ResetCurrentGuildSalesLotteryData(skipAskDialog, false, nil, nil,
         callbackYes, nil,
         {title=GetString(FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_TITLE), question=GetString(FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_QUESTION)}
     )

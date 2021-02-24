@@ -1,12 +1,17 @@
 <GuiXml>
-    <Font name="MyFontGame16" font="$(MEDIUM_FONT)|$(KB_16)|soft-shadow-thin" />
+    <!-- Fonts -->
+	<Font name="MyFontGame16" font="$(MEDIUM_FONT)|$(KB_16)|soft-shadow-thin" />
     <Font name="MyFontGame20" font="$(BOLD_FONT)|$(KB_20)|soft-shadow-thik" />
+
     <Controls>
+<!-- ========================================================================================================================================================== -->
 		<!-- Virtual labels -->
         <Label name="FCOGLRowLabel" font="MyFontGame16" wrapMode="ELLIPSIS" horizontalAlignment="LEFT" verticalAlignment="CENTER" virtual="true" >
 		</Label>
 		<Label name="FCOGLSearchLabel" font="ZoFontGameLargeBold" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_NORMAL" virtual="true" />
-        <!--Sort headers -->
+
+<!-- ========================================================================================================================================================== -->
+        <!--Virtual sort headers -->
         <Control name="FCOGLSortHeader" inherits="ZO_SortHeaderBehavior" virtual="true">
 			<Controls>
                 <Label name="$(parent)Name" font="MyFontGame20" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_NORMAL"  horizontalAlignment="CENTER" verticalAlignment="CENTER" wrapMode="ELLIPSIS">
@@ -14,6 +19,8 @@
                 </Label>
             </Controls>
         </Control>
+
+<!-- ========================================================================================================================================================== -->
         <!-- Virtual Rows -->
 		<Control name="FCOGLRowGuildSales" mouseEnabled="true" virtual="true">
 			<Dimensions y="30" />
@@ -102,6 +109,7 @@
 			</Controls>
 		</Control>
 
+<!-- ========================================================================================================================================================== -->
 		<!--Virtual backdrops - The background of the UI -->
 		<Backdrop name="FCOGL_WindowsBackdrop" inherits="ZO_DarkThinFrame" virtual="true">
 			<Anchor point="TOPLEFT" offsetX="-4" offsetY="-4"/>
@@ -111,6 +119,27 @@
 			<!--<Center file="/esoui/art/upsell/upsell_greymoor_bg.dds" /> -->
         </Backdrop>
 
+		<!-- Virtual ComboBox backdrop -->
+		<Backdrop name="FCOGL_MultiSeletComboBoxBG" inherits="ZO_DarkThinFrame" virtual="true">
+			<AnchorFill />
+			<Edge file="EsoUI/Art/Miscellaneous/dark_edgeFrame_8_thin.dds" edgeFileWidth="64" edgeFileHeight="8" />
+			<Center file="EsoUI/Art/Miscellaneous/Gamepad/gp_edgeFill.dds" />
+			<!--<Center file="/esoui/art/upsell/upsell_greymoor_bg.dds" /> -->
+		</Backdrop>
+
+<!-- ========================================================================================================================================================== -->
+		<!-- Virtual comboboxes -->
+		<Control name="FCOGLMultiselectComboBox" mouseEnabled="true" inherits="ZO_MultiselectComboBox" virtual="true">
+			<Dimensions x="225" y="28" />
+			<Controls>
+				<Backdrop name="$(parent)BGNew" inherits="FCOGL_MultiSeletComboBoxBG">
+					<AnchorFill />
+				</Backdrop>
+			</Controls>
+        </Control>
+
+
+<!-- ========================================================================================================================================================== -->
 		<!-- Virtual edit boxes -->
 		<EditBox name="FCOGLEditForBackdrop" inherits="ZO_DefaultEdit" virtual="true">
             <Anchor point="TOPLEFT" offsetX="2" offsetY="2"/>
@@ -134,6 +163,7 @@
             </Controls>
         </EditBox>
 
+<!-- ========================================================================================================================================================== -->
 		<!-- Virtual Buttons -->
 		<Button name="FCOGLButtonGuildSales" virtual="true">
 			<Dimensions x="50" y="50" />
@@ -306,6 +336,27 @@
 			</OnMouseExit>
 		</Button>
 
+		<Button name="FCOGLButtonDeleteSelectedHistory" virtual="true">
+			<Dimensions x="24" y="24" />
+			<Textures normal="/esoui/art/inventory/inventory_tabicon_junk_up.dds"
+					  mouseOver="/esoui/art/inventory/inventory_tabicon_junk_over.dds"
+                      pressed="/esoui/art/inventory/inventory_tabicon_junk_down.dds"
+                      disabled="/esoui/art/inventory/inventory_tabicon_junk_disabled.dds" />
+			<OnClicked>
+				FCOGL.checkDeleteSelectedGuildSalesLotteryHistoryEntries(self)
+			</OnClicked>
+			<OnMouseEnter>
+				FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_GUILDSALESLOTTERY_DELETE_SELECTED))
+			</OnMouseEnter>
+			<OnMouseExit>
+				FCOGL.HideTooltip()
+			</OnMouseExit>
+		</Button>
+
+
+<!-- ========================================================================================================================================================== -->
+<!-- ========================================================================================================================================================== -->
+<!-- ========================================================================================================================================================== -->
 
 		<!-- Frame/Window - Standard UI with border -->
 		<TopLevelControl name="FCOGLFrame" mouseEnabled="true" movable="true" clampedToScreen="true" hidden="true" > <!--inherits="ZO_RightPanelFootPrint"-->
@@ -549,6 +600,8 @@
 			</Controls>
 		</TopLevelControl>
 
+<!-- ========================================================================================================================================================== -->
+
 		<!-- FCOGLFrameDiceHistory -->
 		<TopLevelControl name="FCOGLFrameDiceHistory" mouseEnabled="true" movable="false" clampedToScreen="true" hidden="true" > <!--inherits="ZO_RightPanelFootPrint"-->
 			<Dimensions x="500" y="690" />
@@ -677,6 +730,20 @@
 
 				<Button name="$(parent)ClearHistory" inherits="FCOGLButtonClearHistory">
 					<Anchor point="BOTTOMLEFT" relativeTo="$(parent)" relativePoint="BOTTOMLEFT" offsetX="15"  offsetY="-6" />
+				</Button>
+
+				<Control name="$(parent)GuildHistoryDeleteDrop" resizeToFitDescendents="true" mouseEnabled="true" inherits="FCOGLMultiselectComboBox">
+					<Anchor point="LEFT" relativeTo="$(parent)ClearHistory" relativePoint="RIGHT" offsetX="10"  offsetY="0" />
+					<OnMouseEnter>
+						FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_GUILDSALESLOTTERY_DELETE_HISTORY_DROP_TT))
+					</OnMouseEnter>
+					<OnMouseExit>
+						FCOGL.HideTooltip()
+					</OnMouseExit>
+				</Control>
+
+				<Button name="$(parent)GuildHistoryDeleteSelected" inherits="FCOGLButtonDeleteSelectedHistory">
+					<Anchor point="LEFT" relativeTo="$(parent)GuildHistoryDeleteDrop" relativePoint="RIGHT" offsetX="5"  offsetY="0" />
 				</Button>
 
 				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED">
