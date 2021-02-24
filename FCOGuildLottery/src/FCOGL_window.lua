@@ -2136,7 +2136,7 @@ function fcoglUI.updateGuildSalesLotteryHistoryDeleteDropdownEntries(guildHistor
             FCOGuildLottery.diceRollGuildLotteryHistory[currentGuildSalesLotteryGuildId][currentGuildSalesLotteryUniqueId] then
             local currentGuildSalesLotteryHistoryEntries = FCOGuildLottery.diceRollGuildLotteryHistory[currentGuildSalesLotteryGuildId][currentGuildSalesLotteryUniqueId]
             for timeStamp, dataOfGuildSalesLotteryRolls in pairs(currentGuildSalesLotteryHistoryEntries) do
-                local countDiceThrowData = NonContiguousCount(currentGuildSalesLotteryHistoryEntries)
+                local countDiceThrowData = NonContiguousCount(dataOfGuildSalesLotteryRolls)
                 if countDiceThrowData > 1 then countDiceThrowData = countDiceThrowData -1 end --remove 1 because of the "daysBefore" entry
                 local dataEntry = {}
                 local dateTimeString = string.format(FCOGuildLottery.FormatDate(timeStamp) .. " (#%s)", tostring(countDiceThrowData))
