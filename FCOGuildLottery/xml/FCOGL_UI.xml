@@ -130,7 +130,7 @@
 <!-- ========================================================================================================================================================== -->
 		<!-- Virtual comboboxes -->
 		<Control name="FCOGLMultiselectComboBox" mouseEnabled="true" inherits="ZO_MultiselectComboBox" virtual="true">
-			<Dimensions x="225" y="28" />
+			<Dimensions x="230" y="28" />
 			<Controls>
 				<Backdrop name="$(parent)BGNew" inherits="FCOGL_MultiSeletComboBoxBG">
 					<AnchorFill />
@@ -343,7 +343,7 @@
                       pressed="/esoui/art/inventory/inventory_tabicon_junk_down.dds"
                       disabled="/esoui/art/inventory/inventory_tabicon_junk_disabled.dds" />
 			<OnClicked>
-				FCOGL.checkDeleteSelectedGuildSalesLotteryHistoryEntries(self)
+				FCOGL.UI.checkDeleteSelectedGuildSalesLotteryHistoryEntries()
 			</OnClicked>
 			<OnMouseEnter>
 				FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_GUILDSALESLOTTERY_DELETE_SELECTED))
@@ -733,7 +733,7 @@
 				</Button>
 
 				<Control name="$(parent)GuildHistoryDeleteDrop" resizeToFitDescendents="true" mouseEnabled="true" inherits="FCOGLMultiselectComboBox">
-					<Anchor point="LEFT" relativeTo="$(parent)ClearHistory" relativePoint="RIGHT" offsetX="10"  offsetY="0" />
+					<Anchor point="LEFT" relativeTo="$(parent)ClearHistory" relativePoint="RIGHT" offsetX="20"  offsetY="0" />
 					<OnMouseEnter>
 						FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_GUILDSALESLOTTERY_DELETE_HISTORY_DROP_TT))
 					</OnMouseEnter>
@@ -743,7 +743,7 @@
 				</Control>
 
 				<Button name="$(parent)GuildHistoryDeleteSelected" inherits="FCOGLButtonDeleteSelectedHistory">
-					<Anchor point="LEFT" relativeTo="$(parent)GuildHistoryDeleteDrop" relativePoint="RIGHT" offsetX="5"  offsetY="0" />
+					<Anchor point="LEFT" relativeTo="$(parent)GuildHistoryDeleteDrop" relativePoint="RIGHT" offsetX="0"  offsetY="0" />
 				</Button>
 
 				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED">

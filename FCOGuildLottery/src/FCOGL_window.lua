@@ -100,6 +100,16 @@ local function updateSceneFragmentTitle(sceneName, fragment, childName, newTitle
 end
 ]]
 
+local function sortByTimeStamp(a, b)
+    if a.timestamp and b.timestamp and a.timestamp < b.timestamp then return true end
+    return false
+end
+local function sortByDescTimeStamp(a, b)
+    if a.timestamp and b.timestamp and a.timestamp > b.timestamp then return true end
+    return false
+end
+
+
 local function updateDropdownEntries(dropdown, tabOfEntries)
 df("updateDropdownEntries")
     if not dropdown then return end
@@ -408,7 +418,7 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
                     table.insert(helperList, diceThrowData)
                 end
             end
-            table.sort(helperList, function(a, b) return a.timestamp < b.timestamp end)
+            table.sort(helperList, sortByTimeStamp)
 
             for _, diceThrowDataSorted in ipairs(helperList) do
                 diceThrowDataSorted.no = #self.masterList + 1
@@ -1130,7 +1140,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
                 end
             end
             --Sort the box entries by their timestamp
-            table.sort(entriesTable, function(a, b) return a.timestamp > b.timestamp  end)
+            table.sort(entriesTable, sortByDescTimeStamp)
             local cnt = 0
             for _, entryData in ipairs(entriesTable) do
                 cnt = cnt + 1
@@ -1865,22 +1875,27 @@ df(">>>>>>>>>>>Updating the UI of the DiceRollHistory now!")
     end
 end
 
-function fcoglUI.ResetDiceHistoryList(clearSV, entryData)
-    if not fcoglUIwindow then return end
-    clearSV = clearSV or false
-    --Delete SavedVariables of the history list?
-    local wasDeleted = true
+local function deleteHistoryEntryNow(alsoDeleteSV, entryData)
+    local timestamp = entryData ~= nil and entryData.timestamp or "n/a"
+    df("deleteHistoryEntryNow - alsoDeleteSV: %s", tostring(alsoDeleteSV), tostring(timestamp))
+
+    local updateListNow     = false
+    local wasDeleted        = true
     local countDeletedItems = 0
-    if clearSV == true then
+
+    if alsoDeleteSV == true then
         wasDeleted = false
         local guildId
         --Check which list is currently active
         if FCOGuildLottery.IsGuildSalesLotteryActive() then
+d(">guild sales lottery is active!")
+            --Delete guild sales lottery entries
             local currentGuildSalesLotteryUniqueId
             local currentGuildSalesLotteryTimeStamp
             guildId = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId
             currentGuildSalesLotteryUniqueId = FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier
             if entryData ~= nil and entryData.timestamp ~= nil then
+df(">entryData switched the timestamp to: %s", tostring(entryData.timestamp))
                 currentGuildSalesLotteryTimeStamp = entryData.timestamp
             else
                 currentGuildSalesLotteryTimeStamp = FCOGuildLottery.currentlyUsedGuildSalesLotteryTimestamp
@@ -1889,15 +1904,19 @@ function fcoglUI.ResetDiceHistoryList(clearSV, entryData)
             if FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId] ~= nil and
                     FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId] ~= nil and
                     FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] ~= nil then
+d(">found sv 1")
                 if FCOGuildLottery.diceRollGuildLotteryHistory[guildId] ~= nil and
                         FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId] ~= nil and
                         FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] ~= nil then
-df(">guildId: %s, lotteryTimestamp: %s / entryData guildId: %s, timestamp: %s, uId: %s", tostring(guildId), tostring(currentGuildSalesLotteryTimeStamp), tostring(entryData.guildId), tostring(entryData.timestamp), tostring(currentGuildSalesLotteryUniqueId))
+                    df(">guildId: %s, lotteryTimestamp: %s / entryData guildId: %s, timestamp: %s, uId: %s", tostring(guildId), tostring(currentGuildSalesLotteryTimeStamp), tostring(entryData.guildId), tostring(entryData.timestamp), tostring(currentGuildSalesLotteryUniqueId))
                     countDeletedItems = NonContiguousCount(FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp])
+                    if countDeletedItems > 1 then countDeletedItems = countDeletedItems - 1 end --subtract 1 because of the "daysBefore" entry!
                     if entryData ~= nil then
+d(">>sv 1 set = nil")
                         FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] = nil
                         FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] = nil
                     else
+d(">>sv 1 set = {}")
                         FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] = {}
                         FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] = {}
                     end
@@ -1905,7 +1924,9 @@ df(">guildId: %s, lotteryTimestamp: %s / entryData guildId: %s, timestamp: %s, u
                     wasDeleted = true
                 end
             end
+
         else
+            --Delete only normal guild entries
             guildId = FCOGuildLottery.currentlyUsedDiceRollGuildId
             if guildId ~= nil then
                 if FCOGuildLottery.settingsVars.settings.diceRollGuildsHistory[guildId] ~= nil then
@@ -1933,10 +1954,39 @@ df(">guildId: %s, lotteryTimestamp: %s / entryData guildId: %s, timestamp: %s, u
             dfa(string.format(GetString(FCOGL_CLEARED_HISTORY_COUNT), tostring(countDeletedItems)))
         end
     end
-    if wasDeleted == true then
+    return wasDeleted, countDeletedItems
+end
+
+function fcoglUI.DeleteDiceHistoryList(alsoDeleteSV, entryData, entriesTable)
+    if not fcoglUIwindow then return end
+    alsoDeleteSV            = alsoDeleteSV or false
+    --Delete SavedVariables of the history list?
+    local updateListNow     = false
+    local wasDeleted        = true
+    local countDeletedItems = 0
+
+    if entryData == nil and entriesTable ~= nil and #entriesTable > 0 then
+        local wasDeletedLoop = false
+        local countDeletedItemsLoop = 0
+        for _, entryDataLoop in ipairs(entriesTable) do
+            wasDeletedLoop, countDeletedItemsLoop = deleteHistoryEntryNow(alsoDeleteSV, entryDataLoop)
+            countDeletedItems = countDeletedItems + countDeletedItemsLoop
+            if wasDeletedLoop == true then
+                wasDeleted = true
+            end
+        end
+    else
+        wasDeleted, countDeletedItems = deleteHistoryEntryNow(alsoDeleteSV, entryData)
+    end
+    if wasDeleted == true and countDeletedItems > 0 then
+        updateListNow = true
+    end
+
+    --Something got deleted? Do we need an update of the lists?
+    if updateListNow == true then
         ZO_ScrollList_Clear(fcoglUIDiceHistoryWindow.list)
         fcoglUIDiceHistoryWindow.masterList = {}
-        if clearSV == true then
+        if alsoDeleteSV == true then
             fcoglUIDiceHistoryWindow:RefreshData()
         end
     end
@@ -1948,7 +1998,7 @@ function fcoglUI.ResetWindowLists()
     ZO_ScrollList_Clear(fcoglUIwindow.list)
     fcoglUIwindow.masterList = {}
 
-    fcoglUI.ResetDiceHistoryList(false, nil)
+    fcoglUI.DeleteDiceHistoryList(false, nil)
 end
 
 function fcoglUI.RefreshWindowLists(showUIifHidden)
@@ -2038,7 +2088,7 @@ end
 function fcoglUI.ClearCurrentHistory()
     local listToCheck, fcoglUIdiceHistoryWindow = getHistoryList()
     if listToCheck and #listToCheck > 0 then
-        fcoglUI.ResetDiceHistoryList(true, nil)
+        fcoglUI.DeleteDiceHistoryList(true, nil)
         fcoglUI.UpdateClearCurrentHistoryButton()
     end
 end
@@ -2051,7 +2101,7 @@ function fcoglUI.deleteGuildSalesLotteryHistoryTimestamp(entry)
         entry.guildId == FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId then
         stopNow = true
     end
-    fcoglUI.ResetDiceHistoryList(true, entry)
+    fcoglUI.DeleteDiceHistoryList(true, entry)
     fcoglUI.UpdateClearCurrentHistoryButton()
 
     if stopNow == true then
@@ -2061,7 +2111,7 @@ function fcoglUI.deleteGuildSalesLotteryHistoryTimestamp(entry)
 end
 
 function fcoglUI.updateGuildSalesLotteryHistoryDeleteDropdownEntries(guildHistoryDeleteDrop)
-df("updateGuildSalesLotteryHistoryDeleteDropdownEntries")
+    df("updateGuildSalesLotteryHistoryDeleteDropdownEntries")
     guildHistoryDeleteDrop = guildHistoryDeleteDrop or fcoglUIDiceHistoryWindow.guildHistoryDeleteDrop
     if not guildHistoryDeleteDrop then return end
 
@@ -2072,13 +2122,11 @@ df("updateGuildSalesLotteryHistoryDeleteDropdownEntries")
     --Fill the table guildSalesLotteryHistoryEntriesOfGuild with the current guildId's SavedVariables of the guild sales
     --lottery history entries
     if guildSalesLotteryIsActive == true then
-d(">1")
         local currentGuildSalesLotteryGuildId = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId
         local currentGuildSalesLotteryUniqueId = FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier
         local currentGuildSalesLotteryDaysBefore = FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore
         if not FCOGuildLottery.diceRollGuildLotteryHistory[currentGuildSalesLotteryGuildId] or
                 not FCOGuildLottery.diceRollGuildLotteryHistory[currentGuildSalesLotteryGuildId][currentGuildSalesLotteryUniqueId] then
-d("<END 1")
             return
         end
         local currentGuildSalesLotteryHistoryEntries = FCOGuildLottery.diceRollGuildLotteryHistory[currentGuildSalesLotteryGuildId][currentGuildSalesLotteryUniqueId]
@@ -2097,8 +2145,9 @@ d("<END 1")
             table.insert(guildSalesLotteryHistoryEntriesOfGuild, dataEntry)
         end
         if guildSalesLotteryHistoryEntriesOfGuild == nil or #guildSalesLotteryHistoryEntriesOfGuild == 0 then return end
+        --Sort the list now
+        table.sort(guildSalesLotteryHistoryEntriesOfGuild, sortByDescTimeStamp)
     end
-d(">3")
     updateDropdownEntries(guildHistoryDeleteDrop, guildSalesLotteryHistoryEntriesOfGuild)
 end
 
@@ -2130,13 +2179,14 @@ function fcoglUI.updateDeleteSelectedGuildSalesLotteryHistoryButton(comboBoxDrop
     fcoglUIDiceHistoryWindow.guildHistoryDeleteSelectedButton:SetMouseEnabled(doEnable)
 end
 
-function fcoglUI.checkDeleteSelectedGuildSalesLotteryHistoryEntries(comboBoxDropdownContainer)
+function fcoglUI.checkDeleteSelectedGuildSalesLotteryHistoryEntries()
     df("checkDeleteSelectedGuildSalesLotteryHistoryEntries")
-    if not comboBoxDropdownContainer or not comboBoxDropdownContainer.dropdown then return end
-    local comboBoxDropdown = comboBoxDropdownContainer.dropdown
+    local comboBoxDropdown = fcoglUIDiceHistoryWindow.guildHistoryDeleteDrop
+    if not comboBoxDropdown then return end
     local numSelectedEntries = comboBoxDropdown:GetNumSelectedEntries()
     if numSelectedEntries <= 0 then return end
-df(">selected %s entries!", tostring(numSelectedEntries))
+
+    --df(">selected %s entries!", tostring(numSelectedEntries))
 
     local guildSalesLotteryHistoryEntriesToDelete = {}
     for _, item in ipairs(comboBoxDropdown:GetItems()) do
@@ -2144,6 +2194,7 @@ df(">selected %s entries!", tostring(numSelectedEntries))
             table.insert(guildSalesLotteryHistoryEntriesToDelete, item)
         end
     end
-
-    FCOGuildLottery._guildSalesLotteryHistoryEntriesToDelete = guildSalesLotteryHistoryEntriesToDelete
+    if #guildSalesLotteryHistoryEntriesToDelete > 0 then
+        fcoglUI.DeleteDiceHistoryList(true, nil, guildSalesLotteryHistoryEntriesToDelete)
+    end
 end
