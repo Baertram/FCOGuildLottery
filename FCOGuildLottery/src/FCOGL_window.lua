@@ -111,11 +111,13 @@ end
 
 
 local function updateDropdownEntries(dropdown, tabOfEntries)
-df("updateDropdownEntries")
+    df("updateDropdownEntries")
     if not dropdown then return end
 
     dropdown:ClearAllSelections()
     dropdown:ClearItems()
+    if tabOfEntries == nil or #tabOfEntries == 0 then return end
+
     for _, entryData in ipairs(tabOfEntries) do
         local entry = dropdown:CreateItemEntry(entryData.name)
         entry.guildId   = entryData.guildId
@@ -2145,11 +2147,13 @@ function fcoglUI.updateGuildSalesLotteryHistoryDeleteDropdownEntries(guildHistor
                 dataEntry.daysBefore = currentGuildSalesLotteryDaysBefore
                 table.insert(guildSalesLotteryHistoryEntriesOfGuild, dataEntry)
             end
-            if guildSalesLotteryHistoryEntriesOfGuild == nil or #guildSalesLotteryHistoryEntriesOfGuild == 0 then return end
-            --Sort the list now
-            table.sort(guildSalesLotteryHistoryEntriesOfGuild, sortByDescTimeStamp)
+            if #guildSalesLotteryHistoryEntriesOfGuild > 0 then
+                --Sort the list now
+                table.sort(guildSalesLotteryHistoryEntriesOfGuild, sortByDescTimeStamp)
+            end
         end
     end
+
     updateDropdownEntries(guildHistoryDeleteDrop, guildSalesLotteryHistoryEntriesOfGuild)
 end
 
@@ -2200,5 +2204,6 @@ function fcoglUI.checkDeleteSelectedGuildSalesLotteryHistoryEntries()
         fcoglUI.DeleteDiceHistoryList(true, nil, guildSalesLotteryHistoryEntriesToDelete)
         comboBoxDropdown:ClearAllSelections()
         fcoglUI.updateDeleteSelectedGuildSalesLotteryHistoryButton(comboBoxDropdown)
+        fcoglUI.UpdateClearCurrentHistoryButton()
     end
 end
