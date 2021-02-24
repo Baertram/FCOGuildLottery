@@ -1891,14 +1891,14 @@ local function deleteHistoryEntryNow(alsoDeleteSV, entryData)
         local guildId
         --Check which list is currently active
         if FCOGuildLottery.IsGuildSalesLotteryActive() then
-d(">guild sales lottery is active!")
+            df(">guild sales lottery is active!")
             --Delete guild sales lottery entries
             local currentGuildSalesLotteryUniqueId
             local currentGuildSalesLotteryTimeStamp
             guildId = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId
             currentGuildSalesLotteryUniqueId = FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier
             if entryData ~= nil and entryData.timestamp ~= nil then
-df(">entryData switched the timestamp to: %s", tostring(entryData.timestamp))
+                df(">entryData switched the timestamp to: %s", tostring(entryData.timestamp))
                 currentGuildSalesLotteryTimeStamp = entryData.timestamp
             else
                 currentGuildSalesLotteryTimeStamp = FCOGuildLottery.currentlyUsedGuildSalesLotteryTimestamp
@@ -1907,19 +1907,17 @@ df(">entryData switched the timestamp to: %s", tostring(entryData.timestamp))
             if FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId] ~= nil and
                     FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId] ~= nil and
                     FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] ~= nil then
-d(">found sv 1")
                 if FCOGuildLottery.diceRollGuildLotteryHistory[guildId] ~= nil and
                         FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId] ~= nil and
                         FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] ~= nil then
-                    df(">guildId: %s, lotteryTimestamp: %s / entryData guildId: %s, timestamp: %s, uId: %s", tostring(guildId), tostring(currentGuildSalesLotteryTimeStamp), tostring(entryData.guildId), tostring(entryData.timestamp), tostring(currentGuildSalesLotteryUniqueId))
                     countDeletedItems = NonContiguousCount(FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp])
                     if countDeletedItems > 1 then countDeletedItems = countDeletedItems - 1 end --subtract 1 because of the "daysBefore" entry!
                     if entryData ~= nil then
-d(">>sv 1 set = nil")
+                        df(">>sv 1 set = nil")
                         FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] = nil
                         FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] = nil
                     else
-d(">>sv 1 set = {}")
+                        df(">>sv 1 set = {}")
                         FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] = {}
                         FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] = {}
                     end
@@ -2132,26 +2130,25 @@ function fcoglUI.updateGuildSalesLotteryHistoryDeleteDropdownEntries(guildHistor
         local currentGuildSalesLotteryGuildId = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId
         local currentGuildSalesLotteryUniqueId = FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier
         local currentGuildSalesLotteryDaysBefore = FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore
-        if not FCOGuildLottery.diceRollGuildLotteryHistory[currentGuildSalesLotteryGuildId] or
-                not FCOGuildLottery.diceRollGuildLotteryHistory[currentGuildSalesLotteryGuildId][currentGuildSalesLotteryUniqueId] then
-            return
+        if FCOGuildLottery.diceRollGuildLotteryHistory[currentGuildSalesLotteryGuildId] and
+            FCOGuildLottery.diceRollGuildLotteryHistory[currentGuildSalesLotteryGuildId][currentGuildSalesLotteryUniqueId] then
+            local currentGuildSalesLotteryHistoryEntries = FCOGuildLottery.diceRollGuildLotteryHistory[currentGuildSalesLotteryGuildId][currentGuildSalesLotteryUniqueId]
+            for timeStamp, dataOfGuildSalesLotteryRolls in pairs(currentGuildSalesLotteryHistoryEntries) do
+                local countDiceThrowData = NonContiguousCount(currentGuildSalesLotteryHistoryEntries)
+                if countDiceThrowData > 1 then countDiceThrowData = countDiceThrowData -1 end --remove 1 because of the "daysBefore" entry
+                local dataEntry = {}
+                local dateTimeString = string.format(FCOGuildLottery.FormatDate(timeStamp) .. " (#%s)", tostring(countDiceThrowData))
+                dataEntry.name = dateTimeString
+                dataEntry.timestamp = timeStamp
+                dataEntry.guildId = currentGuildSalesLotteryGuildId
+                dataEntry.uniqueId = currentGuildSalesLotteryUniqueId
+                dataEntry.daysBefore = currentGuildSalesLotteryDaysBefore
+                table.insert(guildSalesLotteryHistoryEntriesOfGuild, dataEntry)
+            end
+            if guildSalesLotteryHistoryEntriesOfGuild == nil or #guildSalesLotteryHistoryEntriesOfGuild == 0 then return end
+            --Sort the list now
+            table.sort(guildSalesLotteryHistoryEntriesOfGuild, sortByDescTimeStamp)
         end
-        local currentGuildSalesLotteryHistoryEntries = FCOGuildLottery.diceRollGuildLotteryHistory[currentGuildSalesLotteryGuildId][currentGuildSalesLotteryUniqueId]
-        for timeStamp, dataOfGuildSalesLotteryRolls in pairs(currentGuildSalesLotteryHistoryEntries) do
-            local countDiceThrowData = NonContiguousCount(currentGuildSalesLotteryHistoryEntries)
-            if countDiceThrowData > 1 then countDiceThrowData = countDiceThrowData -1 end --remove 1 because of the "daysBefore" entry
-            local dataEntry = {}
-            local dateTimeString = string.format(FCOGuildLottery.FormatDate(timeStamp) .. " (#%s)", tostring(countDiceThrowData))
-            dataEntry.name = dateTimeString
-            dataEntry.timestamp = timeStamp
-            dataEntry.guildId = currentGuildSalesLotteryGuildId
-            dataEntry.uniqueId = currentGuildSalesLotteryUniqueId
-            dataEntry.daysBefore = currentGuildSalesLotteryDaysBefore
-            table.insert(guildSalesLotteryHistoryEntriesOfGuild, dataEntry)
-        end
-        if guildSalesLotteryHistoryEntriesOfGuild == nil or #guildSalesLotteryHistoryEntriesOfGuild == 0 then return end
-        --Sort the list now
-        table.sort(guildSalesLotteryHistoryEntriesOfGuild, sortByDescTimeStamp)
     end
     updateDropdownEntries(guildHistoryDeleteDrop, guildSalesLotteryHistoryEntriesOfGuild)
 end
