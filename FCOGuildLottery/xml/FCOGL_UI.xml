@@ -182,6 +182,11 @@
 			<OnClicked>
 				FCOGL.UI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, false)
 			</OnClicked>
+			<OnMouseUp>
+				if button == MOUSE_BUTTON_INDEX_RIGHT and upInside then
+				 FCOGL.UI.showTabButtonContextMenu(self)
+				end
+			</OnMouseUp>
 			<OnMouseEnter>
 				FCOGL.ShowTooltip(self, TOP, GetString(FCOGL_GUILD_SALES_LOTTERY))
 			</OnMouseEnter>
@@ -292,7 +297,6 @@
                       pressed="/esoui/art/buttons/large_rightarrow_down.dds"
 					  disabled="/esoui/art/buttons/large_rightarrow_disabled.dds"/>
 			<OnClicked>
-				-- TODO: Change FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS to the valkue of an edit box
 				FCOGL.StartNewGuildSalesLottery(FCOGLFrameGuildsDrop.m_comboBox.m_selectedItemData.index, FCOGL.GetGuildSalesLotteryStartDate(), false)
 			</OnClicked>
 			<OnMouseEnter>
@@ -352,7 +356,6 @@
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-
 
 <!-- ========================================================================================================================================================== -->
 <!-- ========================================================================================================================================================== -->
@@ -590,6 +593,11 @@
 				-->
 				<Button name="$(parent)StopGuildSalesLottery" inherits="FCOGLButtonStop">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)NewGuildSalesLottery" relativePoint="TOPRIGHT"
+							offsetX="5"  offsetY="0" />
+				</Button>
+
+				<Button name="$(parent)Sliderbutton1" inherits="FCOGLSliderButton">
+					<Anchor point="TOPLEFT" relativeTo="$(parent)StopGuildSalesLottery" relativePoint="TOPRIGHT"
 							offsetX="5"  offsetY="0" />
 				</Button>
 

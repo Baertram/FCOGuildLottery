@@ -166,7 +166,7 @@ function FCOGuildLottery.buildAddonMenu()
             name    = GetString(FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE),
             tooltip = GetString(FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE_TT),
             min = 1,
-            max = 100,
+            max = FCOGL_MAX_DAYS_BEFORE,
             step = 1,
             getFunc = function() return settings.guildLotteryDaysBefore end,
             setFunc = function(value) settings.guildLotteryDaysBefore = value end,

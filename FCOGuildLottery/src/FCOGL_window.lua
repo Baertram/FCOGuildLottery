@@ -2222,3 +2222,47 @@ function fcoglUI.checkDeleteSelectedGuildSalesLotteryHistoryEntries()
         true
     )
 end
+
+function fcoglUI.toggleWindowLayer()
+df("fcoglUI.toggleWindowLayer")
+    local window = fcoglUIwindow
+    if not window then return end
+    local windowFrame = fcoglUIwindow.frame
+    if not windowFrame then return end
+    local currentLayer = windowFrame:GetDrawLayer()
+    local currentTier  = windowFrame:GetDrawTier()
+
+    --DrawLayer
+    --DL_BACKGROUND = 0
+    --DL_CONTROLS = 1
+    --DL_OVERLAY = 3
+    --DL_TEXT = 2
+
+    --DrawTier
+    --DT_HIGH = 2
+    --DT_LOW = 0
+    --DT_MEDIUM = 1
+    --DT_PARENT = 999
+
+
+    if currentLayer < DL_OVERLAY or currentTier < DT_HIGH then
+        windowFrame:SetDrawLayer(DL_OVERLAY)
+        windowFrame:SetDrawTier(DT_HIGH)
+    elseif currentLayer == DL_OVERLAY or currentTier == DT_HIGH then
+        windowFrame:SetDrawLayer(DL_CONTROLS)
+        windowFrame:SetDrawTier(DT_MEDIUM)
+    end
+end
+
+function fcoglUI.showTabButtonContextMenu(tabButton)
+    if tabButton == FCOGLFrameTabGuildSales then
+        ClearMenu()
+        AddCustomMenuItem(GetString(FCOGL_TOGGLE_WINDOW_DRAW_LAYER), function()
+            fcoglUI.toggleWindowLayer()
+        end)
+        AddCustomMenuItem(GetString(FCOGL_CLOSE), function()
+            fcoglUI.Show(false)
+        end)
+        ShowMenu(FCOGLFrameTabGuildSales)
+    end
+end

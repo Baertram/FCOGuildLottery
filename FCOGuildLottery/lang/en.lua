@@ -74,6 +74,8 @@ FCOGuildLottery.lang["en"] = {
 
     FCOGL_CLEARED_HISTORY_COUNT                 = preFix .. "Deleted \'%s\' history entries",
 
+    FCOGL_TOGGLE_WINDOW_DRAW_LAYER              = "Toggle draw layer",
+
     --LAM settings menu
     --Description
     FCOGL_LAM_DESCRIPTION                       = 'Helper addon for a guild lottery & dice rolls. Chat slash commands are:\n/fcogl   Toggle the UI\n/fcogls   Toggle the settings menu\n/dice <number>   Will roll a dice with <number> sides. If left empty this will roll a dice with 500 sides!\n/diceG1 - /diceG5  Will roll a dice for the number of guild members of guild 1 - 5\n/gslnew <guildIndex 1 to 5> will reset the last used lottery data and start a new one\n/gsl will roll the next dice for the active guild sales lottery.\n/gslstop will stop the currently active guild sales lottery.\n/gsllast or /dicelast will show the last dice roll results in your local chat (or if you got it enabled: within the \'DebugLogViewer\' UI) again.',
@@ -99,7 +101,7 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL    = "Show UI after dice roll",
     FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL_TT = "Automatically show the UI after a dice roll was done via a slash command.\n\nThe dice roll history will be expanded as well then.\nInfo: The dice roll history will not change to the dice throw type (e.g. /diceg1 should switch to the guild 1 dice history) if a guild sales history is currently active!",
     FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE             = "Days backwards from today",
-    FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE_TT          = "The days the guild sales lottery should read backwards from today and collect the sales rankings for. Default value is 7 days.\n\nAttention: The more days you select here the more guild sales history needs to be read! Make sure ALL the selected days are given in your guild sales history, check the guild sales tabs and if LibHistoire did read all the needed data, is lined and updated! Else you'll most probably not be able to start the lottery, or you'll get false results!",
+    FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE_TT          = "The days the guild sales lottery should read backwards from today and collect the sales rankings for. Default value is 7 days.\n\nAttention: The more days you select here the more guild sales history needs to be read! Make sure ALL the selected days are given in your guild sales history, check the guild sales tabs and if \'LibHistoire\' did read all the needed data, is aligned and updated! Else you'll most probably not be able to start the lottery, or you'll get false results!",
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM               = "Date from",
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM_TT            = "The start date of the guild sales lottery. Default value is today - 7 days (at midnight).",
 

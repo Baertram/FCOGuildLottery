@@ -1414,6 +1414,7 @@ end
 function FCOGuildLottery.GetGuildSalesLotteryStartDate()
     local daysBefore
     --Check the settings for the startdate timestamp:
+    --[[
     local guildLotteryStartDate = FCOGuildLottery.settingsVars.settings.guildLotteryDateStart
     if guildLotteryStartDate ~= nil then
         --Count the days difference between now and this date, and return the days difference value.
@@ -1422,6 +1423,9 @@ function FCOGuildLottery.GetGuildSalesLotteryStartDate()
     else
         daysBefore = FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS
     end
+    ]]
+    daysBefore = FCOGuildLottery.settingsVars.settings.guildLotteryDaysBefore
+    daysBefore = daysBefore or  FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS
     return daysBefore
 end
 
@@ -1571,6 +1575,11 @@ function FCOGuildLottery.parseSlashCommandArguments(args, firstArg)
         if guildIndex ~= nil and daysBefore ~= nil then
             local intVal = tonumber(daysBefore)
             if type(intVal) == "number" then
+                if intVal > FCOGL_MAX_DAYS_BEFORE then
+                    intVal = FCOGL_MAX_DAYS_BEFORE
+                elseif intVal <= 0 then
+                    intVal = 1
+                end
                 daysBefore = intVal
             end
         elseif guildIndex ~= nil and daysBefore == nil then

@@ -34,6 +34,7 @@ FCOGL_DICE_SIDES_NO_CHECK = -99999 --Do not do any checks against diceSide
 FCOGL_DICE_SIDES_DEFAULT = 6  --Standard D6/W6 (dice with 6 sides)
 FCOGL_MAX_DICE_SIDES = 999 --999 as of 2021-01-26
 FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS = 7 -- 1 week
+FCOGL_MAX_DAYS_BEFORE = 100
 
 ------------------------------------------------------------------------------------------------------------------------
 --String constants
