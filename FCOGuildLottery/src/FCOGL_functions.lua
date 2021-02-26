@@ -20,6 +20,13 @@ local dfw   = FCOGuildLottery.dfw
 ------------------------------------------------------------------------------------------------------------------------
 --FUNCTIONS
 --Helper functions
+local function showReloadUIMessage(messageType)
+    if messageType == "daysbefore" then
+        dfw(GetString(FCOGL_RELOADUI_WARNING_WITH_TEXT), GetString(FCOGL_RELOADUI_DAYSBEFORE))
+    end
+end
+
+
 local function diffInDays(startTimestamp, endTimestamp)
     endTimestamp = endTimestamp or GetTimeStamp()
     local daysDiff = os.difftime(endTimestamp, startTimestamp) / (60 * 60 * 24)
@@ -725,9 +732,11 @@ function FCOGuildLottery.PrepareSellStatsOfGuild(guildId, daysToGetBefore)
     return uniqueIdentifier, startDate, endDate--, isoWeekAndYear
 end
 
---Get the efault (7 days) sales history data of each guild which got a store enabled
+--Get the default (chosen in settings, or 7 days) sales history data of each guild which got a store enabled
 function FCOGuildLottery.GetDefaultSalesHistoryData()
-    df( "GetDefaultSalesHistoryData - Getting sales history of the last %s days, for all guilds...", tostring(FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS))
+    local daysBefore = FCOGuildLottery.settingsVars.settings.guildLotteryDaysBefore
+    daysBefore = daysBefore or FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS
+    df( "GetDefaultSalesHistoryData - Getting sales history of the last %s days, for all guilds...", tostring(daysBefore))
     if lh == nil then FCOGuildLottery.FetchHistyLibrary() end
     FCOGuildLottery.defaultGuildSalesLotteryUniqueIdentifiers = {}
     --Prepare the sold history data for the 5 guilds, of the last 7 days
@@ -738,7 +747,7 @@ function FCOGuildLottery.GetDefaultSalesHistoryData()
             --Am I member of this guild?
             if IsPlayerInGuild(guildId) and DoesGuildHavePrivilege(guildId, GUILD_PRIVILEGE_TRADING_HOUSE) then
                 --Does this guild use a shop?
-                local unqiueId, _ = FCOGuildLottery.PrepareSellStatsOfGuild(guildId, FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS)
+                local unqiueId, _, _ = FCOGuildLottery.PrepareSellStatsOfGuild(guildId, daysBefore)
                 FCOGuildLottery.defaultGuildSalesLotteryUniqueIdentifiers[guildId] = unqiueId
             end
         end
@@ -1253,9 +1262,17 @@ end
 --/
 function FCOGuildLottery.RollTheDiceForGuildSalesLottery(noChatOutput)
     noChatOutput = noChatOutput or false
-df( "RollTheDiceForGuildSalesLottery - noChatOutput: %s", tostring(noChatOutput) )
+    df( "RollTheDiceForGuildSalesLottery - noChatOutput: %s", tostring(noChatOutput) )
     local guildId
     local guildIndex
+
+    --Was the setting f the daysBefore slider changed /was the slash command used to change the daysBefore?
+    --But no reloadui was done after that?
+    if FCOGuildLottery.guildLotteryDaysBeforeSliderWasChanged == true then
+        FCOGuildLottery.StopGuildSalesLottery(true)
+        showReloadUIMessage("daysbefore")
+        return
+    end
 
     --Build the unique identifier and set the other needed variables
     if not FCOGuildLottery.IsGuildSalesLotteryActive() then
@@ -1535,6 +1552,7 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
 --Slash Command functions
+local daysBeforeLastUsed
 function FCOGuildLottery.parseSlashCommandArguments(args, firstArg)
     --Parse the arguments string
     local options = {}
@@ -1586,6 +1604,12 @@ function FCOGuildLottery.parseSlashCommandArguments(args, firstArg)
             daysBefore = FCOGuildLottery.GetGuildSalesLotteryStartDate()
         end
         if guildIndex ~= nil and daysBefore ~= nil then
+            if daysBeforeLastUsed == nil then
+                daysBeforeLastUsed = daysBefore
+            else
+                FCOGuildLottery.guildLotteryDaysBeforeSliderWasChanged = true
+            end
+            FCOGuildLottery.settingsVars.settings.guildLotteryDaysBefore = daysBefore
             return guildIndex, daysBefore
         end
         return nil, nil

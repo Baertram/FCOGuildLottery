@@ -121,6 +121,8 @@ FCOGuildLottery.lang["en"] = {
     --Keybindings
     SI_BINDING_NAME_FCOGL_TOGGLE                = "Toggle FCO GuildLottery UI",
 
+    FCOGL_RELOADUI_WARNING_WITH_TEXT            = "<<========== ERROR ==========>>\nYou did not do a /reloadui after changing \'%s\' in the settings/via slash command!",
+    FCOGL_RELOADUI_DAYSBEFORE                   = " the days before value"
 }
 local langEn = FCOGuildLottery.lang["en"]
 

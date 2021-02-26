@@ -20,6 +20,8 @@ function FCOGuildLottery.ShowLAMSettings()
     FCOGuildLottery.LAM:OpenToPanel(FCOGuildLottery.FCOSettingsPanel)
 end
 
+local lastGuildLotteryDaysBeforeSliderWasChanged
+
 function FCOGuildLottery.buildAddonMenu()
     local settings = FCOGuildLottery.settingsVars.settings
     if not settings or not FCOGuildLottery.LAM then return false end
@@ -169,8 +171,15 @@ function FCOGuildLottery.buildAddonMenu()
             max = FCOGL_MAX_DAYS_BEFORE,
             step = 1,
             getFunc = function() return settings.guildLotteryDaysBefore end,
-            setFunc = function(value) settings.guildLotteryDaysBefore = value end,
+            setFunc = function(value)
+                settings.guildLotteryDaysBefore = value
+                if value ~= lastGuildLotteryDaysBeforeSliderWasChanged then
+                    lastGuildLotteryDaysBeforeSliderWasChanged = value
+                    FCOGuildLottery.guildLotteryDaysBeforeSliderWasChanged = true
+                end
+            end,
             default = function() return defaults.guildLotteryDaysBefore end,
+            requiresReload = true,
         },
 
         {

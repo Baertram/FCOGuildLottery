@@ -138,3 +138,4 @@ FCOGuildLottery.UI.SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY  = 2
 FCOGuildLottery.prevVars = {
     doNotRunOnTextChanged = false
 }
+FCOGuildLottery.guildLotteryDaysBeforeSliderWasChanged = false
