@@ -170,7 +170,12 @@ function FCOGuildLottery.buildAddonMenu()
             min = 1,
             max = FCOGL_MAX_DAYS_BEFORE,
             step = 1,
-            getFunc = function() return settings.guildLotteryDaysBefore end,
+            getFunc = function()
+                if lastGuildLotteryDaysBeforeSliderWasChanged == nil then
+                    lastGuildLotteryDaysBeforeSliderWasChanged = settings.guildLotteryDaysBefore
+                end
+                return settings.guildLotteryDaysBefore
+            end,
             setFunc = function(value)
                 settings.guildLotteryDaysBefore = value
                 if value ~= lastGuildLotteryDaysBeforeSliderWasChanged then

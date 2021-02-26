@@ -245,7 +245,7 @@ local function checkIfUIShouldBeShownOrUpdated(diceRollType, hideHistory, guildI
 df(">isWindowAlreadyShown: false, showUINow: true, showUIForDiceRollType: %s", tostring(showUIForDiceRollType))
         if not showUIForDiceRollType then return end
 
-        --Create (if not exisitng yet) and show the UI window, and the dice history according to setting
+        --Create (if not existing yet) and show the UI window, and the dice history according to setting
         fcoglUI.Show(true, hideHistory)
 
         updateUIGuildsDropNow(diceRollType, guildIndex, false)
@@ -1206,10 +1206,12 @@ FCOGuildLottery.showAskDialogNow = showAskDialogNow
 
 --Reset the stored / last used data and enable a new lottery dice throw, where the popups of guild and timeFrame selection
 --are showing up again
-function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, startingNewLottery, guildIndex, daysBefore, callbackYes, callbackNo, dialogTextsTable)
-    df("FCOGuildLottery.ResetCurrentGuildSalesLotteryData - noSecurityQuestion: %s, startingNewLottery: %s, guildIndex: %s, daysBefore: %s, guildSalesLotteryIdActive: %s", tostring(noSecurityQuestion), tostring(startingNewLottery), tostring(guildIndex), tostring(daysBefore), tostring(FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier))
+function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, startingNewLottery, guildIndex, daysBefore, callbackYes, callbackNo, dialogTextsTable, forceCallbackYes)
+    df("FCOGuildLottery.ResetCurrentGuildSalesLotteryData - noSecurityQuestion: %s, startingNewLottery: %s, guildIndex: %s, daysBefore: %s, guildSalesLotteryIdActive: %s, forceCallbackYes: %s", tostring(noSecurityQuestion), tostring(startingNewLottery), tostring(guildIndex), tostring(daysBefore), tostring(FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier), tostring(forceCallbackYes))
     noSecurityQuestion = noSecurityQuestion or false
+    forceCallbackYes = forceCallbackYes or false
     local resetDataNow = false
+    local dialogWasShown = false
     --ONLY resetting the data?
     if noSecurityQuestion == true and startingNewLottery == false and guildIndex == nil and daysBefore == nil then
         resetDataNow = true
@@ -1218,6 +1220,7 @@ function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, s
             if not noSecurityQuestion then
                 --Show security question dialog
                 --Do you really want to reset... ?
+                dialogWasShown = true
                 showAskDialogNow(guildIndex, daysBefore, startingNewLottery, callbackYes, callbackNo, dialogTextsTable, false)
             else
                 resetDataNow = true
@@ -1231,6 +1234,12 @@ function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, s
     if resetDataNow == true then
         df(">resetting data now - startingNewLottery: %s, index: %s, daysBefore: %s", tostring(startingNewLottery), tostring(guildIndex), tostring(daysBefore))
         resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex, daysBefore)
+        if forceCallbackYes == true and not dialogWasShown and callbackYes ~= nil then
+            if type(callbackYes) == "function" then
+df(">>callbackYes call!")
+                callbackYes(guildIndex, daysBefore)
+            end
+        end
     end
 end
 
@@ -1269,7 +1278,7 @@ function FCOGuildLottery.RollTheDiceForGuildSalesLottery(noChatOutput)
     --Was the setting f the daysBefore slider changed /was the slash command used to change the daysBefore?
     --But no reloadui was done after that?
     if FCOGuildLottery.guildLotteryDaysBeforeSliderWasChanged == true then
-        FCOGuildLottery.StopGuildSalesLottery(true)
+        FCOGuildLottery.StopGuildSalesLottery(true, true)
         showReloadUIMessage("daysbefore")
         return
     end
@@ -1465,7 +1474,7 @@ df("[FCOGuildLottery.StartNewGuildSalesLottery] - index: %s, daysBefore: %s, dat
     end
 end
 
-function FCOGuildLottery.StopGuildSalesLottery(override)
+function FCOGuildLottery.StopGuildSalesLottery(override, forceCallbackYes)
     if not FCOGuildLottery.IsGuildSalesLotteryActive() then return end
     local callbackYes
     local guildIndex = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex
@@ -1480,7 +1489,8 @@ function FCOGuildLottery.StopGuildSalesLottery(override)
     end
     FCOGuildLottery.ResetCurrentGuildSalesLotteryData(skipAskDialog, false, nil, nil,
         callbackYes, nil,
-        {title=GetString(FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_TITLE), question=GetString(FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_QUESTION)}
+        {title=GetString(FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_TITLE), question=GetString(FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_QUESTION)},
+        forceCallbackYes
     )
 end
 
