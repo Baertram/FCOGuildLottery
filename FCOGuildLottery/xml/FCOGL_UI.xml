@@ -98,12 +98,12 @@
                 </Label>
 				<Label name="$(parent)Name" inherits="FCOGLRowLabel">
 					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)DateTime" />
-					<Dimensions x="235" y="30" />
-					<DimensionConstraints minX="235" minY="30" />
+					<Dimensions x="230" y="30" />
+					<DimensionConstraints minX="230" minY="30" />
 				</Label>
 				<Label name="$(parent)Roll" inherits="FCOGLRowLabel">
 					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Name" />
-					<Dimensions x="80" y="30" />
+					<Dimensions x="85" y="30" />
 					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-15" />
 				</Label>
 			</Controls>
@@ -705,15 +705,15 @@
 								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_MEMBER_NAME), "name", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
 							</OnInitialized>
 							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)DateTime" />
-							<Dimensions x="235" y="32" />
-							<DimensionConstraints minX="235" minY="32" />
+							<Dimensions x="230" y="32" />
+							<DimensionConstraints minX="230" minY="32" />
 						</Control>
 						<Control name="$(parent)Roll" inherits="FCOGLSortHeader">
 							<OnInitialized>
 								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_ROLL), "roll", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
 							</OnInitialized>
 							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Name" />
-							<Dimensions x="80" y="32" />
+							<Dimensions x="85" y="32" />
 							<!--<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$(parent)" />-->
                         </Control>
 					</Controls>

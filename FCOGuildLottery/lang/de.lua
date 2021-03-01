@@ -56,7 +56,7 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_GUILDSALESLOTTERY_DELETE_SELECTED         = "Lösche ausgewählte Gilden Verkaufs-Lotterie Historien Einträge",
 
     FCOGL_DELETE_HISTORY_NONE_SELECTED              = "",
-    FCOGL_DELETE_HISTORY_SOME_SELECTED              = "<<1>> ausgewählt, drücke nun |t24:24:/esoui/art/tutorial/inventory_tabicon_junk_up.dds|t ->",
+    FCOGL_DELETE_HISTORY_SOME_SELECTED              = "<<1>> gewählt, drücke nun|t24:24:/esoui/art/tutorial/inventory_tabicon_junk_up.dds|t ->",
 
     FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_TITLE    = "Gilden Verkaufs-Lotterie zurücksetzen",
     FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_QUESTION = "Willst du die aktive Gilden Verkaufs-Lotterie zurücksetzen?\nDies startet eine neue Lotterie!",
@@ -71,7 +71,7 @@ FCOGuildLottery.lang["de"] = {
 
     FCOGL_HISTORY                               = "Normaler Wurf",
     FCOGL_GUILD_HISTORY                         = "Gilden Wurf",
-    FCOGL_GUILD_SALES_LOTTERY_HISTORY           = "Gilden Verakufs-Lotterie Wurf",
+    FCOGL_GUILD_SALES_LOTTERY_HISTORY           = "Gilden Verkaufs-Lotterie Wurf",
 
     FCOGL_CLEARED_HISTORY_COUNT                 = preFix .. " \'%s\' Historien Einträge wurden gelöscht",
 
@@ -79,7 +79,7 @@ FCOGuildLottery.lang["de"] = {
 
     --LAM settings menu
     --Description
-    FCOGL_LAM_DESCRIPTION                       = 'AddOn für Gilden Verkaufs-Lotterien & Würfel Würfe. Chat Kommandos:\n/fcogl   Zeige/Verstecke die Oberfläche.\n/fcogls   Öffene das Einstellungsmenü.\n/dice <Nummer>   Wirft einen Würfel mit der <number> Anzahl Seiten. Wird die Nummer leer gelassen, so wird die Standard Anzahl aus den Einstellungen verwendet!\n/diceG1 - /diceG5  Wirft einen Würfel für die entsprechende Gilde (der bis zu 5 Gilden) mit der Anzahl Seiten = Gilden Mitglieder.\n/gslnew <GildenIndex 1 bis 5> wird die aktive Gilden Verakufs-Lottery zurücksetzen und eine neue starten.\n/gsl wirft einen Würfel für die aktuelle Gilden Verkaufs-Lotterie.\n/gslstop stoppt die aktuelle Gilden Verkaufs-Lotterie.\n/gsllast bzw. /dicelast zeigt das letzte Würfelergebnis im Chat noch einmal an (oder falls akiviert: in der \'DebugLogViewer\' UI).',
+    FCOGL_LAM_DESCRIPTION                       = 'AddOn für Gilden Verkaufs-Lotterien & Würfel Würfe. Chat Kommandos:\n/fcogl   Zeige/Verstecke die Oberfläche.\n/fcogls   Öffene das Einstellungsmenü.\n/dice <Nummer>   Wirft einen Würfel mit der <number> Anzahl Seiten. Wird die Nummer leer gelassen, so wird die Standard Anzahl aus den Einstellungen verwendet!\n/diceG1 - /diceG5  Wirft einen Würfel für die entsprechende Gilde (der bis zu 5 Gilden) mit der Anzahl Seiten = Gilden Mitglieder.\n/gslnew <GildenIndex 1 bis 5> wird die aktive Gilden Verkaufs-Lottery zurücksetzen und eine neue starten.\n/gsl wirft einen Würfel für die aktuelle Gilden Verkaufs-Lotterie.\n/gslstop stoppt die aktuelle Gilden Verkaufs-Lotterie.\n/gsllast bzw. /dicelast zeigt das letzte Würfelergebnis im Chat noch einmal an (oder falls akiviert: in der \'DebugLogViewer\' UI).',
     --Headlines
     FCOGL_LAM_FORMAT_OPTIONS                    = "Ausgabe Format",
     FCOGL_LAM_DICE_OPTIONS                      = 'Würfel Einstellungen',
