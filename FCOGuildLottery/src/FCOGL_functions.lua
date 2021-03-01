@@ -288,19 +288,21 @@ function FCOGuildLottery.buildGuildsDropEntries()
     local guildsOfAccount = {}
     for guildIndex=1, GetNumGuilds() do
         local guildId = GetGuildId(guildIndex)
-        FCOGuildLottery.diceRollGuildsHistory[guildId] = FCOGuildLottery.diceRollGuildsHistory[guildId] or {}
-        local gotTrader = (IsPlayerInGuild(guildId) and DoesGuildHavePrivilege(guildId, GUILD_PRIVILEGE_TRADING_HOUSE)) or false
-        local guildName = ZO_CachedStrFormat(SI_UNIT_NAME, GetGuildName(guildId))
-        if not gotTrader then
-            guildName = "|cFF0000" .. guildName .. "|r"
+        if guildId ~= nil and guildId > 0 then
+            FCOGuildLottery.diceRollGuildsHistory[guildId] = FCOGuildLottery.diceRollGuildsHistory[guildId] or {}
+            local gotTrader = (IsPlayerInGuild(guildId) and DoesGuildHavePrivilege(guildId, GUILD_PRIVILEGE_TRADING_HOUSE)) or false
+            local guildName = ZO_CachedStrFormat(SI_UNIT_NAME, GetGuildName(guildId))
+            if not gotTrader then
+                guildName = "|cFF0000" .. guildName .. "|r"
+            end
+            guildsOfAccount[guildIndex] = {
+                index       = guildIndex,
+                id          = guildId,
+                name        = string.format("(%s) %s", tostring(guildIndex), guildName),
+                nameClean   = guildName,
+                gotTrader   = gotTrader
+            }
         end
-        guildsOfAccount[guildIndex] = {
-            index       = guildIndex,
-            id          = guildId,
-            name        = string.format("(%s) %s", tostring(guildIndex), guildName),
-            nameClean   = guildName,
-            gotTrader   = gotTrader
-        }
     end
     for guildIndex, guildData in ipairs(guildsOfAccount) do
         cnt = cnt + 1

@@ -40,6 +40,10 @@ local function checkForHistyIsInitialized(isInitialCall)
     em:RegisterForUpdate(uniqueName, 50, updateCheck)
 end
 
+local function buildGuildsData()
+    FCOGuildLottery.guildsData = FCOGuildLottery.buildGuildsDropEntries()
+end
+
 --Player activated function
 local function eventPlayerActivated(eventId, isInitialCall)
     df( "EVENT_PLAYER_ACTIVATED - initial: %s", tostring(isInitialCall))
@@ -63,6 +67,11 @@ local function eventGuildMember(eventId, guildId, displayName)
     FCOGuildLottery.UI.updateGuildDiceSidesEditBox(guildIndex)
 end
 
+local function eventGuildJoinedOrLeft(eventId, guildServerId, characterName, guildId)
+    --Update the guild dropdown box entry base in the addon data
+    buildGuildsData()
+end
+
 local function addonLoaded(eventName, addon)
     if addon ~= addonName then return end
     em:UnregisterForEvent(eventName)
@@ -75,7 +84,7 @@ local function addonLoaded(eventName, addon)
     FCOGuildLottery.getSettings()
 
     --Get the guilds data for the dropdown boxes
-    FCOGuildLottery.guildsData = FCOGuildLottery.buildGuildsDropEntries()
+    buildGuildsData()
 
     --Add the slash commands
     FCOGuildLottery.slashCommands()
@@ -88,10 +97,13 @@ local function addonLoaded(eventName, addon)
 
     --EVENTS
     --Register for the zone change/player ready event
-    em:RegisterForEvent(addonName .. "EVENT_PLAYER_ACTIVATED",      EVENT_PLAYER_ACTIVATED,      eventPlayerActivated)
+    em:RegisterForEvent(addonName .. "EVENT_PLAYER_ACTIVATED",      EVENT_PLAYER_ACTIVATED,         eventPlayerActivated)
 
-    em:RegisterForEvent(addonName .. "EVENT_GUILD_MEMBER_ADDED",    EVENT_GUILD_MEMBER_ADDED,    eventGuildMember)
-    em:RegisterForEvent(addonName .. "EVENT_GUILD_MEMBER_REMOVED",  EVENT_GUILD_MEMBER_REMOVED,  eventGuildMember)
+    em:RegisterForEvent(addonName .. "EVENT_GUILD_MEMBER_ADDED",    EVENT_GUILD_MEMBER_ADDED,       eventGuildMember)
+    em:RegisterForEvent(addonName .. "EVENT_GUILD_MEMBER_REMOVED",  EVENT_GUILD_MEMBER_REMOVED,     eventGuildMember)
+
+    em:RegisterForEvent(addonName .. "EVENT_GUILD_JOINED",          EVENT_GUILD_SELF_JOINED_GUILD,  eventGuildJoinedOrLeft)
+    em:RegisterForEvent(addonName .. "EVENT_GUILD_LEFT",            EVENT_GUILD_SELF_LEFT_GUILD,    eventGuildJoinedOrLeft)
 end
 
 function FCOGuildLottery.initialize()
