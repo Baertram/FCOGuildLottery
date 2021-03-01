@@ -229,7 +229,7 @@ function FCOGuildLottery.buildAddonMenu()
         {
             type    = "checkbox",
             name    = GetString(FCOGL_LAM_DEBUG_OPTIONS),
-            tooltip = "Enable debugging output",
+            tooltip = "Debugging",
             getFunc = function() return settings.debug  end,
             setFunc = function(value) settings.debug = value   end,
             default = function() return defaults.debug  end,

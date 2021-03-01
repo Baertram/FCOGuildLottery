@@ -589,11 +589,6 @@
 							offsetX="5"  offsetY="0" />
 				</Button>
 
-				<Button name="$(parent)Sliderbutton1" inherits="FCOGLSliderButton">
-					<Anchor point="TOPLEFT" relativeTo="$(parent)StopGuildSalesLottery" relativePoint="TOPRIGHT"
-							offsetX="5"  offsetY="0" />
-				</Button>
-
 				<!--Background -->
 		    	<Backdrop name="$(parent)BG" alpha="1" inherits="FCOGL_WindowsBackdrop" centerColor="666666">
 		    		<AnchorFill/>

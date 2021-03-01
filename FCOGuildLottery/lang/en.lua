@@ -20,7 +20,7 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_HEADER_TAX                            = "Tax",
     FCOGL_HEADER_INFO                           = "Info",
     FCOGL_HEADER_NO                             = "#",
-    FCOGL_HEADER_ROLL                           = "Dice (Roll)",
+    FCOGL_HEADER_ROLL                           = "|t28:28:/esoui/art/loot/dice_disabled.dds|t(Roll)",
     FCOGL_HEADER_MEMBER_NAME                    = "Member name",
 
     FCOGL_NO_GUILD                              = "-> No guild <-",
