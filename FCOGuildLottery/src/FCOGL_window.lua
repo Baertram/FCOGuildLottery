@@ -741,7 +741,7 @@ function fcoglWindowClass:CheckForMatch(data, searchInput)
 end
 
 function fcoglWindowClass:ProcessItemEntry(stringSearch, data, searchTerm )
---d("[WLW.ProcessItemEntry] stringSearch: " ..tostring(stringSearch) .. ", setName: " .. tostring(data.name:lower()) .. ", searchTerm: " .. tostring(searchTerm))
+--df("[WLW.ProcessItemEntry] stringSearch: " ..tostring(stringSearch) .. ", setName: " .. tostring(data.name:lower()) .. ", searchTerm: " .. tostring(searchTerm))
     local listType = self:GetListType()
     if not listType then return end
     if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
@@ -760,7 +760,7 @@ end
 --- FCOGL Search Dropdown
 ------------------------------------------------
 function fcoglWindowClass:SearchNow(searchValue, resetSearchTextBox)
---d("[fcoglWindow:SearchNow]searchValue: " ..tostring(searchValue))
+--df("[fcoglWindow:SearchNow]searchValue: " ..tostring(searchValue))
     resetSearchTextBox = resetSearchTextBox or false
     if not searchValue then return end
     local searchBox = self.searchBox
@@ -1543,7 +1543,7 @@ df("[fcoglWindowClass:resetSortGroupHeader]currentTab: %s, listType: %s", tostri
 end
 
 function fcoglWindowClass:updateSortHeaderAnchorsAndPositions(currentTab, nameHeaderWidth, nameHeaderHeight)
---d("[fcoglWindowClass]:updateSortHeaderAnchorsAndPositions")
+--df("[fcoglWindowClass]:updateSortHeaderAnchorsAndPositions")
     if currentTab == FCOGL_TAB_GUILDSALESLOTTERY then
         if fcoglUI.CurrentState == FCOGL_TAB_STATE_LOADED then
             self.headers:SetMouseEnabled(true)
@@ -1632,7 +1632,7 @@ df("fcoglWindowClass:UpdateDiceHistoryInfoLabel")
     self.historyTypeLabel:SetHidden(false)
     self.historyTypeLabel:SetText("")
     if FCOGuildLottery.IsGuildSalesLotteryActive() then
-        self.historyTypeLabel:SetText("Guild sales lottery history")
+        self.historyTypeLabel:SetText(GetString(FCOGL_GUILD_SALES_LOTTERY_HISTORY))
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "GuildSalesHistory")
         self.guildHistoryDrop.m_container:SetHidden(false)
         self.guildHistoryDeleteDrop.m_container:SetHidden(false)

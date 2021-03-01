@@ -186,7 +186,7 @@ function FCOGuildLottery.buildAddonMenu()
             default = function() return defaults.guildLotteryDaysBefore end,
             requiresReload = true,
         },
-
+--[[
         {
             type = 'datepicker',
             name = GetString(FCOGL_LAM_GUILD_LOTTERY_DATE_FROM),
@@ -201,6 +201,7 @@ function FCOGuildLottery.buildAddonMenu()
             reference = "FCOGL_DatePickerFrom",
             disabled = function() return true  end
         },
+]]
         {
             type    = "editbox",
             name    = GetString(FCOGL_LAM_GUILD_DICE_ROLL_RESULT_TO_CHAT_EDIT),

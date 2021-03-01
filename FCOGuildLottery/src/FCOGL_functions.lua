@@ -282,7 +282,7 @@ function FCOGuildLottery.getCurrentDiceRollTypeAndGuildIndex()
 end
 
 function FCOGuildLottery.buildGuildsDropEntries()
---d("[FCOGuildLottery]buildGuildsDropEntries")
+--df("[FCOGuildLottery]buildGuildsDropEntries")
     local guildsComboBoxEntryBase = {}
     local cnt = 0
     local guildsOfAccount = {}
@@ -425,7 +425,7 @@ local function checkAndShowNoTraderMessage(guildIndex)
     local guildId, guildName = getGuildIdAndName(guildIndex)
     local gotTrader = (IsPlayerInGuild(guildId) and DoesGuildHavePrivilege(guildId, GUILD_PRIVILEGE_TRADING_HOUSE)) or false
     if not gotTrader then
-        local noTraderChatErrorMessage = "Either you are not a member of the guild \'%s\' aymore, or ths guild does not use a trader."
+        local noTraderChatErrorMessage = GetString(FCOGL_ERROR_GUILD_GOT_NO_TRADER)
         dfa(noTraderChatErrorMessage, guildName)
         return true
     end
@@ -438,7 +438,7 @@ end
 local function showGuildEventsStillFetchingMessage(guildId, guildIndex)
     guildIndex = guildIndex or FCOGuildLottery.GetGuildIndexById(guildId)
     local _, guildName = getGuildIdAndName(guildIndex)
-    dfe( "The listener for the guild #" ..tostring(guildIndex) .." \'" .. guildName .. "\' (ID: " ..tostring(guildId) ..") is still fetching events...\nPlease wait (could take minutes), or open the guild history of that guild and manually press the \'Get more\' keybind to fetch more events, until all missing ones were added!\nThis is only working if the mising data is a small timeframe like 2-10 days.\nAlso check if LibHistoire is still fetching data or if it is fully linked and updated.")
+    dfe( GetString(FCOGL_ERROR_GUILD_LISTENER_STILL_FETCHING_EVENTS), tostring(guildIndex), guildName, tostring(guildId) )
 end
 
 local function showGuildEventsNoTraderWeekDeterminedMessage(dateStr)
@@ -448,7 +448,7 @@ end
 local function showGuildEventsNoMemberCountMessage(guildId, guildIndex)
     guildIndex = guildIndex or FCOGuildLottery.GetGuildIndexById(guildId)
     local _, guildName = getGuildIdAndName(guildIndex)
-    dfe( "The count of members having sold any items, for the guild #" ..tostring(guildIndex) .." \'" .. guildName .. "\' (ID: " ..tostring(guildId) .."), is 0.\nEither no items were sold in the selected timeframe, or there occured an error!\nPlease try to manually update the guild history via the \'Get more\' keybind at the guild's history. Also check if LibHistoire is still fetching data or if it is fully linked and updated.")
+    dfe(GetString(FCOGL_ERROR_GUILD_MEMBER_COUNT), tostring(guildIndex), guildName, tostring(guildId))
 end
 
 
@@ -654,6 +654,7 @@ function FCOGuildLottery.CollectGuildSellStats(guildId, startDate, endDate, uniq
     end
 end
 
+--[[
 function FCOGuildLottery.CompareMMAndFCOGLGuildSalesData(guildIndex)
     if not IsGuildIndexValid(guildIndex) then return end
     local guildName = GetGuildName(GetGuildId(guildIndex))
@@ -698,6 +699,7 @@ function FCOGuildLottery.CompareMMAndFCOGLGuildSalesData(guildIndex)
     end
 
 end
+]]
 
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
@@ -903,9 +905,9 @@ function FCOGuildLottery.GetGuildName(guildIndex, noChatOutput, shortChatOutput)
     local guildId, guildName = getGuildIdAndName(guildIndex)
     if not noChatOutput then
         if shortChatOutput == true then
-            dfa( "Guild name: %s", tostring(guildName))
+            dfa( GetString(FCOGL_GUILD_NAME_SHORT), tostring(guildName))
         else
-            dfa( "Guild name of guild no %s (server-wide unique ID: %s): %s", tostring(guildIndex), tostring(guildId), tostring(guildName))
+            dfa( GetString(FCOGL_GUILD_NAME_LONG), tostring(guildIndex), tostring(guildId), tostring(guildName))
         end
     end
     return guildName, guildId
@@ -918,9 +920,9 @@ function FCOGuildLottery.GetGuildInfo(guildIndex, noChatOutput)
     local numMembers, numOnline, leaderName, numInvitees = GetGuildInfo(guildId)
     if not noChatOutput then
         dfa(">>==============================>>")
-        dfa( "GuildInfo about your guild no. %s (server-wide unique ID: %s), name: %s", tostring(guildIndex), tostring(guildId), tostring(guildName))
-        dfa(">Leader name: %s / Open invitations: %s", tostring(leaderName), tostring(numInvitees))
-        dfa(">Member count: %s / Currently online: %s", tostring(numMembers), tostring(numOnline))
+        dfa(GetString(FCOGL_GUILD_INFO_ROW_1), tostring(guildIndex), tostring(guildId), tostring(guildName))
+        dfa(GetString(FCOGL_GUILD_INFO_ROW_2), tostring(leaderName), tostring(numInvitees))
+        dfa(GetString(FCOGL_GUILD_INFO_ROW_3), tostring(numMembers), tostring(numOnline))
         dfa("<<==============================<<")
     end
     return numMembers, numOnline, leaderName, numInvitees
@@ -1236,7 +1238,7 @@ function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, s
         resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex, daysBefore)
         if forceCallbackYes == true and not dialogWasShown and callbackYes ~= nil then
             if type(callbackYes) == "function" then
-df(">>callbackYes call!")
+                df(">>callbackYes call!")
                 callbackYes(guildIndex, daysBefore)
             end
         end
@@ -1246,7 +1248,6 @@ end
 --Build the ranks list and get number of members having sold something in the timeframe
 function FCOGuildLottery.BuildGuildSalesMemberRank(guildId, daysBefore, startTime, endTime, uniqueIdentifier)
     df( "BuildGuildSalesMemberRank - guildId: %s, endTime: %s, daysBefore: %s, startTime: %s, uniqueId: %s", tostring(guildId), os.date("%c", endTime), tostring(daysBefore), os.date("%c", startTime) , tostring(uniqueIdentifier))
-    --d( string.format("BuildGuildSalesMemberRank - guildId: %s, endTime: %s, daysBefore: %s, startTime: %s, uniqueId: %s", tostring(guildId), os.date("%c", endTime), tostring(daysBefore), os.date("%c", startTime) , tostring(uniqueIdentifier)))
     if guildId == nil or guildId == 0 then return end
 
     if checkIfPendingSellEventAndResetGuildSalesLottery(guildId) then return end
@@ -1262,7 +1263,6 @@ function FCOGuildLottery.BuildGuildSalesMemberRank(guildId, daysBefore, startTim
         )
     end
     df(">guildSalesMemberCount: " ..tostring(guildSalesMemberCount))
-    --d(">guildSalesMemberCount: " ..tostring(guildSalesMemberCount))
     return guildSalesMemberCount
 end
 
@@ -1714,9 +1714,9 @@ function FCOGuildLottery.getDateTimeFormatted(dateTimeStamp)
                 dateTimeStr = os.date(settings.useCustomDateFormat, dateTimeStamp)
             else
                 if settings.use24hFormat then
-                    dateTimeStr = os.date("%d.%m.%y, %H:%M:%S", dateTimeStamp)
+                    dateTimeStr = os.date(GetString(FCOGL_DATTIME_FORMAT_24HOURS), dateTimeStamp)
                 else
-                    dateTimeStr = os.date("%y-%m-%d, %I:%M:%S %p", dateTimeStamp)
+                    dateTimeStr = os.date(GetString(FCOGL_DATTIME_FORMAT_12HOURS), dateTimeStamp)
                 end
 
             end

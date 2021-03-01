@@ -167,13 +167,6 @@
 		<!-- Virtual Buttons -->
 		<Button name="FCOGLButtonGuildSales" virtual="true">
 			<Dimensions x="50" y="50" />
-			<!--
-			<Textures normal="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_up.dds"
-					  mouseOver="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_over.dds"
-					  pressed="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_down.dds"
-					  disabled="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_disabled.dds"
-			/>
-			-->
 			<Textures normal="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_up.dds"
 					  mouseOver="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_up.dds"
 					  pressed="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_up.dds"

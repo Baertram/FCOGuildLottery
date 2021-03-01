@@ -52,10 +52,10 @@ function FCOGuildLottery.getSettings()
         autoPreFillChatEditBoxAfterDiceRoll = false,
         preFillChatEditBoxAfterDiceRollTextTemplates = {
             normal = {
-                [1] = "#<<1>>, congratulations to \'<<C:2>>\'"
+                [1] = GetString(FCOGL_CHAT_EDITBOX_TEXT_TEMPLATE_DEFAULT)
             },
             guilds = {
-                [1] = "#<<1>>, congratulations to \'<<C:2>>\'"
+                [1] = GetString(FCOGL_CHAT_EDITBOX_TEXT_TEMPLATE_DEFAULT)
             },
         },
 

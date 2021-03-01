@@ -45,6 +45,7 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_CLOSE                                 = "Close",
     FCOGL_TOGGLE_DICE_ROLL_HISTORY              = "Toggle dice roll history",
     FCOGL_GUILD_SALES_LOTTERY                   = "Guild sales lottery",
+    FCOGL_GUILD_SALES_LOTTERY_HISTORY           = "Guild sales lottery history",
 
     FCOGL_DICE_PREFIX                           = "D",
 
@@ -78,7 +79,7 @@ FCOGuildLottery.lang["en"] = {
 
     --LAM settings menu
     --Description
-    FCOGL_LAM_DESCRIPTION                       = 'Helper addon for a guild lottery & dice rolls. Chat slash commands are:\n/fcogl   Toggle the UI\n/fcogls   Toggle the settings menu\n/dice <number>   Will roll a dice with <number> sides. If left empty this will roll a dice with 500 sides!\n/diceG1 - /diceG5  Will roll a dice for the number of guild members of guild 1 - 5\n/gslnew <guildIndex 1 to 5> will reset the last used lottery data and start a new one\n/gsl will roll the next dice for the active guild sales lottery.\n/gslstop will stop the currently active guild sales lottery.\n/gsllast or /dicelast will show the last dice roll results in your local chat (or if you got it enabled: within the \'DebugLogViewer\' UI) again.',
+    FCOGL_LAM_DESCRIPTION                       = 'Helper addon for a guild lottery & dice rolls. Chat slash commands are:\n/fcogl   Toggle the UI.\n/fcogls   Toggle the settings menu.\n/dice <number>   Will roll a dice with <number> sides. If left empty the default value from the settings will be used!\n/diceG1 - /diceG5  Will roll a dice for the number of guild members of guild 1 - 5.\n/gslnew <guildIndex 1 to 5> will reset the currently active sales lottery and start a new one.\n/gsl will roll the next dice for the active guild sales lottery.\n/gslstop will stop the currently active guild sales lottery.\n/gsllast or /dicelast will show the last dice roll results in your local chat (or if you got it enabled: within the \'DebugLogViewer\' UI) again.',
     --Headlines
     FCOGL_LAM_FORMAT_OPTIONS                    = "Output format",
     FCOGL_LAM_DICE_OPTIONS                      = 'Dice settings',
@@ -97,11 +98,11 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_LAM_GUILD_LOTTERY_DICE_ROLL_RESULT_TO_CHAT_EDIT_TT= "Define the text that should be shown in the chat after a guild sales lottery dice roll was done, and a member rank was determined\n\nYou can use the following placeholders:\n<<1>>   Dice roll #\n<<2>>   @AccountName of seller.",
 
     FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT     = "Cut-off at 00:00 current day",
-    FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT_TT  = "Cut-off the guild sales history data at the current day at 00:00.\nNo newer events coming in after 00:00 via LibHistoire will be used for the ranking!\nIf this setting is disabled (default setting) the ranking will be using the same values as Master Merchant e.g. does for the 7 days ranking.",
+    FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT_TT  = "Cut-off the guild sales lottery data at the current day at 00:00.\nNo newer events coming in after 00:00 via LibHistoire will be used for the ranking!\nIf this setting is disabled (default setting) the ranking will be using the same values as Master Merchant e.g. does for the 7 days ranking.",
     FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL    = "Show UI after dice roll",
-    FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL_TT = "Automatically show the UI after a dice roll was done via a slash command.\n\nThe dice roll history will be expanded as well then.\nInfo: The dice roll history will not change to the dice throw type (e.g. /diceg1 should switch to the guild 1 dice history) if a guild sales history is currently active!",
+    FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL_TT = "Automatically show the UI after a dice roll was done via a slash command.\n\nThe dice roll history will be expanded as well then.\nInfo: The dice roll history will not change to the dice throw type (e.g. /diceg1 should switch to the guild 1 dice history) if a guild sales lottery is currently active!",
     FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE             = "Days backwards from today",
-    FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE_TT          = "The days the guild sales lottery should read backwards from today and collect the sales rankings for. Default value is 7 days.\n\nAttention: The more days you select here the more guild sales history needs to be read! Make sure ALL the selected days are given in your guild sales history, check the guild sales tabs and if \'LibHistoire\' did read all the needed data, is aligned and updated! Else you'll most probably not be able to start the lottery, or you'll get false results!",
+    FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE_TT          = "The days the guild sales lottery should read backwards from today and collect the sales rankings for. Default value is 7 days.\n\nAttention: The more days you select here the more guild sales events need to be read! Make sure ALL the selected days are given in your guild sales history, check the guild sales tabs and if \'LibHistoire\' did read all the needed data, is aligned and updated! Else you'll most probably not be able to start the lottery, or you'll get false results!",
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM               = "Date from",
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM_TT            = "The start date of the guild sales lottery. Default value is today - 7 days (at midnight).",
 
@@ -113,13 +114,32 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_LAM_DEBUG_CHAT_OUTPUT_TOO             = "Chat output too (LibDebugLogger)",
     FCOGL_LAM_DEBUG_CHAT_OUTPUT_TOO_TT          = "If LibDebugLogger is enabled the logging will only be shown in the UI DebugLogViewer, or within the SavedVariables file LibDebugLogger.lua.\nIf you enable the setting there also will be a chat output shown for you, but only if:\n|c5F5F5F\'LibDebugLogger\' is loaded AND \'DebugLogViewer\' is currently not loaded|r.",
 
+    FCOGL_CHAT_EDITBOX_TEXT_TEMPLATE_DEFAULT    = "#<<1>>, congratulations to \'<<C:2>>\'",
+    FCOGL_GUILD_NAME_SHORT                      = "Guild name: %s",
+    FCOGL_GUILD_NAME_LONG                       = "Guild name of guild no %s (server-wide unique ID: %s): %s",
+    FCOGL_GUILD_INFO_ROW_1                      = "GuildInfo about your guild no. %s (server-wide unique ID: %s), name: %s",
+    FCOGL_GUILD_INFO_ROW_2                      = ">Leader name: %s / Open invitations: %s",
+    FCOGL_GUILD_INFO_ROW_3                      = ">Member count: %s / Currently online: %s",
+
+    --Date & time formats
+    FCOGL_DATTIME_FORMAT_24HOURS                = "%d.%m.%y, %H:%M:%S",
+    FCOGL_DATTIME_FORMAT_12HOURS                = "%y-%m-%d, %I:%M:%S %p",
+
     --Errors
     FCOGL_ERROR_SELECTED_GUILD_INVALID          = "The selected guild does not seem be valid. Please select the guild from the guilds dropdown box.",
     FCOGL_ERROR_NO_GUILD_ONLY_GENERIC_DICE_THROW= "Please select a guild from the guilds dropdown box!\nElse you are only able to use the dice button/use the slash command /dice to throw a random dice throw with the sides you have defined at the editbox next to the button/at the normal dice settings.",
-    FCOGL_ERROR_GUILD_SALES_LOTTERY_PARAMETERS_MISSING = "Please use the slash command /newgsl <guildIndex> <daysBeforeCurrent> to start a new guild sales lottery.\nReplace <guildIndex> with the index 81 to 5) of your guilds, and optinally replace <daysBeforeCurrent> with the count of days you want to check the guild sales history for.\nIf this 2nd parameter is left empty \'%s days\' will be used as default value.\n\nAfter starting a new guild sales lottery via /newgsl you can use /gsl to throw the next dice.",
+    FCOGL_ERROR_GUILD_SALES_LOTTERY_PARAMETERS_MISSING = "Please use the slash command /gslnew <guildIndex> <daysBeforeCurrent> to start a new guild sales lottery.\nReplace <guildIndex> with the index 1 to 5 of your guilds, and optinally replace <daysBeforeCurrent> with the count of days you want to build the ranking of the guild sales lottery for.\nIf this 2nd parameter is left empty \'%s days\' will be used as default value.\n\nAfter starting a new guild sales lottery via /gslnew you can use /gsl to throw the next dice.",
+    FCOGL_ERROR_GUILD_GOT_NO_TRADER             = "Either you are not a member of the guild \'%s\' aymore, or this guild does not use a trader.",
+    FCOGL_ERROR_GUILD_MEMBER_COUNT              = "The count of members having sold any items, for the guild #%s \'%s\' (ID: %s) is 0.\nEither no items were sold in the selected timeframe, or there occured an error!\nPlease try to manually update the guild history via the \'Get more\' keybind at the guild's history. Also check if LibHistoire is still fetching data or if it is fully linked and updated.",
+    FCOGL_ERROR_GUILD_LISTENER_STILL_FETCHING_EVENTS = "The listener for the guild #%s \'%s\' (ID: %s) is still fetching events...\nPlease wait (could take minutes), or open the guild history of that guild and manually press the \'Get more\' keybind to fetch more events, until all missing ones were added!\nThis is only working if the mising data is a small timeframe like 2-10 days.\nAlso check if LibHistoire is still fetching data or if it is fully linked and updated.",
 
     --Keybindings
     SI_BINDING_NAME_FCOGL_TOGGLE                = "Toggle FCO GuildLottery UI",
+    SI_BINDING_NAME_FCOGL_ROLL_THE_DICE         = "Roll dice with def. sides",
+    SI_BINDING_NAME_FCOGL_ROLL_THE_DICE_FOR_GUILD_SALES = "Start lottery/Roll dice",
+    SI_BINDING_NAME_FCOGL_RESET_GUILD_SALES     = "Reset guild sales lottery",
+    SI_BINDING_NAME_FCOGL_STOP_GUILD_SALES      = "Stop guild sales lottery",
+
 
     FCOGL_RELOADUI_WARNING_WITH_TEXT            = "<<========== ERROR ==========>>\nYou did not do a /reloadui after changing \'%s\' in the settings/via slash command!",
     FCOGL_RELOADUI_DAYSBEFORE                   = " the days before value"
