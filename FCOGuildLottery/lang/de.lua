@@ -4,10 +4,11 @@ local FCOGuildLottery = FCOGL
 local preFix = "[FCOGL]"
 
 FCOGuildLottery.lang["de"] = {
-    --1st entry in the search dropdown
+    --Entries in the search dropdown
     [FCOGL_SEARCHDROP_PREFIX .."1"]             = "Name / Rang",
+    [FCOGL_SEARCHDROP_PREFIX .."2"]             = "Datum Beitritt",
 
-    --1st entry in the history search dropdown
+    --Entries in the history search dropdown
     [FCOGL_HISTORY_SEARCHDROP_PREFIX .."1"]     = "Name / #",
 
     --The sort headers
@@ -28,12 +29,14 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_DICE_TYPE_STRING_RANDOM               = "Zufall",
     FCOGL_DICE_TYPE_STRING_GUILD                = "Gilde \'%s\' Mitglieder Index ",
     FCOGL_DICE_TYPE_STRING_GUILDSALESLOTTERY    = "Gilden \'%s\' Verkaufs-Lotterie Rang ",
+    FCOGL_DICE_TYPE_STRING_GUILDMEMBERJOINED    = "Gilden \'%s\' Mitglieder Beitritt Liste ",
 
     FCOGL_DICE_HISTORY_NORMAL                   = "Normale Würfe Historie",
     FCOGL_DICE_HISTORY_GUILD                    = "Gilden Würfe Historie",
 
     FCOGL_LASTROLLED_DICE_CHAT_OUTPUT           = "%s Würfel Wurf (W%s) =   %s",
     FCOGL_LASTROLLED_DICE_FOUND_MEMBER_SOLD_CHAT_OUTPUT = ">>Mitglied \'%s\' gefunden auf Rang: %s, Verkaufssumme: %s",
+    FCOGL_LASTROLLED_DICE_FOUND_MEMBER_JOINED_CHAT_OUTPUT = ">>Beigetretenes Mitglied \'%s\' gefunden an Position: %s",
     FCOGL_LASTROLLED_DICE_FOUND_MEMBER_CHAT_OUTPUT = ">>Mitglied \'%s\' gefunden",
 
     FCOGL_DICE_SIDES                            = "# der Würfelseiten",
@@ -52,7 +55,7 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_CURRENTGUILSALESLOTTERY_TEXT              = "Start: %s / Ende: %s",
     FCOGL_CURRENTGUILSALESLOTTERY_DICEHISTORY_TEXT  = "Von: %s / -%s Tage",
     FCOGL_GUILDSALESLOTTERY_HISTORY_DROP_TT         = "Wähle eine gespeicherte Gilden Verkaufs-Lotterie Historie.\nDie gewählte Historie wird für neue Würfel Würfe erneut geöffnet.\nEine aktuell aktive Gilden Verkaufs-Lotterie wird dabei gestoppt!!",
-    FCOGL_GUILDSALESLOTTERY_DELETE_HISTORY_DROP_TT  = "Wähle eine gespeicherte Gilden Verkaufs-Lotterie Historien Einträge, welche du löschen möchtest. Klicke danach auf den Löschen Knopf rechts neben dieser Mehrfach-Auswahl Dropdown-Box.",
+    FCOGL_GUILDSALESLOTTERY_DELETE_HISTORY_DROP_TT  = "Wähle gespeicherte Gilden Verkaufs-Lotterie Historien Einträge, welche du löschen möchtest. Klicke danach auf den Löschen Knopf rechts neben dieser Mehrfach-Auswahl Dropdown-Box.",
     FCOGL_GUILDSALESLOTTERY_DELETE_SELECTED         = "Lösche ausgewählte Gilden Verkaufs-Lotterie Historien Einträge",
 
     FCOGL_DELETE_HISTORY_NONE_SELECTED              = "",
@@ -115,7 +118,7 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_LAM_DEBUG_CHAT_OUTPUT_TOO_TT          = "Wenn LibDebugLogger aktiv ist wird der Log nur in der DebugLogViewer Oberfläche (falls aktiv), oder in der SavedVariables file LibDebugLogger.lua ausgegeben.\nWenn du diese Option aktivierst wird zusätzlich im Chat der Text ausgegben, aber nur wenn\n|c5F5F5F\'LibDebugLogger\' geladen ist UND \'DebugLogViewer\' aktuell nicht aktiv ist!|r.",
 
     FCOGL_CHAT_EDITBOX_TEXT_TEMPLATE_DEFAULT    = "#<<1>>, Glückwunsch an \'<<C:2>>\'",
-    FCOGL_GUILD_NAME_SHORT                      = "Gulden Name: %s",
+    FCOGL_GUILD_NAME_SHORT                      = "Gilden Name: %s",
     FCOGL_GUILD_NAME_LONG                       = "Gilden Name der Gilde Nr. %s (Server-weite eindeutige ID: %s): %s",
     FCOGL_GUILD_INFO_ROW_1                      = "Gilden Info über deine Gilde Nr. %s (Server-weite eindeutige ID: %s), Name: %s",
     FCOGL_GUILD_INFO_ROW_2                      = ">Anführer Name: %s / Offene Einladungen: %s",
@@ -131,6 +134,7 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_ERROR_GUILD_SALES_LOTTERY_PARAMETERS_MISSING = "Bitte nutze das Chat Kommando /gslnew <GildenIndex> <TageForDemAktuellen> um eine neue Gilden Verkaufs-Lotterie zu starten.\nErsetze <GildenIndex> mit dem Index 1 bis 5 deiner Gilden, und optional <TageForDemAktuellen> mit der Anzahl an Tagen die die Gilden Verkaufs-Lotterie das Ranking in die Vergangenheit berücksichtigen soll.\nwird der 2. Parameter leer gelassen, so werden \'%s days\' als Standard Wert verwendet.\n\nNach dem Starten einer neuen Gilden Verkaufs-Lotterie via /gslnew kannst du /gsl für den nächsten Würfen Wurf verwenden.",
     FCOGL_ERROR_GUILD_GOT_NO_TRADER             = "Entweder du bist kein Mitglied der Gilde \'%s\', oder diese Gilde besitzt keinen Verkäufer..",
     FCOGL_ERROR_GUILD_MEMBER_COUNT              = "Die Anzahl der Gilden Mitglieder der Gilde #%s \'%s\' (ID: %s), welche etwas verkauft haben, ist 0.\nEntweder es wurden keine Gegenstände im gewählten Zeitrahmen verkauft, oder es gab einen Fehler!\nBitte versuche die Gilden Historien Daten manuell zu aktualisieren mit Hilfe des \'Mehr\' Knopfes (Tastenkombination) auf dem Gilden Historien Reiter. Prüfe dort auch, ob die LibHistoire Daten alle geladen wurden und synchron sind, oder ob noch etwas aktuell geladen wird.",
+    FCOGL_ERROR_GUILD_MEMBER_JOINED_COUNT       = "Die Anzahl der Gilden Mitglieder der Gilde #%s \'%s\' (ID: %s), welche im selektierten Zeitraum der Gilde beigetreten sind, ist 0.\nBitte versuche die Gilden Historien Daten manuell zu aktualisieren mit Hilfe des \'Mehr\' Knopfes (Tastenkombination) auf dem Gilden Historien Reiter. Prüfe dort auch, ob die LibHistoire Daten alle geladen wurden und synchron sind, oder ob noch etwas aktuell geladen wird.",
     FCOGL_ERROR_GUILD_LISTENER_STILL_FETCHING_EVENTS = "Der Gilden Historien Datensammler der Gilde #%s \'%s\' (ID: %s) sammelt noch Events...\nBitte warten (kann Minuten, oder länger dauern), oder öffne die Gilden Historie der Gilde und aktualisiere diese manuell per \'Mehr\' Knopf (Tastenkombination) um neue Events einzulesen. Es müssen alle Events gelesen werden bis LibHistoire anzeigt, dass alles synchron und aktualisiert ist!",
 
     --Keybindings

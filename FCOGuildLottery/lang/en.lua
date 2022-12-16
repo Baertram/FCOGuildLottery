@@ -4,10 +4,11 @@ local FCOGuildLottery = FCOGL
 local preFix = "[FCOGL]"
 
 FCOGuildLottery.lang["en"] = {
-    --1st entry in the search dropdown
+    --Entries in the search dropdown
     [FCOGL_SEARCHDROP_PREFIX .."1"]             = "Name / Rank",
+    [FCOGL_SEARCHDROP_PREFIX .."2"]             = "Joined date",
 
-    --1st entry in the history search dropdown
+    --Entries in the history search dropdown
     [FCOGL_HISTORY_SEARCHDROP_PREFIX .."1"]     = "Name / #",
 
     --The sort headers
@@ -28,19 +29,23 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_DICE_TYPE_STRING_RANDOM               = "Random",
     FCOGL_DICE_TYPE_STRING_GUILD                = "Guild's \'%s\' member index ",
     FCOGL_DICE_TYPE_STRING_GUILDSALESLOTTERY    = "Guild's \'%s\' sales lottery rank ",
+    FCOGL_DICE_TYPE_STRING_GUILDMEMBERJOINED    = "Guild's \'%s\' member joined list ",
 
     FCOGL_DICE_HISTORY_NORMAL                   = "Normal rolls history",
     FCOGL_DICE_HISTORY_GUILD                    = "Guild rolls history",
 
     FCOGL_LASTROLLED_DICE_CHAT_OUTPUT           = "%s dice roll (D%s) =   %s",
     FCOGL_LASTROLLED_DICE_FOUND_MEMBER_SOLD_CHAT_OUTPUT = ">>Found member \'%s\' at rank: %s, with sold sum: %s",
+    FCOGL_LASTROLLED_DICE_FOUND_MEMBER_JOINED_CHAT_OUTPUT = ">>Found joined member \'%s\' at list index: %s",
     FCOGL_LASTROLLED_DICE_FOUND_MEMBER_CHAT_OUTPUT = ">>Found member \'%s\'",
 
     FCOGL_DICE_SIDES                            = "# of sides of the dice",
     FCOGL_START_NEW_GUILD_SALES_LOTTERY         = "Start new guild sales lottery",
+    FCOGL_START_NEW_GUILD_MEMBER_JOINED_LIST    = "Start new guild member joined date list",
     FCOGL_ROLL_THE_DICE                         = "Roll the dice",
     FCOGL_REFRESH                               = "Refresh",
     FCOGL_STOP_GUILDSALESLOTTERY                = "Stop guild sales lottery",
+    FCOGL_STOP_GUILD_MEMBER_JOINED_LIST         = "Stop guild members joined date list",
     FCOGL_SETTINGS                              = "Open settings",
     FCOGL_CLOSE                                 = "Close",
     FCOGL_TOGGLE_DICE_ROLL_HISTORY              = "Toggle dice roll history",
@@ -60,8 +65,13 @@ FCOGuildLottery.lang["en"] = {
 
     FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_TITLE    = "Reset guild sales lottery",
     FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_QUESTION = "Do you want to reset the currently active guild\n sales lottery?\nThis will start a new lottery!",
+    FCOGL_RESET_GUILD_MEMBER_JOINED_DIALOG_TITLE    = "Reset guild member joined throws",
+    FCOGL_RESET_GUILD_MEMBER_JOINED_DIALOG_QUESTION = "Do you want to reset the currently active guild\n member joined list?\nThis will start a new guild member joined list!",
+
     FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_TITLE     = "Stop guild sales lottery",
     FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_QUESTION  = "Do you want to stop the currently active guild\nsales lottery?\nThis will enable the guild dice throws for the\nselected guild again.",
+    FCOGL_STOP_GUILD_MEMBER_JOINED_DIALOG_TITLE     = "Stop guild member joined throws",
+    FCOGL_STOP_GUILD_MEMBER_JOINED_DIALOG_QUESTION  = "Do you want to stop the currently active guild\nmember joined throws?\nThis will enable the guild dice throws for the\nselected guild again.",
 
     FCOGL_CLEAR_HISTORY                             = "Clear the shown history list",
     FCOGL_CLEAR_HISTORY_DIALOG_TITLE                = "Clear history list?",
@@ -72,6 +82,7 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_HISTORY                               = "Normal roll",
     FCOGL_GUILD_HISTORY                         = "Guild roll",
     FCOGL_GUILD_SALES_LOTTERY_HISTORY           = "Guild sales lottery roll",
+    FCOGL_GUILD_MEMBER_JOIN_DATE_HISTORY        = "Guild member join date roll",
 
     FCOGL_CLEARED_HISTORY_COUNT                 = preFix .. "Deleted \'%s\' history entries",
 
@@ -85,6 +96,7 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_LAM_DICE_OPTIONS                      = 'Dice settings',
     FCOGL_LAM_GUILD_ROLL_OPTIONS                = 'Guild role settings',
     FCOGL_LAM_GUILD_LOTTERY_OPTIONS             = 'Guild lottery settings',
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_OPTIONS      = 'Guild members joined settings',
     FCOGL_LAM_DEBUG_OPTIONS                     = 'Debug',
 
     FCOGL_LAM_SAVE_TYPE                         = 'Settings save type',
@@ -95,14 +107,15 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_LAM_DEFAULT_DICE_SIDES_TT                         = "The standard sides of a dice which you roll via the \'/dice\' slash command, or via the keybind \'Roll dice with def. sides\'",
     FCOGL_LAM_GUILD_DICE_ROLL_RESULT_TO_CHAT_EDIT           = "Chat edit box: Dice roll result",
     FCOGL_LAM_GUILD_DICE_ROLL_RESULT_TO_CHAT_EDIT_TT        = "Define the text that should be shown in the chat after a normal guild dice roll was done, and a member index was determined\n\nYou can use the following placeholders:\n<<1>>   Dice roll #\n<<2>>   @AccountName of guild member.",
+    FCOGL_LAM_GUILD_MEMBER_JOIN_DATE_DICE_ROLL_RESULT_TO_CHAT_EDIT_TT = "Define the text that should be shown in the chat after a normal guild dice roll was done, and a member index was determined\n\nYou can use the following placeholders:\n<<1>>   Dice roll #\n<<2>>   @AccountName of guild member.",
     FCOGL_LAM_GUILD_LOTTERY_DICE_ROLL_RESULT_TO_CHAT_EDIT_TT= "Define the text that should be shown in the chat after a guild sales lottery dice roll was done, and a member rank was determined\n\nYou can use the following placeholders:\n<<1>>   Dice roll #\n<<2>>   @AccountName of seller.",
 
     FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT     = "Cut-off at 00:00 current day",
-    FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT_TT  = "Cut-off the guild sales lottery data at the current day at 00:00.\nNo newer events coming in after 00:00 via LibHistoire will be used for the ranking!\nIf this setting is disabled (default setting) the ranking will be using the same values as Master Merchant e.g. does for the 7 days ranking.",
+    FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT_TT  = "Cut-off the data at the current day at 00:00.\nNo newer events coming in after 00:00 via LibHistoire will be used for the list entries!\nOnly for the guild lottery ranking: If this setting is disabled (default setting) the ranking will be using the same values as Master Merchant e.g. does for the 7 days ranking.",
     FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL    = "Show UI after dice roll",
-    FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL_TT = "Automatically show the UI after a dice roll was done via a slash command.\n\nThe dice roll history will be expanded as well then.\nInfo: The dice roll history will not change to the dice throw type (e.g. /diceg1 should switch to the guild 1 dice history) if a guild sales lottery is currently active!",
+    FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL_TT = "Automatically show the UI after a dice roll was done via a slash command.\n\nThe dice roll history will be expanded as well then.\nInfo: The dice roll history will not change to the dice throw type (e.g. /diceg1 should switch to the guild 1 dice history) if a guild sales lottery or guild member joined list is currently active!",
     FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE             = "Days backwards from today",
-    FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE_TT          = "The days the guild sales lottery should read backwards from today and collect the sales rankings for. Default value is 7 days.\n\nAttention: The more days you select here the more guild sales events need to be read! Make sure ALL the selected days are given in your guild sales history, check the guild sales tabs and if \'LibHistoire\' did read all the needed data, is aligned and updated! Else you'll most probably not be able to start the lottery, or you'll get false results!",
+    FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE_TT          = "The days the guild should read backwards from today and collect the sales/member data. Default value is 7/31 days.\n\nAttention: The more days you select here the more guild sales/member events need to be read! Make sure ALL the selected days are given in your guild  history, check the guild tabs and if \'LibHistoire\' did read all the needed data, is aligned and updated! Else you'll most probably not be able to start the dice rolls, or you'll get false results!",
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM               = "Date from",
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM_TT            = "The start date of the guild sales lottery. Default value is today - 7 days (at midnight).",
 
@@ -130,6 +143,7 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_ERROR_NO_GUILD_ONLY_GENERIC_DICE_THROW= "Please select a guild from the guilds dropdown box!\nElse you are only able to use the dice button/use the slash command /dice to throw a random dice throw with the sides you have defined at the editbox next to the button/at the normal dice settings.",
     FCOGL_ERROR_GUILD_SALES_LOTTERY_PARAMETERS_MISSING = "Please use the slash command /gslnew <guildIndex> <daysBeforeCurrent> to start a new guild sales lottery.\nReplace <guildIndex> with the index 1 to 5 of your guilds, and optinally replace <daysBeforeCurrent> with the count of days you want to build the ranking of the guild sales lottery for.\nIf this 2nd parameter is left empty \'%s days\' will be used as default value.\n\nAfter starting a new guild sales lottery via /gslnew you can use /gsl to throw the next dice.",
     FCOGL_ERROR_GUILD_GOT_NO_TRADER             = "Either you are not a member of the guild \'%s\' aymore, or this guild does not use a trader.",
+    FCOGL_ERROR_GUILD_MEMBER_JOINED_COUNT       = "The count of members who joined the guild #%s \'%s\' (ID: %s) during the selected timeframe is 0.\nPlease try to manually update the guild history via the \'Get more\' keybind at the guild's history. Also check if LibHistoire is still fetching data or if it is fully linked and updated.",
     FCOGL_ERROR_GUILD_MEMBER_COUNT              = "The count of members having sold any items, for the guild #%s \'%s\' (ID: %s) is 0.\nEither no items were sold in the selected timeframe, or there occured an error!\nPlease try to manually update the guild history via the \'Get more\' keybind at the guild's history. Also check if LibHistoire is still fetching data or if it is fully linked and updated.",
     FCOGL_ERROR_GUILD_LISTENER_STILL_FETCHING_EVENTS = "The listener for the guild #%s \'%s\' (ID: %s) is still fetching events...\nPlease wait (could take minutes), or open the guild history of that guild and manually press the \'Get more\' keybind to fetch more events, until all missing ones were added!\nThis is only working if the mising data is a small timeframe like 2-10 days.\nAlso check if LibHistoire is still fetching data or if it is fully linked and updated.",
 

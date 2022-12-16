@@ -34,6 +34,9 @@ local function checkForHistyIsInitialized(isInitialCall)
             df( ">>>>>>>>>> \'LibHistoire\' was initialized properly >>>>>>>>>>")
             --Get the default sales history time range of all guilds which own a guild store
             FCOGuildLottery.GetDefaultSalesHistoryData()
+
+            --Get the default guild member history time range of all guilds
+            FCOGuildLottery.GetDefaultMemberHistoryData()
         end
     end
     em:UnregisterForUpdate(uniqueName)
@@ -94,6 +97,7 @@ local function addonLoaded(eventName, addon)
 
     --Dialogs
     FCOGuildLottery.AskBeforeResetDialogInitialize(FCOGLAskBeforeResetDialogXML, FCOGuildLottery.getDialogName("resetGuildSalesLottery"))
+    FCOGuildLottery.AskBeforeResetDialogInitialize(FCOGLAskBeforeResetGuildMemberJoinDateDialogXML, FCOGuildLottery.getDialogName("resetGuildMembersJoinDate"))
 
     --EVENTS
     --Register for the zone change/player ready event

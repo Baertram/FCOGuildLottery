@@ -47,15 +47,18 @@ function FCOGuildLottery.getSettings()
         --false: Like MasterMerchant determines the sales from the history -> Until current time.
         --true: cut-off at midnght of the current day
         cutOffGuildSalesHistoryCurrentDateMidnight = false,
+        cutOffGuildMembersJoinedCurrentDateMidnight = false,
 
         autoPreFillChatEditBoxAfterDiceRollOnlyNumber = false,
         autoPreFillChatEditBoxAfterDiceRoll = false,
         preFillChatEditBoxAfterDiceRollTextTemplates = {
             normal = {
-                [1] = GetString(FCOGL_CHAT_EDITBOX_TEXT_TEMPLATE_DEFAULT)
+                [1] =                                               GetString(FCOGL_CHAT_EDITBOX_TEXT_TEMPLATE_DEFAULT)
             },
             guilds = {
-                [1] = GetString(FCOGL_CHAT_EDITBOX_TEXT_TEMPLATE_DEFAULT)
+                [FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC] =              GetString(FCOGL_CHAT_EDITBOX_TEXT_TEMPLATE_DEFAULT),
+                [FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY] =        GetString(FCOGL_CHAT_EDITBOX_TEXT_TEMPLATE_DEFAULT),
+                [FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE] =    GetString(FCOGL_CHAT_EDITBOX_TEXT_TEMPLATE_DEFAULT)
             },
         },
 
@@ -65,6 +68,10 @@ function FCOGuildLottery.getSettings()
         guildLotteryDaysBefore = 7,
         guildLotteryDateStart = 0,
         guildLotteryDateStartSet = false,
+
+        guildMembersDaysBefore = 31,
+        --guildMembersDateStart = 0,
+        --guildMembersDateStartSet = false,
 
         --UI
         -->Window
@@ -93,6 +100,7 @@ function FCOGuildLottery.getSettings()
           [FCOGL_DICE_ROLL_TYPE_GENERIC]                = false,
           [FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC]          = false,
           [FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY]    = false,
+          [FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE] = false,
         },
 
     }
