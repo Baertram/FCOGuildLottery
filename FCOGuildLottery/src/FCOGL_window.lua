@@ -19,6 +19,7 @@ local dfw   = FCOGuildLottery.dfw
 --UI variables
 FCOGuildLottery.UI = FCOGuildLottery.UI or {}
 local fcoglUI = FCOGuildLottery.UI
+
 local fcoglUIwindow
 local fcoglUIwindowFrame
 local fcoglUIguildSalesLotteryWindow
@@ -27,6 +28,17 @@ local fcoglUIDiceHistoryWindow
 
 fcoglUI.CurrentState    = FCOGL_TAB_STATE_LOADING
 fcoglUI.CurrentTab      = FCOGL_TAB_GUILDSALESLOTTERY
+fcoglUI.CurrentListType = FCOGL_LISTTYPE_NORMAL_THROWS
+
+fcoglUI.ListTypeToListObject = {
+    [FCOGL_LISTTYPE_NORMAL_THROWS] =            nil,
+    [FCOGL_LISTTYPE_GUILD_MEMBER_THROWS] =      nil,
+    [FCOGL_LISTTYPE_GUILD_SALES_LOTTERY] =      fcoglUIguildSalesLotteryWindow,
+    [FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE] =  fcoglUIguildMembersJoinedListWindow,
+    [FCOGL_LISTTYPE_ROLLED_DICE_HISTORY] =      fcoglUIDiceHistoryWindow,
+}
+local fcoglUIListTypeToListObject = fcoglUI.ListTypeToListObject
+
 fcoglUI.comingFromSortScrollListSetupFunction = false
 fcoglUI.selectedGuildDataBeforeUpdate = nil
 fcoglUI.searchBoxLastSelected = {}
@@ -42,8 +54,15 @@ local SCROLLLIST_DATATYPE_GUILDMEMBERSJOINEDLIST= fcoglUI.SCROLLLIST_DATATYPE_GU
 
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
+function fcoglUI.GetCurrentlyShownListsObject()
+    --todo  20221218 Find the currently shown ZO_SortFilterList: Is it fcoglUIguildSalesLotteryWindow or fcoglUIguildMembersJoinedListWindow or
+    --todo  normal guild member list or no guild (normal dice roll) list
+    return fcoglUIListTypeToListObject[fcoglUI.CurrentListType]
+end
+local getCurrentlyShownListsObject = fcoglUI.GetCurrentlyShownListsObject
+
 local function updateDiceSidesEditControl(value, isEnabled)
-    local editBoxDiceSides = fcoglUIwindow.editBoxDiceSides
+    local editBoxDiceSides = fcoglUIwindowFrame.editBoxDiceSides
     if editBoxDiceSides == nil then return end
     editBoxDiceSides:SetText(tostring(value))
     editBoxDiceSides:SetMouseEnabled(isEnabled)
@@ -165,6 +184,7 @@ function fcoglWindowClass:New(control, listType, parentFrameControl)
 --d(">parentFrameControl is not NIL")
         list.frame = parentFrameControl
     end
+    list._rectControl = control
     list.listType = listType
 	list:Setup(listType)
 	return list
@@ -217,9 +237,15 @@ function fcoglWindowClass:Setup(listType)
         --Search
         self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("SearchDrop"))
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "name")
+        if self.frame.searchDrop == nil then
+            self.frame.searchDrop = self.searchDrop
+        end
         --Guilds
         self.guildsDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("GuildsDrop"))
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "guilds")
+        if self.frame.guildsDrop == nil then
+            self.frame.guildsDrop = self.guildsDrop
+        end
 
         --Search box and search functions
         self.searchBox = self.frame:GetNamedChild("SearchBox")
@@ -292,9 +318,15 @@ function fcoglWindowClass:Setup(listType)
         --Search
         self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("SearchDrop"))
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "name")
+        if self.frame.searchDrop == nil then
+            self.frame.searchDrop = self.searchDrop
+        end
         --Guilds
         self.guildsDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("GuildsDrop"))
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "guilds")
+        if self.frame.guildsDrop == nil then
+            self.frame.guildsDrop = self.guildsDrop
+        end
 
         --Search box and search functions
         self.searchBox = self.frame:GetNamedChild("SearchBox")
@@ -430,6 +462,27 @@ function fcoglWindowClass:GetListType()
     return self.listType
 end
 
+--Hide all list controls at the left TLC
+local function hideLeftTLCListControlsExceptThis(doNotHideThisListObject)
+    --Hide all lists
+    local currentlyActiveListObject = getCurrentlyShownListsObject()
+    if currentlyActiveListObject ~= nil and currentlyActiveListObject.control ~= nil then
+        currentlyActiveListObject.control:SetHidden(true)
+    else
+        --Hide all
+        for listType, listObject in pairs(fcoglUIListTypeToListObject) do
+            if listObject ~= nil and listObject.control ~= nil then
+                listObject.control:SetHidden(true)
+            end
+        end
+    end
+
+    --Show the list object
+    if doNotHideThisListObject ~= nil and doNotHideThisListObject.control ~= nil then
+        doNotHideThisListObject.control:SetHidden(false)
+    end
+end
+
 function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
     calledFromFilterFunction = calledFromFilterFunction or false
     local listType = self:GetListType()
@@ -441,8 +494,6 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
 
     if fcoglUI.CurrentTab == FCOGL_TAB_GUILDSALESLOTTERY then
         --Guild sales lottery is active?
-
-
         if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
             if guildSalesLotteryActive == true then
                 self.masterList = {}
@@ -454,13 +505,11 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
                     table.insert(self.masterList, self:CreateGuildSalesRankingEntry(item))
                 end
                 --self:updateSortHeaderAnchorsAndPositions(fcoglUI.CurrentTab, settings.maxNameColumnWidth, 32)
-            --elseif FCOGuildLottery.currentlyUsedDiceRollGuildId ~= nil then
+                --elseif FCOGuildLottery.currentlyUsedDiceRollGuildId ~= nil then
                 --TODO Show the normal guild members list at the ranks list?
-
             end
-        end
-------------------------------------------------------------------------------------------------------------------------
-        if listType == FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE then
+            ------------------------------------------------------------------------------------------------------------------------
+        elseif listType == FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE then
             if guildMemberJoinedListActive == true then
                 self.masterList = {}
 
@@ -471,13 +520,20 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
                     table.insert(self.masterList, self:CreateGuildMemberJoinedListEntry(item))
                 end
                 --self:updateSortHeaderAnchorsAndPositions(fcoglUI.CurrentTab, settings.maxNameColumnWidth, 32)
-            --elseif FCOGuildLottery.currentlyUsedDiceRollGuildId ~= nil then
+                --elseif FCOGuildLottery.currentlyUsedDiceRollGuildId ~= nil then
                 --TODO Show the normal guild members list at the ranks list?
-
             end
+        --[[
+        else
+
+            if listType ~= FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
+                fcoglUI.CurrentListType = listType
+                hideLeftTLCListControlsExceptThis(listType)
+            end
+        ]]
         end
 ------------------------------------------------------------------------------------------------------------------------
-        --Dice history is shown?
+        --Dice history is shown? MasterList can be build in addition to the left TLC's list
         if listType == FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
             self.masterList = {}
 
@@ -1046,7 +1102,15 @@ end
 
 local function setLastSelected()
     local selectedGuildDropsData = fcoglUI.getSelectedGuildsDropEntry()
-    fcoglUIwindowFrame:SetSearchBoxLastSelected(fcoglUI.CurrentTab, "guilds", selectedGuildDropsData.selectedIndex)
+    --Get the needed list to show now:
+    --No guild list at all?
+    --Normal guild dice throws
+    --Guild sales lottery           fcoglUIguildSalesLotteryWindow
+    --Guild members joined list     fcoglUIguildMembersJoinedListWindow
+    --todo 20221218
+    local currentlyShownListObject = getCurrentlyShownListsObject()
+    if currentlyShownListObject == nil then return end
+    currentlyShownListObject:SetSearchBoxLastSelected(fcoglUI.CurrentTab, "guilds", selectedGuildDropsData.selectedIndex)
 end
 
 function fcoglUI.resetGuildDropDownToNone()
@@ -1154,7 +1218,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
             local diceSidesGuild = FCOGuildLottery.RollTheDiceNormalForGuildMemberCheck(entry.index, true)
             if diceSidesGuild and diceSidesGuild > 0 then
                 FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
-                fcoglUIwindow.editBoxDiceSides:SetText(tostring(diceSidesGuild))
+                fcoglUIwindowFrame.editBoxDiceSides:SetText(tostring(diceSidesGuild))
             else
                 updateMaxDefaultDiceSides()
             end
@@ -1649,6 +1713,15 @@ function fcoglUI.createWindow()
             FCOGuildLottery.UI.diceHistoryWindow = fcoglWindowClass:New(FCOGLFrameDiceHistory, FCOGL_LISTTYPE_ROLLED_DICE_HISTORY, nil) --use it's own TLC as frame control!
             fcoglUIDiceHistoryWindow = FCOGuildLottery.UI.diceHistoryWindow
         end
+
+        fcoglUI.ListTypeToListObject = {
+            [FCOGL_LISTTYPE_NORMAL_THROWS] =            nil,
+            [FCOGL_LISTTYPE_GUILD_MEMBER_THROWS] =      nil,
+            [FCOGL_LISTTYPE_GUILD_SALES_LOTTERY] =      fcoglUIguildSalesLotteryWindow,
+            [FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE] =  fcoglUIguildMembersJoinedListWindow,
+            [FCOGL_LISTTYPE_ROLLED_DICE_HISTORY] =      fcoglUIDiceHistoryWindow,
+        }
+        fcoglUIListTypeToListObject = fcoglUI.ListTypeToListObject
     end
 end
 
@@ -1673,8 +1746,13 @@ df("showUIWindow: " ..tostring(doShow))
             --Normal guild dice throws
             --Guild sales lottery           fcoglUIguildSalesLotteryWindow
             --Guild members joined list     fcoglUIguildMembersJoinedListWindow
-            --todo 20221218
-            fcoglUIguildSalesLotteryWindow:UpdateUI(FCOGL_TAB_STATE_LOADED, false, doShowDiceHistory)
+            --todo 20221218 if listType is FCOGL_LISTTYPE_NORMAL_THROWS or FCOGL_LISTTYPE_GUILD_MEMBER_THROWS: What list should be shown then? None?
+            local currentlyShownListObject = getCurrentlyShownListsObject()
+            if currentlyShownListObject == nil and FCOGuildLottery.UI.firstCallOfShowUIWindow == true then
+                FCOGuildLottery.UI.firstCallOfShowUIWindow = false
+                currentlyShownListObject = fcoglUIguildSalesLotteryWindow
+            end
+            currentlyShownListObject:UpdateUI(FCOGL_TAB_STATE_LOADED, false, doShowDiceHistory)
         else
             local windowDiceRollFrame = fcoglUIDiceHistoryWindow.frame
             if windowDiceRollFrame:IsHidden() then return end
@@ -1691,7 +1769,7 @@ end
 FCOGuildLottery.ToggleUI = fcoglUI.Show
 
 function fcoglUI.OnWindowMoveStop()
-    local frameControl = fcoglUIwindow.frame
+    local frameControl = fcoglUIwindowFrame or fcoglUIwindow.frame
     if not frameControl then return end
     local settings = FCOGuildLottery.settingsVars.settings
     settings.UIwindow.left  = frameControl:GetLeft()
@@ -2021,6 +2099,12 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
             --updateSceneFragmentTitle(WISHLIST_SCENE_NAME, TITLE_FRAGMENT, "Label", GetString(WISHLIST_TITLE) .. " - " .. GetString(WISHLIST_BUTTON_SEARCH_TT):upper())
 
             if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
+                --Hide the other left TLC's list controls and show the currently active one
+                hideLeftTLCListControlsExceptThis(fcoglUIListTypeToListObject[listType])
+                --Update the currently active listType after old one was hidden
+                fcoglUI.CurrentListType = listType
+
+
                 --Hide currently unused tabs
                 frameControl:GetNamedChild("TabList"):SetEnabled(false)
                 frameControl:GetNamedChild("TabList"):SetHidden(true)
@@ -2074,6 +2158,11 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
 
 
             elseif listType == FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE then
+                --Hide the other left TLC's list controls and show the currently active one
+                hideLeftTLCListControlsExceptThis(fcoglUIListTypeToListObject[listType])
+                --Update the currently active listType after old one was hidden
+                fcoglUI.CurrentListType = listType
+
                 --Hide currently unused tabs
                 frameControl:GetNamedChild("TabList"):SetEnabled(false)
                 frameControl:GetNamedChild("TabList"):SetHidden(true)
@@ -2167,7 +2256,7 @@ end -- fcoglWindow:UpdateUI(state)
 --Change the tabs at the WishList menu
 function fcoglUI.SetTab(index, blockDiceHistoryUpdate, override)
 df("[SetTab] - index: %s, override: %s", tostring(index), tostring(override))
-    if not fcoglUIwindow then return end
+    if not fcoglUIwindow or not fcoglUIwindowFrame then return end
     --fcoglUI.saveSortGroupHeader(fcoglUI.CurrentTab)
 
     --Do not activate active tab
@@ -2181,13 +2270,21 @@ df("[SetTab] - index: %s, override: %s", tostring(index), tostring(override))
         fcoglUI.comingFromSortScrollListSetupFunction = false
         --Update the UI (hide/show items), and also check for the dice roll history to show
         --via function fcoglUI.ToggleDiceRollHistory() -> Calls fcoglUIDiceHistoryWindow:UpdateUI
-        fcoglUIwindowFrame:UpdateUI(fcoglUI.CurrentState, blockDiceHistoryUpdate, override)
+
+        --Get the needed list to show now:
+        --No guild list at all?
+        --Normal guild dice throws
+        --Guild sales lottery           fcoglUIguildSalesLotteryWindow
+        --Guild members joined list     fcoglUIguildMembersJoinedListWindow --todo 20221218 if listType is FCOGL_LISTTYPE_NORMAL_THROWS or FCOGL_LISTTYPE_GUILD_MEMBER_THROWS: What list should be shown then? None?
+        local currentlyShownListObject = getCurrentlyShownListsObject()
+        if currentlyShownListObject == nil then return end
+        currentlyShownListObject:UpdateUI(fcoglUI.CurrentState, blockDiceHistoryUpdate, override)
     end
 end
 
 function fcoglUI.setDiceRollHistoryButtonState(newState)
 df("setDiceRollHistoryButtonState")
-    local frameControl = fcoglUIwindow and fcoglUIwindow.frame
+    local frameControl = fcoglUIwindowFrame or (fcoglUIwindow and fcoglUIwindow.frame)
     local tabDiceRollHistoryButton = frameControl:GetNamedChild("TabDiceRollHistory")
     local newStateVal = buttonNewStateVal[newState]
 df(">newStateVal: %s, newState: %s", tostring(newStateVal), tostring(newState))
@@ -2199,7 +2296,7 @@ end
 function fcoglUI.ToggleDiceRollHistory(setHidden, blockToggle, diceHistoryHiddenOverride)
     blockToggle = blockToggle or false
     df("[ToggleDiceRollHistory] - setHidden: %s, blockToggle: %s, historyHiddenOverride: %s", tostring(setHidden), tostring(blockToggle), tostring(diceHistoryHiddenOverride))
-    local frameControl = fcoglUIwindow and fcoglUIwindow.frame
+    local frameControl = fcoglUIwindowFrame or (fcoglUIwindow and fcoglUIwindow.frame)
     --Update the currently used dice roll type as it could have been reset to "generic" via a slash command
     FCOGuildLottery.UpdateCurrentDiceRollType(fcoglUIwindow)
 
@@ -2325,7 +2422,7 @@ end
 
 function fcoglUI.DeleteDiceHistoryList(alsoDeleteSV, entryData, entriesTable)
 df("DeleteDiceHistoryList - alsoDeleteSV: %s", tostring(alsoDeleteSV))
-    if not fcoglUIwindow then return end
+    if not fcoglUIwindow or not fcoglUIwindowFrame then return end
     alsoDeleteSV            = alsoDeleteSV or false
     --Delete SavedVariables of the history list?
     local updateListNow     = false
@@ -2363,10 +2460,13 @@ df(">updateListNow: %s", tostring(updateListNow))
 end
 
 function fcoglUI.ResetWindowLists()
-    if not fcoglUIwindow then return end
+    if not fcoglUIwindow or not fcoglUIwindowFrame then return end
+    local listObjectShown = getCurrentlyShownListsObject()
+    if listObjectShown == nil or listObjectShown.list == nil then return end
+
     --Clear the master list of the currently shown ZO_SortFilterLists
-    ZO_ScrollList_Clear(fcoglUIwindow.list)
-    fcoglUIwindow.masterList = {}
+    ZO_ScrollList_Clear(listObjectShown.list)
+    listObjectShown.masterList = {}
 
     fcoglUI.DeleteDiceHistoryList(false, nil, nil)
 end
@@ -2402,8 +2502,8 @@ d(">>DiceHistoryFrame is shown -> RefreshData()")
 end
 
 local function checkComboBoxExistsAndGetSelectedEntry(comboBoxName)
-    if fcoglUIwindow == nil then return end
-    local comboBox = fcoglUIwindow[comboBoxName]
+    if fcoglUIwindowFrame == nil then return end
+    local comboBox = fcoglUIwindowFrame[comboBoxName]
     if comboBox == nil then return end
     local selectedData = comboBox:GetSelectedItemData()
     return comboBox, selectedData

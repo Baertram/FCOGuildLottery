@@ -570,7 +570,7 @@
 
 				<Button name="$(parent)NewGuildSalesLottery" inherits="FCOGLButtonNewGuildSalesLottery">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)EditDiceSides" relativePoint="TOPRIGHT"
-							offsetX="6"  offsetY="0" />
+							offsetX="2"  offsetY="0" />
 				</Button>
 				<!--
 				<Button name="$(parent)ReloadGuildSalesLottery" inherits="FCOGLButtonReload">
@@ -580,15 +580,15 @@
 				-->
 				<Button name="$(parent)StopGuildMemberJoinedList" inherits="FCOGLButtonStopGuildMemberJoinedList">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)NewGuildSalesLottery" relativePoint="TOPRIGHT"
-							offsetX="6"  offsetY="3" />
+							offsetX="4"  offsetY="3" />
 				</Button>
 				<Button name="$(parent)StopGuildSalesLottery" inherits="FCOGLButtonStop">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)NewGuildSalesLottery" relativePoint="TOPRIGHT"
-							offsetX="6"  offsetY="3" />
+							offsetX="4"  offsetY="3" />
 				</Button>
 				<Button name="$(parent)StartGuildMemberJoinedList" inherits="FCOGLButtonNewGuildMemberJoinedList">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)StopGuildMemberJoinedList" relativePoint="TOPRIGHT"
-							offsetX="6"  offsetY="-4" />
+							offsetX="2"  offsetY="-4" />
 				</Button>
 
 				<!--Background -->
@@ -762,7 +762,7 @@
 		<TopLevelControl name="FCOGLFrameDiceHistory" mouseEnabled="true" movable="false" clampedToScreen="true" hidden="true" > <!--inherits="ZO_RightPanelFootPrint"-->
 			<Dimensions x="500" y="690" />
 			<DimensionConstraints minX="500" minY="300" />
-			<Anchor point="TOPLEFT" relativeTo="FCOGLFrameSalesLottery" relativePoint="TOPRIGHT" offsetX="0" offsetY="0"/>
+			<Anchor point="TOPLEFT" relativeTo="FCOGLFrame" relativePoint="TOPRIGHT" offsetX="0" offsetY="0"/>
 			<Controls>
 				<Label name="$(parent)HistoryTypeLabel" font="ZoFontGameSmall" horizontalAlignment="LEFT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="1">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPLEFT" offsetX="10" offsetY="10" />
