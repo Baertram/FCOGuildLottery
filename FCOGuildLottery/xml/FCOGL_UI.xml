@@ -74,6 +74,45 @@
 			</Controls>
 		</Control>
 
+		<Control name="FCOGLRowGuildMemberJoined" mouseEnabled="true" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+			<Dimensions y="30" />
+			<OnMouseEnter>
+				FCOGL_UI_OnMouseEnter(self)
+			</OnMouseEnter>
+			<OnMouseExit>
+				FCOGL_UI_OnMouseExit(self)
+			</OnMouseExit>
+            <OnMouseUp>
+				FCOGL_UI_OnMouseUp(self, button, upInside)
+			</OnMouseUp>
+			<Controls>
+				<Texture name="$(parent)BG" inherits="ZO_ThinListBgStrip" tier="LOW" layer="BACKGROUND" level="0"/>
+                <Label name="$(parent)Rank" inherits="FCOGLRowLabel">
+                    <Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" />
+                    <Dimensions x="50" y="30" />
+                </Label>
+                <!--
+				<Label name="$(parent)DateTime" inherits="FCOGLRowLabel">
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Rank" />
+                    <Dimensions x="135" y="30" />
+                </Label>
+                -->
+				<Label name="$(parent)Name" inherits="FCOGLRowLabel">
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Rank" />
+					<Dimensions x="200" y="30" />
+				</Label>
+				<Label name="$(parent)InvitedBy" inherits="FCOGLRowLabel">
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Name" />
+					<Dimensions x="150" y="30" />
+				</Label>
+                <Label name="$(parent)Info" inherits="FCOGLRowLabel">
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Amount" />
+                    <Dimensions x="100" y="30" />
+					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-15" />
+                </Label>
+			</Controls>
+		</Control>
+
 		<Control name="FCOGLRowDiceHistory" mouseEnabled="true" virtual="true" tier="LOW" layer="CONTROLS" level="1">
 			<Dimensions y="30" />
 			<OnMouseEnter>
@@ -470,85 +509,6 @@
 					<Dimensions x="300" y="32" />
 				</Label>
 
-				<!-- Sort headers -->
-				<Control name="$(parent)Headers" tier="LOW" layer="CONTROLS" level="1">
-					<Anchor point="TOPLEFT" offsetX="15" offsetY="51" />
-					<Anchor point="TOPRIGHT" offsetX="-15" offsetY="51" />
-					<Dimensions y="32" />
-					<Controls>
-                        <Control name="$(parent)Rank" inherits="FCOGLSortHeader">
-                            <OnInitialized>
-                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_RANK), "rank", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
-                            </OnInitialized>
-                            <Anchor point="TOPLEFT" />
-                            <Dimensions x="50" y="32" />
-                        </Control>
-                        <!--
-						<Control name="$(parent)DateTime" inherits="FCOGLSortHeader">
-                            <OnInitialized>
-                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_DATE), "timestamp", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
-                            </OnInitialized>
-							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Rank" />
-                            <Dimensions x="135" y="32" />
-                        </Control>
-                        -->
-						<Control name="$(parent)Name" inherits="FCOGLSortHeader">
-							<OnInitialized>
-								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_NAME), "name", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
-							</OnInitialized>
-							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Rank" />
-							<Dimensions x="200" y="32" />
-						</Control>
-						<!--
-						<Control name="$(parent)Item" inherits="FCOGLSortHeader">
-							<OnInitialized>
-								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_ITEM), "itemLink", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
-							</OnInitialized>
-							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Name" />
-							<Dimensions x="100" y="32" />
-						</Control>
-						-->
-						<Control name="$(parent)Price" inherits="FCOGLSortHeader">
-							<OnInitialized>
-								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_PRICE), "price", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
-							</OnInitialized>
-							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Name" />
-							<Dimensions x="80" y="32" />
-						</Control>
-                        <Control name="$(parent)Tax" inherits="FCOGLSortHeader">
-                            <OnInitialized>
-                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_TAX), "tax", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
-                            </OnInitialized>
-                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Price" />
-                            <Dimensions x="80" y="32" />
-                        </Control>
-						<Control name="$(parent)Amount" inherits="FCOGLSortHeader">
-							<OnInitialized>
-								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_AMOUNT), "amount", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
-							</OnInitialized>
-							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Tax" />
-							<Dimensions x="150" y="32" />
-						</Control>
-                        <Control name="$(parent)Info" inherits="FCOGLSortHeader">
-                            <OnInitialized>
-                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_INFO), "info", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
-                            </OnInitialized>
-                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Amount" />
-							<Anchor point="TOPRIGHT" offsetX="-16" />
-                            <Dimensions x="100" y="32" />
-                        </Control>
-					</Controls>
-				</Control>
-
-				<Control name="$(parent)List" inherits="ZO_ScrollList" tier="LOW" layer="CONTROLS" level="1">
-					<Anchor point="TOPLEFT" relativeTo="$(parent)Headers" relativePoint="BOTTOMLEFT" offsetY="3" />
-					<Anchor point="BOTTOMRIGHT" offsetX="-15" offsetY="-32" />
-				</Control>
-
-				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="1">
-					<Anchor point="TOPRIGHT" relativeTo="$(parent)List" relativePoint="BOTTOMRIGHT" offsetY="6" />
-				</Label>
-
 				<!-- Tab Buttons -->
 				<Button name="$(parent)TabGuildSales" inherits="FCOGLButtonGuildSales">
 					<Anchor point="TOPRIGHT" relativeTo="$(parent)" relativePoint="TOPRIGHT"
@@ -638,13 +598,171 @@
 			</Controls>
 		</TopLevelControl>
 
+
+
+		<!-- Guild Sales Lottery -->
+		<Backdrop name="FCOGLFrameSalesLottery" mouseEnabled="true" movable="false" hidden="true" >
+			<Dimensions x="730" y="690" />
+			<DimensionConstraints minX="400" minY="300" />
+			<Anchor point="TOPLEFT" relativeTo="FCOGLFrameRollTheDice" relativePoint="BOTTOMLEFT" offsetX="0" offsetY="5"/>
+			<Controls>
+
+				<!-- Sort headers -->
+				<Control name="$(parent)Headers" tier="LOW" layer="CONTROLS" level="1">
+					<Anchor point="TOPLEFT" offsetX="15" offsetY="51" />
+					<Anchor point="TOPRIGHT" offsetX="-15" offsetY="51" />
+					<Dimensions y="32" />
+					<Controls>
+                        <Control name="$(parent)Rank" inherits="FCOGLSortHeader">
+                            <OnInitialized>
+                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_RANK), "rank", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+                            </OnInitialized>
+                            <Anchor point="TOPLEFT" />
+                            <Dimensions x="50" y="32" />
+                        </Control>
+                        <!--
+						<Control name="$(parent)DateTime" inherits="FCOGLSortHeader">
+                            <OnInitialized>
+                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_DATE), "timestamp", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+                            </OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Rank" />
+                            <Dimensions x="135" y="32" />
+                        </Control>
+                        -->
+						<Control name="$(parent)Name" inherits="FCOGLSortHeader">
+							<OnInitialized>
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_NAME), "name", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+							</OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Rank" />
+							<Dimensions x="200" y="32" />
+						</Control>
+						<!--
+						<Control name="$(parent)Item" inherits="FCOGLSortHeader">
+							<OnInitialized>
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_ITEM), "itemLink", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+							</OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Name" />
+							<Dimensions x="100" y="32" />
+						</Control>
+						-->
+						<Control name="$(parent)Price" inherits="FCOGLSortHeader">
+							<OnInitialized>
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_PRICE), "price", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+							</OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Name" />
+							<Dimensions x="80" y="32" />
+						</Control>
+                        <Control name="$(parent)Tax" inherits="FCOGLSortHeader">
+                            <OnInitialized>
+                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_TAX), "tax", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+                            </OnInitialized>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Price" />
+                            <Dimensions x="80" y="32" />
+                        </Control>
+						<Control name="$(parent)Amount" inherits="FCOGLSortHeader">
+							<OnInitialized>
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_AMOUNT), "amount", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+							</OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Tax" />
+							<Dimensions x="150" y="32" />
+						</Control>
+                        <Control name="$(parent)Info" inherits="FCOGLSortHeader">
+                            <OnInitialized>
+                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_INFO), "info", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+                            </OnInitialized>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Amount" />
+							<Anchor point="TOPRIGHT" offsetX="-16" />
+                            <Dimensions x="100" y="32" />
+                        </Control>
+					</Controls>
+				</Control>
+
+				<Control name="$(parent)List" inherits="ZO_ScrollList" tier="LOW" layer="CONTROLS" level="1">
+					<Anchor point="TOPLEFT" relativeTo="$(parent)Headers" relativePoint="BOTTOMLEFT" offsetY="3" />
+					<Anchor point="BOTTOMRIGHT" offsetX="-15" offsetY="-32" />
+				</Control>
+
+				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="1">
+					<Anchor point="TOPRIGHT" relativeTo="$(parent)List" relativePoint="BOTTOMRIGHT" offsetY="6" />
+				</Label>
+
+			</Controls>
+		</Backdrop>
+
 <!-- ========================================================================================================================================================== -->
 
+		<!-- Guild Members Joined List -->
+		<Backdrop name="FCOGLFrameMembersJoined" tier="HIGH" layer="CONTROLS" level="2" movable="false" hidden="true">
+			<Dimensions x="730" y="690" />
+			<DimensionConstraints minX="400" minY="300" />
+			<Anchor point="TOPLEFT" relativeTo="FCOGLFrameRollTheDice" relativePoint="BOTTOMLEFT" offsetX="0" offsetY="5"/>
+			<Controls>
+
+				<!-- Sort headers -->
+				<Control name="$(parent)Headers" tier="LOW" layer="CONTROLS" level="1">
+					<Anchor point="TOPLEFT" offsetX="15" offsetY="51" />
+					<Anchor point="TOPRIGHT" offsetX="-15" offsetY="51" />
+					<Dimensions y="32" />
+					<Controls>
+                        <Control name="$(parent)Rank" inherits="FCOGLSortHeader">
+                            <OnInitialized>
+                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_RANK), "rank", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+                            </OnInitialized>
+                            <Anchor point="TOPLEFT" />
+                            <Dimensions x="50" y="32" />
+                        </Control>
+                        <!--
+						<Control name="$(parent)DateTime" inherits="FCOGLSortHeader">
+                            <OnInitialized>
+                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_DATE), "timestamp", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+                            </OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Rank" />
+                            <Dimensions x="135" y="32" />
+                        </Control>
+                        -->
+						<Control name="$(parent)Name" inherits="FCOGLSortHeader">
+							<OnInitialized>
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_NAME), "name", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+							</OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Rank" />
+							<Dimensions x="200" y="32" />
+						</Control>
+						<Control name="$(parent)InvitedBy" inherits="FCOGLSortHeader">
+							<OnInitialized>
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_INVITEDBY), "invitedBy", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+							</OnInitialized>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Name" />
+							<Dimensions x="150" y="32" />
+						</Control>
+                        <Control name="$(parent)Info" inherits="FCOGLSortHeader">
+                            <OnInitialized>
+                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_INFO), "info", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+                            </OnInitialized>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)InvitedBy" />
+							<Anchor point="TOPRIGHT" offsetX="-16" />
+                            <Dimensions x="100" y="32" />
+                        </Control>
+					</Controls>
+				</Control>
+
+				<Control name="$(parent)List" inherits="ZO_ScrollList" tier="LOW" layer="CONTROLS" level="1">
+					<Anchor point="TOPLEFT" relativeTo="$(parent)Headers" relativePoint="BOTTOMLEFT" offsetY="3" />
+					<Anchor point="BOTTOMRIGHT" offsetX="-15" offsetY="-32" />
+				</Control>
+
+				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="1">
+					<Anchor point="TOPRIGHT" relativeTo="$(parent)List" relativePoint="BOTTOMRIGHT" offsetY="6" />
+				</Label>
+			</Controls>
+		</Backdrop>
+
+
+<!-- ========================================================================================================================================================== -->
 		<!-- FCOGLFrameDiceHistory -->
 		<TopLevelControl name="FCOGLFrameDiceHistory" mouseEnabled="true" movable="false" clampedToScreen="true" hidden="true" > <!--inherits="ZO_RightPanelFootPrint"-->
 			<Dimensions x="500" y="690" />
 			<DimensionConstraints minX="500" minY="300" />
-			<Anchor point="TOPLEFT" relativeTo="FCOGLFrame" relativePoint="TOPRIGHT" offsetX="0" offsetY="0"/>
+			<Anchor point="TOPLEFT" relativeTo="FCOGLFrameSalesLottery" relativePoint="TOPRIGHT" offsetX="0" offsetY="0"/>
 			<Controls>
 				<Label name="$(parent)HistoryTypeLabel" font="ZoFontGameSmall" horizontalAlignment="LEFT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="1">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="TOPLEFT" offsetX="10" offsetY="10" />

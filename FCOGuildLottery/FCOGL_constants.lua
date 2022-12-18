@@ -153,6 +153,7 @@ FCOGuildLottery.UI.diceHistoryWindow = nil
 FCOGuildLottery.UI.SCENE_NAME = "FCOGuildLottery_UI_Scene"
 FCOGuildLottery.UI.SCROLLLIST_DATATYPE_GUILDSALESRANKING    = 1
 FCOGuildLottery.UI.SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY  = 2
+FCOGuildLottery.UI.SCROLLLIST_DATATYPE_GUILDMEMBERSJOINEDLIST = 3
 
 --Preventer variables
 FCOGuildLottery.prevVars = {
