@@ -257,6 +257,10 @@ function fcoglWindowClass:Setup(listType)
             end
             ]]
         end)
+        if self.frame.searchBox == nil then
+            self.frame.searchBox = self.searchBox
+        end
+
         self.search = ZO_StringSearch:New()
         self.search:AddProcessor(SCROLLLIST_DATATYPE_GUILDSALESRANKING, function(stringSearch, data, searchTerm, cache)
             return(self:ProcessItemEntry(stringSearch, data, searchTerm, cache))
@@ -283,6 +287,9 @@ function fcoglWindowClass:Setup(listType)
         FCOGuildLottery.tempEditBoxNumDiceSides = nil
         self.editBoxDiceSides:SetText(tostring(editBoxNewValue))
         ]]
+        if self.frame.editBoxDiceSides == nil then
+            self.frame.editBoxDiceSides = self.editBoxDiceSides
+        end
 
         --Build initial masterlist via self:BuildMasterList()
         --d("[fcoglUI.Setup] RefreshData > BuildMasterList ???")
@@ -340,6 +347,9 @@ function fcoglWindowClass:Setup(listType)
             end
             ]]
         --end)
+        if self.frame.searchBox == nil then
+            self.frame.searchBox = self.searchBox
+        end
 
         self.search = ZO_StringSearch:New()
         self.search:AddProcessor(SCROLLLIST_DATATYPE_GUILDMEMBERSJOINEDLIST, function(stringSearch, data, searchTerm, cache)
@@ -362,6 +372,9 @@ function fcoglWindowClass:Setup(listType)
         local editBoxNewValue = tempEditBoxNumDices or FCOGuildLottery.settingsVars.settings.defaultDiceSides
         FCOGuildLottery.tempEditBoxNumDiceSides = nil
         self.editBoxDiceSides:SetText(tostring(editBoxNewValue))
+        if self.frame.editBoxDiceSides == nil then
+            self.frame.editBoxDiceSides = self.editBoxDiceSides
+        end
 
 
     --The rolled dice history list
