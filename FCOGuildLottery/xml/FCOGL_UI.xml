@@ -289,7 +289,7 @@
                       pressed="/esoui/art/buttons/large_rightarrow_down.dds"
 					  disabled="/esoui/art/buttons/large_rightarrow_disabled.dds"/>
 			<OnClicked>
-				FCOGL.StartNewGuildSalesLottery(FCOGLFrameGuildsDrop.m_comboBox.m_selectedItemData.index, FCOGL.GetGuildSalesLotteryStartDate(), false)
+				FCOGL.CheckBeforeStartNew(FCOGLFrameGuildsDrop.m_comboBox.m_selectedItemData.index, FCOGL.GetGuildSalesLotteryStartDate(), false, FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY)
 			</OnClicked>
 			<OnMouseEnter>
 				FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_START_NEW_GUILD_SALES_LOTTERY))
@@ -305,7 +305,7 @@
                       pressed="/esoui/art/buttons/cancel_down.dds"
                       disabled="/esoui/art/buttons/cancel_disabled.dds" />
 			<OnClicked>
-				FCOGL.StopGuildMembersJoinedDate()
+				FCOGL.StopGuildMembersJoinDate()
 			</OnClicked>
 			<OnMouseEnter>
 				FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_STOP_GUILD_MEMBER_JOINED_LIST))
@@ -315,13 +315,13 @@
 			</OnMouseExit>
 		</Button>
 		<Button name="FCOGLButtonNewGuildMemberJoinedList" virtual="true" tier="LOW" layer="CONTROLS" level="1">
-			<Dimensions x="30" y="30" />
+			<Dimensions x="34" y="34" />
 			<Textures normal="/esoui/art/icons/guildranks/guild_indexicon_member_up.dds"
 					  mouseOver="/esoui/art/icons/guildranks/guild_indexicon_member_over.dds"
                       pressed="/esoui/art/icons/guildranks/guild_indexicon_member_down.dds"
 					  disabled="/esoui/art/icons/guildranks/guild_indexicon_member_disabled.dds"/>
 			<OnClicked>
-				FCOGL.StartNewGuildMembersJoinDate(FCOGLFrameGuildsDrop.m_comboBox.m_selectedItemData.index, FCOGL.GetGuildMemberJoinedDateStartDate(), false)
+				FCOGL.CheckBeforeStartNew(FCOGLFrameGuildsDrop.m_comboBox.m_selectedItemData.index, FCOGL.GetGuildMemberJoinedDateStartDate(), false, FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE)
 			</OnClicked>
 			<OnMouseEnter>
 				FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_START_NEW_GUILD_MEMBER_JOINED_LIST))
@@ -609,8 +609,8 @@
 				</Backdrop>
 
 				<Button name="$(parent)NewGuildSalesLottery" inherits="FCOGLButtonNewGuildSalesLottery">
-					<Anchor point="TOPLEFT" relativeTo="$(parent)RollTheDice" relativePoint="TOPRIGHT"
-							offsetX="28"  offsetY="0" />
+					<Anchor point="TOPLEFT" relativeTo="$(parent)EditDiceSides" relativePoint="TOPRIGHT"
+							offsetX="6"  offsetY="0" />
 				</Button>
 				<!--
 				<Button name="$(parent)ReloadGuildSalesLottery" inherits="FCOGLButtonReload">
@@ -618,17 +618,17 @@
 							offsetX="5"  offsetY="0" />
 				</Button>
 				-->
-				<Button name="$(parent)StopGuildSalesLottery" inherits="FCOGLButtonStop">
-					<Anchor point="TOPLEFT" relativeTo="$(parent)StartGuildMemberJoinedList" relativePoint="TOPRIGHT"
-							offsetX="2"  offsetY="3" />
-				</Button>
 				<Button name="$(parent)StopGuildMemberJoinedList" inherits="FCOGLButtonStopGuildMemberJoinedList">
-					<Anchor point="TOPLEFT" relativeTo="$(parent)StartGuildMemberJoinedList" relativePoint="TOPRIGHT"
-							offsetX="2"  offsetY="3" />
+					<Anchor point="TOPLEFT" relativeTo="$(parent)NewGuildSalesLottery" relativePoint="TOPRIGHT"
+							offsetX="6"  offsetY="3" />
+				</Button>
+				<Button name="$(parent)StopGuildSalesLottery" inherits="FCOGLButtonStop">
+					<Anchor point="TOPLEFT" relativeTo="$(parent)NewGuildSalesLottery" relativePoint="TOPRIGHT"
+							offsetX="6"  offsetY="3" />
 				</Button>
 				<Button name="$(parent)StartGuildMemberJoinedList" inherits="FCOGLButtonNewGuildMemberJoinedList">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)StopGuildMemberJoinedList" relativePoint="TOPRIGHT"
-							offsetX="2"  offsetY="0" />
+							offsetX="6"  offsetY="-4" />
 				</Button>
 
 				<!--Background -->

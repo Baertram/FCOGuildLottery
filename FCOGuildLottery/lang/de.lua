@@ -66,6 +66,9 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_TITLE     = "Stoppe Gilden Verkaufs-Lotterie",
     FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_QUESTION  = "Wilslt du die aktive Gilden Verkaufs-Lotterie stoppen?\nDies ermöglicht wieder Würfel Würfe für die\nausgewählte Gilde.",
 
+    FCOGL_STOP_GUILD_MEMBER_JOINED_LIST_DIALOG_TITLE= "Stoppe Gilden Mitglied Beitritt Liste",
+    FCOGL_STOP_GUILD_MEMBER_JOINED_LIST_DIALOG_QUESTION  = "Willst du die aktive Gilden Mitglied Beitritt\n Liste stoppen?\nDies ermöglicht wieder Würfel Würfe für die\nausgewählte Gilde.",
+
     FCOGL_CLEAR_HISTORY                             = "Leere die angezeigte Historien Liste",
     FCOGL_CLEAR_HISTORY_DIALOG_TITLE                = "Historien Liste leeren?",
     FCOGL_CLEAR_HISTORY_DIALOG_QUESTION             = "Willst du die \'%s\' Historien Liste\n leeren? Dies wird alle Einträge löschen!",

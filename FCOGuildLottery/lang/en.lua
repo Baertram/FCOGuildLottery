@@ -70,8 +70,8 @@ FCOGuildLottery.lang["en"] = {
 
     FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_TITLE     = "Stop guild sales lottery",
     FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_QUESTION  = "Do you want to stop the currently active guild\nsales lottery?\nThis will enable the guild dice throws for the\nselected guild again.",
-    FCOGL_STOP_GUILD_MEMBER_JOINED_DIALOG_TITLE     = "Stop guild member joined throws",
-    FCOGL_STOP_GUILD_MEMBER_JOINED_DIALOG_QUESTION  = "Do you want to stop the currently active guild\nmember joined throws?\nThis will enable the guild dice throws for the\nselected guild again.",
+    FCOGL_STOP_GUILD_MEMBER_JOINED_LIST_DIALOG_TITLE= "Stop guild member joined throws",
+    FCOGL_STOP_GUILD_MEMBER_JOINED_LIST_DIALOG_QUESTION  = "Do you want to stop the currently active guild\nmember joined list throws?\nThis will enable the guild dice throws for the\nselected guild again.",
 
     FCOGL_CLEAR_HISTORY                             = "Clear the shown history list",
     FCOGL_CLEAR_HISTORY_DIALOG_TITLE                = "Clear history list?",

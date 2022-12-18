@@ -1564,7 +1564,7 @@ local function checkIfButtonIsEnabled(checkType)
         end
     end
     if checkType == FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE then
-        if not FCOGuildLottery.IsGuildMembersJoinDateActive() or ( FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildIndex ~= nil and
+        if not FCOGuildLottery.IsGuildMembersJoinDateListActive() or ( FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildIndex ~= nil and
                 currentlySeclectedGuildIndexAtDropdown ~= nil and FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildIndex ~= currentlySeclectedGuildIndexAtDropdown ) then
             return false
         else
@@ -1758,7 +1758,7 @@ df("fcoglWindowClass:UpdateGuildMemberListDateStartLabel")
     self.guildSalesDateStartLabel:SetHidden(true)
     self.guildSalesDateStartLabel:SetResizeToFitDescendents(true)
     self.guildSalesDateStartLabel:SetText("")
-    if not FCOGuildLottery.IsGuildMembersJoinDateActive() then return end
+    if not FCOGuildLottery.IsGuildMembersJoinDateListActive() then return end
 
     --Date end      ->  timestamp of the guild members list end
     --Date start    ->  Date start - Daten ed minus selected days of the guild members list

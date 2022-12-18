@@ -68,11 +68,16 @@ function FCOGuildLottery.slashCommands()
     --Reset slash command for the guild sales lottery
     SLASH_COMMANDS["/gslnew"]               = FCOGuildLottery.NewGuildSalesLotterySlashCommand
     SLASH_COMMANDS["/gslstop"]              = FCOGuildLottery.StopGuildSalesLotterySlashCommand
-
     --Start new/Roll dice W<numberOfGuildSales> for guild sales lottery
     SLASH_COMMANDS["/gsl"]                  = FCOGuildLottery.GuildSalesLotterySlashCommand
-
     SLASH_COMMANDS["/gsllast"]              = FCOGuildLottery.GuildSalesLotteryLastRolledSlashCommand
+
+    --Reset slash command for the guild members joined list
+    SLASH_COMMANDS["/gmjnew"]               = FCOGuildLottery.NewGuildMembersJoinedListSlashCommand
+    SLASH_COMMANDS["/gmjstop"]              = FCOGuildLottery.StopGuildMembersJoinedListSlashCommand
+    --Start new/Roll dice W<numberOfGuildMembersJoinedInTimeframe> for guild members joined list
+    SLASH_COMMANDS["/gmj"]                  = FCOGuildLottery.GuildMembersJoinedListSlashCommand
+    SLASH_COMMANDS["/gmjlast"]              = FCOGuildLottery.GuildMembersJoinedListLastRolledSlashCommand
 
     SLASH_COMMANDS["/fcogl"]                = function() FCOGuildLottery.ToggleUI() end
 end
