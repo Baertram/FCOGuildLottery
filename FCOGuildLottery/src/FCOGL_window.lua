@@ -61,6 +61,7 @@ local SCROLLLIST_DATATYPE_GUILDMEMBERSJOINEDLIST= fcoglUI.SCROLLLIST_DATATYPE_GU
 function fcoglUI.GetCurrentlyShownListsObject()
     --todo  20221218 Find the currently shown ZO_SortFilterList: Is it fcoglUIguildSalesLotteryWindow or fcoglUIguildMembersJoinedListWindow or
     --todo  normal guild member list or no guild (normal dice roll) list
+    df("[FCOGLUI.GetCurrentlyShownListsObject]listType: %s", tos(fcoglUI.CurrentListType))
     return fcoglUIListTypeToListObject[fcoglUI.CurrentListType]
 end
 local getCurrentlyShownListsObject = fcoglUI.GetCurrentlyShownListsObject
@@ -1036,31 +1037,31 @@ df("initializeSearchDropdown - listType: %s, searchBoxType: %s", tos(currentList
                 ["name"] = {dropdown=self.searchDrop,  prefix=FCOGL_SEARCHDROP_PREFIX,  entryCount=FCOGL_SEARCH_TYPE_ITERATION_END,
                             exclude = {
                                 [FCOGL_SEARCH_TYPE_NAME]     = false,
-                            }, --exclude the search entries from the set search
+                            }, --exclude the search entries from the search
                 },
                 ["guilds"] = {dropdown=self.guildsDrop,  prefix=FCOGL_GUILDSDROP_PREFIX,  entryCount=#FCOGuildLottery.guildsData + 1, --5 guilds + 1 non-guild entry
                               exclude = {
                                   [FCOGL_SEARCH_TYPE_NAME]     = false,
-                              }, --exclude the search entries from the set search
+                              }, --exclude the search entries from the search
                 },
             },
             [FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE] = {
                 ["name"] = {dropdown=self.searchDrop,  prefix=FCOGL_SEARCHDROP_PREFIX,  entryCount=FCOGL_SEARCH_TYPE_ITERATION_END,
                             exclude = {
                                 [FCOGL_SEARCH_TYPE_NAME]     = false,
-                            }, --exclude the search entries from the set search
+                            }, --exclude the search entries from the search
                 },
                 ["guilds"] = {dropdown=self.guildsDrop,  prefix=FCOGL_GUILDSDROP_PREFIX,  entryCount=#FCOGuildLottery.guildsData + 1, --5 guilds + 1 non-guild entry
                               exclude = {
                                   [FCOGL_SEARCH_TYPE_NAME]     = false,
-                              }, --exclude the search entries from the set search
+                              }, --exclude the search entries from the search
                 },
             },
             [FCOGL_LISTTYPE_ROLLED_DICE_HISTORY] = {
                 ["name"] = {dropdown=self.searchDrop,  prefix=FCOGL_HISTORY_SEARCHDROP_PREFIX,  entryCount=FCOGL_HISTORY_SEARCH_TYPE_ITERATION_END,
                             exclude = {
                                 [FCOGL_SEARCH_TYPE_NAME]     = false,
-                            }, --exclude the search entries from the set search
+                            }, --exclude the search entries from the search
                 },
                 ["GuildSalesHistory"] = {dropdown=self.guildHistoryDrop,  prefix=FCOGL_GUILDSALESHISTORYDROP_PREFIX,
                                          entryCount=0,
@@ -1128,6 +1129,7 @@ function fcoglUI.getSelectedGuildsDropEntry()
 end
 
 local function setLastSelected()
+    df("setLastSelected")
     local selectedGuildDropsData = fcoglUI.getSelectedGuildsDropEntry()
     --Get the needed list to show now:
     --No guild list at all?
@@ -1141,6 +1143,7 @@ local function setLastSelected()
 end
 
 function fcoglUI.resetGuildDropDownToNone()
+    df("[fcoglUI.resetGuildDropDownToNone]")
     FCOGuildLottery.currentlyUsedGuildSalesLotteryChosenData = nil
 
     setLastSelected()
@@ -1159,6 +1162,7 @@ function fcoglUI.resetGuildDropDownToNone()
 end
 
 function fcoglUI.resetGuildDropDownToGuild(guildIndex)
+    df("[fcoglUI.resetGuildDropDownToGuild]guildIndex: %s", tos(guildIndex))
     FCOGuildLottery.currentlyUsedGuildSalesLotteryChosenData = nil
 
     setLastSelected()
@@ -1490,10 +1494,12 @@ df("SetSearchBoxLastSelected - UITab: %s, searchBoxType: %s, selectedIndex: %s",
 end
 
 function fcoglWindowClass:GetSearchBoxLastSelected(UITab, searchBoxType)
-df("GetSearchBoxLastSelected - UITab: %s, searchBoxType: %s", tos(UITab), tos(searchBoxType))
     local listType = self:GetListType()
-    return fcoglUI.searchBoxLastSelected[UITab] and fcoglUI.searchBoxLastSelected[UITab][listType] and
-            fcoglUI.searchBoxLastSelected[UITab][listType][searchBoxType] or 1
+    local lastSelectedDropdownEntry = fcoglUI.searchBoxLastSelected[UITab] and fcoglUI.searchBoxLastSelected[UITab][listType] and
+            fcoglUI.searchBoxLastSelected[UITab][listType][searchBoxType]
+    df("GetSearchBoxLastSelected - UITab: %s, searchBoxType: %s->lastSelectedDropdownEntry: %s", tos(UITab), tos(searchBoxType), tos(lastSelectedDropdownEntry))
+    if lastSelectedDropdownEntry == nil then lastSelectedDropdownEntry = 1 end
+    return lastSelectedDropdownEntry
 end
 
 ------------------------------------------------
