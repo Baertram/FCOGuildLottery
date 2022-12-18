@@ -77,7 +77,7 @@ local function hideLeftTLCListControlsExceptThis(doNotHideThisListObject)
         --Hide all
         for listType, listObject in pairs(fcoglUIListTypeToListObject) do
             if listObject ~= nil and listObject.control ~= nil then
-                df(">LOOP hiding: %s", tos(currentlyActiveListObject.control:GetName()))
+                df(">LOOP hiding: %s", tos(listObject.control:GetName()))
                 listObject.control:SetHidden(true)
             end
         end
@@ -2125,7 +2125,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
 
             if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
                 --Hide the other left TLC's list controls and show the currently active one
-                hideLeftTLCListControlsExceptThis(fcoglUIListTypeToListObject[listType])
+                hideLeftTLCListControlsExceptThis(self)
                 --Update the currently active listType after old one was hidden
                 fcoglUI.CurrentListType = listType
 
@@ -2176,7 +2176,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 self.headerAmount:SetHidden(false)
                 self.headerInfo:SetHidden(false)
 
-                selfControl:SetHidden(false)
+                --selfControl:SetHidden(false)
 
                 --Hide/Unhide the dice history frame -> Will call recursively function UpdateUI(state) for listType
                 --FCOGL_LISTTYPE_ROLLED_DICE_HISTORY
@@ -2185,7 +2185,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
 
             elseif listType == FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE then
                 --Hide the other left TLC's list controls and show the currently active one
-                hideLeftTLCListControlsExceptThis(fcoglUIListTypeToListObject[listType])
+                hideLeftTLCListControlsExceptThis(self)
                 --Update the currently active listType after old one was hidden
                 fcoglUI.CurrentListType = listType
 
@@ -2236,7 +2236,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 self.headerAmount:SetHidden(true)
                 self.headerInfo:SetHidden(false)
 
-                selfControl:SetHidden(false)
+                --selfControl:SetHidden(false)
 
                 --Hide/Unhide the dice history frame -> Will call recursively function UpdateUI(state) for listType
                 --FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE
