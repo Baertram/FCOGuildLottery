@@ -1486,19 +1486,23 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
 end
 
 function fcoglWindowClass:SetSearchBoxLastSelected(UITab, searchBoxType, selectedIndex)
+d(">>>>> DEBUG DEBUG DEBUG >>>>>")
 df("SetSearchBoxLastSelected - UITab: %s, searchBoxType: %s, selectedIndex: %s", tos(UITab), tos(searchBoxType), tos(selectedIndex))
     local listType = self:GetListType()
     fcoglUI.searchBoxLastSelected[UITab]                = fcoglUI.searchBoxLastSelected[UITab] or {}
     fcoglUI.searchBoxLastSelected[UITab][listType]      = fcoglUI.searchBoxLastSelected[UITab][listType] or {}
     fcoglUI.searchBoxLastSelected[UITab][listType][searchBoxType] = selectedIndex
+d("<<<<< DEBUG DEBUG DEBUG <<<<<")
 end
 
 function fcoglWindowClass:GetSearchBoxLastSelected(UITab, searchBoxType)
+d(">!!!! DEBUG DEBUG DEBUG >>>>>")
     local listType = self:GetListType()
     local lastSelectedDropdownEntry = fcoglUI.searchBoxLastSelected[UITab] and fcoglUI.searchBoxLastSelected[UITab][listType] and
             fcoglUI.searchBoxLastSelected[UITab][listType][searchBoxType]
     df("GetSearchBoxLastSelected - UITab: %s, searchBoxType: %s->lastSelectedDropdownEntry: %s", tos(UITab), tos(searchBoxType), tos(lastSelectedDropdownEntry))
     if lastSelectedDropdownEntry == nil then lastSelectedDropdownEntry = 1 end
+d("<!!!! DEBUG DEBUG DEBUG")
     return lastSelectedDropdownEntry
 end
 
