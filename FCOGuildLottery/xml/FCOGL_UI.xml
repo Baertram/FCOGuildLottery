@@ -580,15 +580,15 @@
 				-->
 				<Button name="$(parent)StopGuildMemberJoinedList" inherits="FCOGLButtonStopGuildMemberJoinedList">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)NewGuildSalesLottery" relativePoint="TOPRIGHT"
-							offsetX="4"  offsetY="3" />
+							offsetX="2"  offsetY="3" />
 				</Button>
 				<Button name="$(parent)StopGuildSalesLottery" inherits="FCOGLButtonStop">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)NewGuildSalesLottery" relativePoint="TOPRIGHT"
-							offsetX="4"  offsetY="3" />
+							offsetX="2"  offsetY="3" />
 				</Button>
 				<Button name="$(parent)StartGuildMemberJoinedList" inherits="FCOGLButtonNewGuildMemberJoinedList">
-					<Anchor point="TOPLEFT" relativeTo="$(parent)StopGuildMemberJoinedList" relativePoint="TOPRIGHT"
-							offsetX="2"  offsetY="-4" />
+					<Anchor point="LEFT" relativeTo="$(parent)NewGuildSalesLottery" relativePoint="RIGHT"
+							offsetX="22"  offsetY="0" />
 				</Button>
 
 				<!--Background -->

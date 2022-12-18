@@ -18,6 +18,10 @@ local dfe   = FCOGuildLottery.dfe
 local dfv   = FCOGuildLottery.dfv
 local dfw   = FCOGuildLottery.dfw
 
+
+local fcoglUIwindow
+local fcoglUIwindowFrame
+
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
 --FUNCTIONS
@@ -460,6 +464,9 @@ local function showNewGSLSlashCommandHelp(noGuildSelected, guildSalesLotteryActi
     local newGSLChatErrorMessage
     local uiWindow = FCOGuildLottery.UI and FCOGuildLottery.UI.window and FCOGuildLottery.UI.window.control
     if uiWindow ~= nil and uiWindow:IsControlHidden() == false then
+        fcoglUIwindow = fcoglUIwindow or FCOGuildLottery.UI.window
+        fcoglUIwindowFrame = fcoglUIwindowFrame or FCOGuildLottery.UI.window.frame
+
         if noGuildSelected == true then
             newGSLChatErrorMessage = GetString(FCOGL_ERROR_NO_GUILD_ONLY_GENERIC_DICE_THROW)
         else
@@ -1574,10 +1581,13 @@ function FCOGuildLottery.UpdateMaxDiceSides(numDiceSides)
         FCOGuildLottery.tempEditBoxNumDiceSides = numDiceSides
         return
     end
+    fcoglUIwindow = fcoglUIwindow or FCOGuildLottery.UI.window
+    fcoglUIwindowFrame = fcoglUIwindowFrame or FCOGuildLottery.UI.window.frame
+
     FCOGuildLottery.tempEditBoxNumDiceSides = nil
     if numDiceSides == nil then return end
     FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
-    FCOGuildLottery.UI.window.editBoxDiceSides:SetText(tos(numDiceSides))
+    fcoglUIwindowFrame.editBoxDiceSides:SetText(tos(numDiceSides))
 end
 
 

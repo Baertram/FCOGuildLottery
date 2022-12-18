@@ -276,11 +276,13 @@ function fcoglWindowClass:Setup(listType)
 
         self.editBoxDiceSides = self.frame:GetNamedChild("EditDiceSidesBox")
         self.editBoxDiceSides:SetTextType(TEXT_TYPE_NUMERIC_UNSIGNED_INT)
+        --[[
         FCOGuildLottery.prevVars.doNotRunOnTextChanged = true
         local tempEditBoxNumDices = FCOGuildLottery.tempEditBoxNumDiceSides
         local editBoxNewValue = tempEditBoxNumDices or FCOGuildLottery.settingsVars.settings.defaultDiceSides
         FCOGuildLottery.tempEditBoxNumDiceSides = nil
         self.editBoxDiceSides:SetText(tostring(editBoxNewValue))
+        ]]
 
         --Build initial masterlist via self:BuildMasterList()
         --d("[fcoglUI.Setup] RefreshData > BuildMasterList ???")
