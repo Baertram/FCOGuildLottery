@@ -999,12 +999,12 @@ function fcoglUI.SelectLastDropdownEntry(searchBoxType, lastIndex, callCallback)
     if searchBoxType == nil or lastIndex == nil or lastIndex <= 0 then return end
     local comboBox
     if searchBoxType == "guilds" then
-        local guildsDrop = fcoglUIwindow.guildsDrop
+        local guildsDrop = fcoglUIwindowFrame.guildsDrop
         if guildsDrop == nil then return end
         comboBox = guildsDrop
 
     elseif searchBoxType == "name" then
-        local searchDrop = fcoglUIwindow.searchDrop
+        local searchDrop = fcoglUIwindowFrame.searchDrop
         if searchDrop == nil then return end
         comboBox = searchDrop
 
@@ -1041,12 +1041,12 @@ function fcoglUI.updateGuildDiceSidesEditBox(guildIndex)
 end
 
 function fcoglUI.getSelectedGuildsDropEntry()
-    return fcoglUIwindow.guildsDrop:GetSelectedItemData()
+    return fcoglUIwindowFrame.guildsDrop:GetSelectedItemData()
 end
 
 local function setLastSelected()
     local selectedGuildDropsData = fcoglUI.getSelectedGuildsDropEntry()
-    fcoglUIwindow:SetSearchBoxLastSelected(fcoglUI.CurrentTab, "guilds", selectedGuildDropsData.selectedIndex)
+    fcoglUIwindowFrame:SetSearchBoxLastSelected(fcoglUI.CurrentTab, "guilds", selectedGuildDropsData.selectedIndex)
 end
 
 function fcoglUI.resetGuildDropDownToNone()
@@ -1409,7 +1409,7 @@ end
 --- FCOGL window global functions XML
 ------------------------------------------------
 function FCOGL_UI_OnMouseEnter( rowControlEnter )
-	fcoglUIwindow:Row_OnMouseEnter(rowControlEnter)
+	fcoglUIwindowFrame:Row_OnMouseEnter(rowControlEnter)
     --[[
     local showAdditionalTextTooltip = false
     if showAdditionalTextTooltip then
@@ -1442,7 +1442,7 @@ function FCOGL_UI_OnMouseEnter( rowControlEnter )
 end
 
 function FCOGL_UI_OnMouseExit( rowControlExit )
-	fcoglUIwindow:Row_OnMouseExit(rowControlExit)
+	fcoglUIwindowFrame:Row_OnMouseExit(rowControlExit)
     FCOGuildLottery.HideTooltip()
 end
 
@@ -1654,7 +1654,7 @@ end
 
 local function showUIWindow(doShow, doShowDiceHistory)
 df("showUIWindow: " ..tostring(doShow))
-    local windowFrame = fcoglUIwindow.frame
+    local windowFrame = fcoglUIwindowFrame or fcoglUIwindow.frame
     if windowFrame == nil then return end
     --Toggle show/hide
     if doShow == nil then
@@ -1667,7 +1667,14 @@ df("showUIWindow: " ..tostring(doShow))
         FCOGuildLottery.UI.windowShown = doShow
         if doShow == true then
             setWindowPosition(windowFrame)
-            fcoglUIwindow:UpdateUI(FCOGL_TAB_STATE_LOADED, false, doShowDiceHistory)
+
+            --Get the needed list to show now:
+            --No guild list at all?
+            --Normal guild dice throws
+            --Guild sales lottery           fcoglUIguildSalesLotteryWindow
+            --Guild members joined list     fcoglUIguildMembersJoinedListWindow
+            --todo 20221218
+            fcoglUIguildSalesLotteryWindow:UpdateUI(FCOGL_TAB_STATE_LOADED, false, doShowDiceHistory)
         else
             local windowDiceRollFrame = fcoglUIDiceHistoryWindow.frame
             if windowDiceRollFrame:IsHidden() then return end
@@ -2004,7 +2011,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
     FCOGuildLottery.tempEditBoxNumDiceSides = nil
     --fcoglUI.saveSortGroupHeader(fcoglUI.CurrentTab)
 
-    local frameControl = self.frame
+    local frameControl = self.frame -- the TLC
     ------------------------------------------------------------------------------------------------------------------------
     --SEARCH tab
     if fcoglUI.CurrentTab == FCOGL_TAB_GUILDSALESLOTTERY then
@@ -2174,7 +2181,7 @@ df("[SetTab] - index: %s, override: %s", tostring(index), tostring(override))
         fcoglUI.comingFromSortScrollListSetupFunction = false
         --Update the UI (hide/show items), and also check for the dice roll history to show
         --via function fcoglUI.ToggleDiceRollHistory() -> Calls fcoglUIDiceHistoryWindow:UpdateUI
-        fcoglUIwindow:UpdateUI(fcoglUI.CurrentState, blockDiceHistoryUpdate, override)
+        fcoglUIwindowFrame:UpdateUI(fcoglUI.CurrentState, blockDiceHistoryUpdate, override)
     end
 end
 
