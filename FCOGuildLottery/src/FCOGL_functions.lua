@@ -398,6 +398,7 @@ function FCOGuildLottery.UpdateCurrentDiceRollType(uiWindow)
             local guildIndex = selectedGuildsDropdownData.index
             local guildId = selectedGuildsDropdownData.id
             local isGuildSalesLotteryActive = FCOGuildLottery.IsGuildSalesLotteryActive()
+            local isGuildMemberJoinedListActive = FCOGuildLottery.IsGuildMembersJoinDateListActive()
 
             local currentDiceRollType = FCOGuildLottery.currentlyUsedDiceRollType
             df(">frame not hidden - currentDiceRollType: %s, guildsDropSelectedIndex: %s", tos(currentDiceRollType), tos(selectedIndex))
@@ -406,16 +407,21 @@ function FCOGuildLottery.UpdateCurrentDiceRollType(uiWindow)
                 if IsGuildIndexValid(guildIndex) then
                     if isGuildSalesLotteryActive then
                         newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY
+                    elseif isGuildMemberJoinedListActive then
+                        newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE
                     else
                         newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC
                     end
                 end
 
             elseif currentDiceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC or
-                    currentDiceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY then
+                    currentDiceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY or
+                    currentDiceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE then
                 if guildId ~= nil and IsGuildIndexValid(guildIndex) then
                     if isGuildSalesLotteryActive then
                         newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY
+                    elseif isGuildMemberJoinedListActive then
+                        newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE
                     else
                         newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC
                     end
@@ -449,7 +455,7 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
 --Slash command functions
-local function showNewGSLSlashCommandHelp(noGuildSelected, guildSalesLotteryActive)
+local function showNewGSLSlashCommandHelp(noGuildSelected, guildSalesLotteryActive, guildMemberJoinedListActive)
     noGuildSelected = noGuildSelected or false
     local newGSLChatErrorMessage
     local uiWindow = FCOGuildLottery.UI and FCOGuildLottery.UI.window and FCOGuildLottery.UI.window.control
@@ -457,8 +463,10 @@ local function showNewGSLSlashCommandHelp(noGuildSelected, guildSalesLotteryActi
         if noGuildSelected == true then
             newGSLChatErrorMessage = GetString(FCOGL_ERROR_NO_GUILD_ONLY_GENERIC_DICE_THROW)
         else
-            if not guildSalesLotteryActive then
+            if not guildSalesLotteryActive and guildMemberJoinedListActive == nil  then
                 newGSLChatErrorMessage = string.format(GetString(FCOGL_ERROR_GUILD_SALES_LOTTERY_PARAMETERS_MISSING), tos(FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS))
+            elseif not guildMemberJoinedListActive and guildSalesLotteryActive == nil then
+                newGSLChatErrorMessage = string.format(GetString(FCOGL_ERROR_GUILD_MEMBERS_JOIN_DATE_LIST_PARAMETERS_MISSING), tos(FCOGL_DEFAULT_GUILD_MEMBERS_JOIN_DATE_HISTORY_DAYS))
             else
                 newGSLChatErrorMessage = GetString(FCOGL_ERROR_SELECTED_GUILD_INVALID)
             end
@@ -2032,10 +2040,10 @@ df("<guild sell rank data missing!")
                 local guildMemberIndex = GetGuildMemberIndexFromDisplayName(guildId, memberRankName)
                 if guildMemberIndex ~= nil and guildMemberIndex > 0 then
                    memberName, memberNote , rankIndex, playerStatus, secsSinceLogoff = GetGuildMemberInfo(guildId, guildMemberIndex)
-                   --Did the user leave the guild already again?
-                    if memberName == nil or memberName == "" then
-                        memberName = memberRankName
-                    end
+                end
+               --Did the user leave the guild already again?
+                if guildMemberIndex == nil or memberName == nil or memberName == "" then
+                    memberName = memberRankName
                 end
             else
                 df("<<nothing found :-(")
@@ -2119,7 +2127,7 @@ end
 function FCOGuildLottery.StartNewGuildSalesLottery(guildIndex, daysBefore, dataWasResetAlready)
 df("[FCOGuildLottery.StartNewGuildSalesLottery] - index: %s, daysBefore: %s, dataWasResetAlready: %s", tos(guildIndex), tos(daysBefore), tos(dataWasResetAlready))
     if not IsGuildIndexValid(guildIndex) or daysBefore == nil then
-        showNewGSLSlashCommandHelp((FCOGuildLottery.noGuildIndex ~= nil and guildIndex == FCOGuildLottery.noGuildIndex) or false, nil)
+        showNewGSLSlashCommandHelp((FCOGuildLottery.noGuildIndex ~= nil and guildIndex == FCOGuildLottery.noGuildIndex) or false, nil, nil)
         return
     end
     if checkAndShowNoTraderMessage(guildIndex) == true then
@@ -2138,7 +2146,7 @@ end
 function FCOGuildLottery.StartNewGuildMembersJoinDateList(guildIndex, daysBefore, dataWasResetAlready)
 df("[FCOGuildLottery.StartNewGuildMembersJoinDate] - index: %s, daysBefore: %s, dataWasResetAlready: %s", tos(guildIndex), tos(daysBefore), tos(dataWasResetAlready))
     if not IsGuildIndexValid(guildIndex) or daysBefore == nil then
-        showNewGSLSlashCommandHelp((FCOGuildLottery.noGuildIndex ~= nil and guildIndex == FCOGuildLottery.noGuildIndex) or false, nil)
+        showNewGSLSlashCommandHelp((FCOGuildLottery.noGuildIndex ~= nil and guildIndex == FCOGuildLottery.noGuildIndex) or false, nil, nil)
         return
     end
 
@@ -2406,14 +2414,30 @@ end
 
 --Start (if not started yet) or roll a dice for the current guild sales lottery, via slash command
 function FCOGuildLottery.GuildSalesLotterySlashCommand(args)
+    if FCOGuildLottery.IsGuildMembersJoinDateListActive() then return end
+
     --Is a guild sales lottery active so we can go on with this "dice roll"?
     if not FCOGuildLottery.IsGuildSalesLotteryActive() then
-        showNewGSLSlashCommandHelp(nil, false)
+        showNewGSLSlashCommandHelp(nil, false, nil)
     else
         --Just roll next guild sales lottery dice
         FCOGuildLottery.RollTheDiceForGuildSalesLottery()
     end
 end
+
+--Start (if not started yet) or roll a dice for the current guild member joined list, via slash command
+function FCOGuildLottery.GuildMembersJoinedListSlashCommand(args)
+    if FCOGuildLottery.IsGuildSalesLotteryActive() then return end
+
+    --Is a guild sales lottery active so we can go on with this "dice roll"?
+    if not FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+        showNewGSLSlashCommandHelp(nil, nil, false)
+    else
+        --Just roll next guild sales lottery dice
+        FCOGuildLottery.RollTheDiceForGuildMembersJoinDate()
+    end
+end
+
 
 --Start a new guild sales lottery, via slash command
 function FCOGuildLottery.NewGuildSalesLotterySlashCommand(args)

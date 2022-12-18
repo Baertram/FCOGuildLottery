@@ -1843,6 +1843,59 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 fcoglUI.ToggleDiceRollHistory(FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden, blockDiceHistoryUpdate, diceHistoryOverride)
 
 
+            elseif listType == FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE then
+                --Hide currently unused tabs
+                frameControl:GetNamedChild("TabList"):SetEnabled(false)
+                frameControl:GetNamedChild("TabList"):SetHidden(true)
+                frameControl:GetNamedChild("TabDiceRollHistory"):SetEnabled(true)
+                frameControl:GetNamedChild("TabDiceRollHistory"):SetHidden(false)
+
+                --Unhide buttons at the tab
+                self.frame:GetNamedChild("RollTheDice"):SetEnabled(true)
+                self.frame:GetNamedChild("RollTheDice"):SetHidden(false)
+                local isEnabled = self:checkNewGuildSalesLotteryButtonEnabled()
+                --self:checkRefreshGuildSalesLotteryButtonEnabled(isEnabled)
+                self:checkStopGuildSalesLotteryButtonEnabled(isEnabled)
+                self:UpdateGuildSalesDateStartLabel()
+
+                local isEnabledNewGuildMemberList = self:checkNewGuildMemberJoinedButtonEnabled()
+                self:checkStopGuildMemberJoinedButtonEnabled(isEnabledNewGuildMemberList)
+                self:UpdateGuildMemberListDateStartLabel()
+
+                --Update the guild's dropdown box to select the currently active entry (if it was updated via slash commands)
+                -->Alsoupdate if guild sales lottery is enabled, but do not run the callback of the dropdown -> Just the visual update
+                local diceRollType, guildIndex = FCOGuildLottery.getCurrentDiceRollTypeAndGuildIndex()
+                fcoglUI.updateUIGuildsDropNow(diceRollType, guildIndex, true, true)
+
+                self.frame:GetNamedChild("NewGuildSalesLottery"):SetHidden(false)
+                --self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetHidden(false)
+                self.frame:GetNamedChild("StopGuildSalesLottery"):SetHidden(false)
+
+                self.frame:GetNamedChild("StartGuildMemberJoinedList"):SetHidden(false)
+                self.frame:GetNamedChild("StopGuildMemberJoinedList"):SetHidden(false)
+
+                self.frame:GetNamedChild("GuildsDrop"):SetHidden(false)
+
+                --Unhide the scroll list
+                self.list:SetHidden(false)
+                self.frame:GetNamedChild("List"):SetHidden(false)
+                --Unhide the scroll list headers
+                self.headers:SetHidden(false)
+
+                self.headerRank:SetHidden(false)
+                --self.headerDate:SetHidden(false)
+                self.headerName:SetHidden(false)
+                --self.headerItem:SetHidden(false)
+                self.headerPrice:SetHidden(true)
+                self.headerTax:SetHidden(true)
+                self.headerAmount:SetHidden(true)
+                self.headerInfo:SetHidden(false)
+
+                --Hide/Unhide the dice history frame -> Will call recursively function UpdateUI(state) for listType
+                --FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE
+                fcoglUI.ToggleDiceRollHistory(FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden, blockDiceHistoryUpdate, diceHistoryOverride)
+
+
             elseif listType == FCOGL_LISTTYPE_ROLLED_DICE_HISTORY then
                 --Unhide the scroll list
                 --self.frame:GetNamedChild("List"):SetHidden(false)
