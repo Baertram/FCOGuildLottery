@@ -425,7 +425,7 @@
 <!-- ========================================================================================================================================================== -->
 
 		<!-- Frame/Window - Standard UI with border -->
-		<TopLevelControl name="FCOGLFrame" mouseEnabled="true" movable="true" clampedToScreen="true" hidden="true" > <!--inherits="ZO_RightPanelFootPrint"-->
+		<TopLevelControl name="FCOGLFrame" mouseEnabled="true" movable="true" clampedToScreen="true" hidden="true" tier="LOW" layer="CONTROLS" level="1"> <!--inherits="ZO_RightPanelFootPrint"-->
 			<Dimensions x="730" y="690" />
 			<DimensionConstraints minX="400" minY="300" />
 			<Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER" offsetX="300" offsetY="-100"/>
@@ -601,7 +601,7 @@
 
 
 		<!-- Guild Sales Lottery -->
-		<Backdrop name="FCOGLFrameSalesLottery" mouseEnabled="true" movable="false" hidden="true" >
+		<Control name="FCOGLFrameSalesLottery" mouseEnabled="true" movable="false" hidden="true" tier="LOW" layer="CONTROLS" level="1">
 			<Dimensions x="730" y="690" />
 			<DimensionConstraints minX="400" minY="300" />
 			<Anchor point="TOPLEFT" relativeTo="FCOGLFrameRollTheDice" relativePoint="BOTTOMLEFT" offsetX="0" offsetY="5"/>
@@ -687,12 +687,12 @@
 				</Label>
 
 			</Controls>
-		</Backdrop>
+		</Control>
 
 <!-- ========================================================================================================================================================== -->
 
 		<!-- Guild Members Joined List -->
-		<Backdrop name="FCOGLFrameMembersJoined" tier="HIGH" layer="CONTROLS" level="2" movable="false" hidden="true">
+		<Control name="FCOGLFrameMembersJoined" movable="false" hidden="true" tier="LOW" layer="CONTROLS" level="1">
 			<Dimensions x="730" y="690" />
 			<DimensionConstraints minX="400" minY="300" />
 			<Anchor point="TOPLEFT" relativeTo="FCOGLFrameRollTheDice" relativePoint="BOTTOMLEFT" offsetX="0" offsetY="5"/>
@@ -754,7 +754,7 @@
 					<Anchor point="TOPRIGHT" relativeTo="$(parent)List" relativePoint="BOTTOMRIGHT" offsetY="6" />
 				</Label>
 			</Controls>
-		</Backdrop>
+		</Control>
 
 
 <!-- ========================================================================================================================================================== -->

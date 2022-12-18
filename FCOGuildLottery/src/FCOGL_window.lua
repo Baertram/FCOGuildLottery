@@ -71,8 +71,12 @@ local function hideLeftTLCListControlsExceptThis(doNotHideThisListObject)
     --Hide all lists
     local currentlyActiveListObject = getCurrentlyShownListsObject()
     if currentlyActiveListObject ~= nil and currentlyActiveListObject.control ~= nil then
-        df(">hiding: %s", tos(currentlyActiveListObject.control:GetName()))
-        currentlyActiveListObject.control:SetHidden(true)
+        if doNotHideThisListObject ~= nil and doNotHideThisListObject ~= currentlyActiveListObject then
+            df(">hiding: %s", tos(currentlyActiveListObject.control:GetName()))
+            currentlyActiveListObject.control:SetHidden(true)
+        else
+            df(">NOT hiding, because it should be shown now: %s", tos(doNotHideThisListObject.control:GetName()))
+        end
     else
         --Hide all
         for listType, listObject in pairs(fcoglUIListTypeToListObject) do
@@ -213,8 +217,8 @@ function fcoglWindowClass:New(control, listType, parentFrameControl)
     else
 --d(">parentFrameControl is not NIL")
         list.frame = parentFrameControl
+        list.control:SetParent(parentFrameControl)
     end
-    list._rectControl = control
     list.listType = listType
 	list:Setup(listType)
 	return list
@@ -323,7 +327,6 @@ function fcoglWindowClass:Setup(listType)
 
         --Build initial masterlist via self:BuildMasterList()
         --d("[fcoglUI.Setup] RefreshData > BuildMasterList ???")
-
 
     --The Guild members joined list
     elseif listType == FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE then
@@ -1813,13 +1816,13 @@ end
 
 function fcoglUI.saveSortGroupHeader(currentTab)
 df("[fcoglUI.saveSortGroupHeader]currentTab: %s", tos(currentTab))
-    if fcoglUIwindow ~= nil then
-        fcoglUIwindow.currentSortKey = fcoglUIwindow.sortHeaderGroup:GetCurrentSortKey()
-        fcoglUIwindow.currentSortOrder = fcoglUIwindow.sortHeaderGroup:GetSortDirection()
+    if fcoglUIguildSalesLotteryWindow ~= nil then
+        fcoglUIguildSalesLotteryWindow.currentSortKey = fcoglUIguildSalesLotteryWindow.sortHeaderGroup:GetCurrentSortKey()
+        fcoglUIguildSalesLotteryWindow.currentSortOrder = fcoglUIguildSalesLotteryWindow.sortHeaderGroup:GetSortDirection()
 
-        FCOGuildLottery.settingsVars.settings.UIwindow.sortKeys[currentTab][FCOGL_LISTTYPE_GUILD_SALES_LOTTERY]  = fcoglUIwindow.currentSortKey
-        FCOGuildLottery.settingsVars.settings.UIwindow.sortOrder[currentTab][FCOGL_LISTTYPE_GUILD_SALES_LOTTERY] = fcoglUIwindow.currentSortOrder
-df(">listType: %s, sortKey: %s, sortOrder: %s", tos(FCOGL_LISTTYPE_GUILD_SALES_LOTTERY), tos(fcoglUIwindow.currentSortKey), tos(fcoglUIwindow.currentSortOrder))
+        FCOGuildLottery.settingsVars.settings.UIwindow.sortKeys[currentTab][FCOGL_LISTTYPE_GUILD_SALES_LOTTERY]  = fcoglUIguildSalesLotteryWindow.currentSortKey
+        FCOGuildLottery.settingsVars.settings.UIwindow.sortOrder[currentTab][FCOGL_LISTTYPE_GUILD_SALES_LOTTERY] = fcoglUIguildSalesLotteryWindow.currentSortOrder
+df(">listType: %s, sortKey: %s, sortOrder: %s", tos(FCOGL_LISTTYPE_GUILD_SALES_LOTTERY), tos(fcoglUIguildSalesLotteryWindow.currentSortKey), tos(fcoglUIguildSalesLotteryWindow.currentSortOrder))
     end
     if fcoglUIguildMembersJoinedListWindow ~= nil then
         fcoglUIguildMembersJoinedListWindow.currentSortKey = fcoglUIguildMembersJoinedListWindow.sortHeaderGroup:GetCurrentSortKey()
