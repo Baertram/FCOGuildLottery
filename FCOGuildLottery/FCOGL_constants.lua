@@ -160,6 +160,10 @@ FCOGuildLottery.UI.SCROLLLIST_DATATYPE_GUILDSALESRANKING    = 1
 FCOGuildLottery.UI.SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY  = 2
 FCOGuildLottery.UI.SCROLLLIST_DATATYPE_GUILDMEMBERSJOINEDLIST = 3
 
+FCOGuildLottery.Localization = {}
+FCOGuildLottery.Localization.Yes = GetString(SI_YES)
+FCOGuildLottery.Localization.No = GetString(SI_NO)
+
 --Preventer variables
 FCOGuildLottery.prevVars = {
     doNotRunOnTextChanged = false

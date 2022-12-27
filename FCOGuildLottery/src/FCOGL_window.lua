@@ -19,6 +19,16 @@ local dfw   = FCOGuildLottery.dfw
 local tos = tostring
 local ton = tonumber
 
+--Localization
+local locVars = FCOGuildLottery.Localization
+local yesStr = locVars.Yes
+local noStr = locVars.No
+locVars.boolean2String = {}
+locVars.boolean2String[true] = yesStr
+locVars.boolean2String[false] = noStr
+local bool2Str = locVars.boolean2String
+
+
 
 --UI variables
 FCOGuildLottery.UI = FCOGuildLottery.UI or {}
@@ -1719,7 +1729,7 @@ function fcoglWindowClass:CreateGuildMemberJoinedListEntry(item)
         name =      item.memberName,
         invitedBy = item.invitedBy,
         --Joined date formatted [boolean "is still in guild"/number "memberIndex"]
-        info =      item._eventTimeFormated .. " [" .. tos(item.isStillInGuild) .. "/" .. tos(item.memberIndex) .. "]",
+        info =      item._eventTimeFormated .. " [" .. tos(bool2Str[item.isStillInGuild]) .. "/" .. tos(item.memberIndex) .. "]",
     }
     return guildMembersJoinedListLine
 end

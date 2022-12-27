@@ -24,6 +24,7 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_HEADER_ROLL                           = "|t28:28:/esoui/art/loot/dice_disabled.dds|t(Wurf)",
     FCOGL_HEADER_MEMBER_NAME                    = "Mitglied Name",
     FCOGL_HEADER_INVITEDBY                      = "Eingeladen durch",
+    FCOGL_HEADER_JOINEDINFO                     = "Beitritt am [Noch dabei?/Index]",
     FCOGL_NO_GUILD                              = "-> Keine Gilde <-",
 
     FCOGL_DICE_TYPE_STRING_RANDOM               = "Zufall",
