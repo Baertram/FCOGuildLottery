@@ -300,6 +300,7 @@ function fcoglWindowClass:Setup(listType)
         end
 
         --Search box and search functions
+        self.searchBg = self.frame:GetNamedChild("Search")
         self.searchBox = self.frame:GetNamedChild("SearchBox")
         self.searchBox:SetHandler("OnTextChanged", function() self:RefreshFilters() end)
         self.searchBox:SetHandler("OnMouseUp", function(ctrl, mouseButton, upInside)
@@ -309,6 +310,9 @@ function fcoglWindowClass:Setup(listType)
             end
             ]]
         end)
+        if self.frame.searchBg == nil then
+            self.frame.searchBg = self.searchBg
+        end
         if self.frame.searchBox == nil then
             self.frame.searchBox = self.searchBox
         end
@@ -389,6 +393,7 @@ function fcoglWindowClass:Setup(listType)
         end
 
         --Search box and search functions
+        self.searchBg = self.frame:GetNamedChild("Search")
         self.searchBox = self.frame:GetNamedChild("SearchBox")
         self.searchBox:SetHandler("OnTextChanged", function() self:RefreshFilters() end)
         --self.searchBox:SetHandler("OnMouseUp", function(ctrl, mouseButton, upInside)
@@ -398,6 +403,9 @@ function fcoglWindowClass:Setup(listType)
             end
             ]]
         --end)
+        if self.frame.searchBg == nil then
+            self.frame.searchBg = self.searchBg
+        end
         if self.frame.searchBox == nil then
             self.frame.searchBox = self.searchBox
         end
@@ -460,6 +468,7 @@ function fcoglWindowClass:Setup(listType)
         self.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "name")
 
         --Search box and search functions
+        self.searchBg = self.frame:GetNamedChild("Search")
         self.searchBox = self.frame:GetNamedChild("SearchBox")
         self.searchBox:SetHandler("OnTextChanged", function() self:RefreshFilters() end)
         self.searchBox:SetHandler("OnMouseUp", function(ctrl, mouseButton, upInside)
@@ -2183,6 +2192,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
 
                 --Hide the search dropdown and edit box?
                 self.searchDrop.m_container:SetHidden(not doShowListAndHeaders)
+                self.searchBg:SetHidden(not doShowListAndHeaders)
                 self.searchBox:SetHidden(not doShowListAndHeaders)
                 self.searchBox:Clear()
 
@@ -2251,6 +2261,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
 
                 --Hide the search dropdown and edit box?
                 self.searchDrop.m_container:SetHidden(not doShowListAndHeaders)
+                self.searchBg:SetHidden(not doShowListAndHeaders)
                 self.searchBox:SetHidden(not doShowListAndHeaders)
                 self.searchBox:Clear()
 
@@ -2321,7 +2332,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
 
                 --Unhide the search
                 self.searchBox:SetHidden(false)
-                self.frame:GetNamedChild("Search"):SetHidden(false)
+                self.searchBg:SetHidden(false)
                 --Unhide the search dropdown box
                 self.frame:GetNamedChild("SearchDrop"):SetHidden(false)
                 self.searchBox:Clear()
