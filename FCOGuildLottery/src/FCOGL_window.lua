@@ -2177,6 +2177,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 fcoglUI.CurrentListType = listType
                 --If no guild sales lottery is active: Hide the total list and it's sort headers!
                 local doShowListAndHeaders = FCOGuildLottery.IsGuildSalesLotteryActive()
+--d(">00000 GuildSalesLotteryActive: " ..tos(doShowListAndHeaders))
                 --Show the left TLC's currently shown list control and hide all others
                 hideLeftTLCListControlsExceptThis((doShowListAndHeaders == true and self) or nil, true)
 
@@ -2184,7 +2185,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 self.searchDrop.m_container:SetHidden(not doShowListAndHeaders)
                 self.searchBox:SetHidden(not doShowListAndHeaders)
                 self.searchBox:Clear()
-                
+
                 --Hide currently unused tabs
                 frameControl:GetNamedChild("TabList"):SetEnabled(false)
                 frameControl:GetNamedChild("TabList"):SetHidden(true)
@@ -2243,7 +2244,8 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 --Update the currently active listType
                 fcoglUI.CurrentListType = listType
                 --If no guild members joined list is active: Hide the total list and it's sort headers!
-                local doShowListAndHeaders = FCOGuildLottery.IsGuildMembersJoinDateListActive
+                local doShowListAndHeaders = FCOGuildLottery.IsGuildMembersJoinDateListActive()
+--d(">00000 GuildMembersJoinedListActive: " ..tos(doShowListAndHeaders))
                 --Show the left TLC's currently shown list control and hide all others
                 hideLeftTLCListControlsExceptThis((doShowListAndHeaders == true and self) or nil, true)
 
@@ -2320,7 +2322,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 --Unhide the search
                 self.searchBox:SetHidden(false)
                 self.frame:GetNamedChild("Search"):SetHidden(false)
-                --Unhide the dropdown boxes
+                --Unhide the search dropdown box
                 self.frame:GetNamedChild("SearchDrop"):SetHidden(false)
                 self.searchBox:Clear()
             end
