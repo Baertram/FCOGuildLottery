@@ -74,7 +74,7 @@
 			</Controls>
 		</Control>
 
-		<Control name="FCOGLRowGuildMemberJoined" mouseEnabled="true" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Control name="FCOGLRowGuildMembersJoined" mouseEnabled="true" virtual="true" tier="LOW" layer="CONTROLS" level="1">
 			<Dimensions y="30" />
 			<OnMouseEnter>
 				FCOGL_UI_OnMouseEnter(self)
@@ -106,7 +106,7 @@
 					<Dimensions x="150" y="30" />
 				</Label>
                 <Label name="$(parent)Info" inherits="FCOGLRowLabel">
-                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Amount" />
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)InvitedBy" />
                     <Dimensions x="100" y="30" />
 					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-15" />
                 </Label>
