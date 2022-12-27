@@ -2181,7 +2181,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 hideLeftTLCListControlsExceptThis((doShowListAndHeaders == true and self) or nil, true)
 
                 --Hide the search dropdown and edit box?
-                self.searchDrop:SetHidden(not doShowListAndHeaders)
+                self.searchDrop.m_container:SetHidden(not doShowListAndHeaders)
                 self.searchBox:SetHidden(not doShowListAndHeaders)
 
                 --Hide currently unused tabs
@@ -2247,7 +2247,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 hideLeftTLCListControlsExceptThis((doShowListAndHeaders == true and self) or nil, true)
 
                 --Hide the search dropdown and edit box?
-                self.searchDrop:SetHidden(not doShowListAndHeaders)
+                self.searchDrop.m_container:SetHidden(not doShowListAndHeaders)
                 self.searchBox:SetHidden(not doShowListAndHeaders)
 
                 --Hide currently unused tabs
