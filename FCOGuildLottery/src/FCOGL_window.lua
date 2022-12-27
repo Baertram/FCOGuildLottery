@@ -2180,6 +2180,10 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 --Show the left TLC's currently shown list control and hide all others
                 hideLeftTLCListControlsExceptThis((doShowListAndHeaders == true and self) or nil, true)
 
+                --Hide the search dropdown and edit box?
+                self.searchDrop:SetHidden(not doShowListAndHeaders)
+                self.searchBox:SetHidden(not doShowListAndHeaders)
+
                 --Hide currently unused tabs
                 frameControl:GetNamedChild("TabList"):SetEnabled(false)
                 frameControl:GetNamedChild("TabList"):SetHidden(true)
@@ -2241,6 +2245,10 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 local doShowListAndHeaders = FCOGuildLottery.IsGuildMembersJoinDateListActive
                 --Show the left TLC's currently shown list control and hide all others
                 hideLeftTLCListControlsExceptThis((doShowListAndHeaders == true and self) or nil, true)
+
+                --Hide the search dropdown and edit box?
+                self.searchDrop:SetHidden(not doShowListAndHeaders)
+                self.searchBox:SetHidden(not doShowListAndHeaders)
 
                 --Hide currently unused tabs
                 frameControl:GetNamedChild("TabList"):SetEnabled(false)
