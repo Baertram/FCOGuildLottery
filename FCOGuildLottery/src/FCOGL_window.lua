@@ -94,6 +94,7 @@ local function hideLeftTLCListControlsExceptThis(doNotHideThisListObject, hideOt
     hideOthers = hideOthers or false
     df("hideLeftTLCListControlsExceptThis - doNotHideObject: %s, hideOthers: %s", tos(doNotHideThisListObject), tos(hideOthers))
     --Hide all other lists?
+    local hideAllNow = false
     if hideOthers == true then
         local currentlyActiveListObject = getCurrentlyShownListsObject()
         if currentlyActiveListObject ~= nil and currentlyActiveListObject.control ~= nil then
@@ -104,12 +105,18 @@ local function hideLeftTLCListControlsExceptThis(doNotHideThisListObject, hideOt
                 else
                     df(">NOT hiding list, because it should be shown now: %s", tos(doNotHideThisListObject.control:GetName()))
                 end
+            else
+                hideAllNow = true
             end
         else
+            hideAllNow = true
+        end
+        if hideAllNow == true then
+            df(">ALL hiding now...")
             --Hide all
             for listType, listObject in pairs(fcoglUIListTypeToListObject["left"]) do
                 if listObject ~= nil and listObject.control ~= nil then
-                    df(">LOOP hiding: %s", tos(listObject.control:GetName()))
+                    df(">>LOOP hiding: %s", tos(listObject.control:GetName()))
                     listObject.control:SetHidden(true)
                 end
             end
@@ -1182,6 +1189,7 @@ end
 function fcoglUI.resetGuildDropDownToNone()
     df("[fcoglUI.resetGuildDropDownToNone]")
     FCOGuildLottery.currentlyUsedGuildSalesLotteryChosenData = nil
+    FCOGuildLottery.currentlyUsedGuildMembersJoinDateChosenData = nil
 
     setLastSelected()
 
@@ -1201,6 +1209,7 @@ end
 function fcoglUI.resetGuildDropDownToGuild(guildIndex)
     df("[fcoglUI.resetGuildDropDownToGuild]guildIndex: %s", tos(guildIndex))
     FCOGuildLottery.currentlyUsedGuildSalesLotteryChosenData = nil
+    FCOGuildLottery.currentlyUsedGuildMembersJoinDateChosenData = nil
 
     setLastSelected()
 
@@ -2280,7 +2289,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 fcoglUI.CurrentListType = listType
                 --If no guild members joined list is active: Hide the total list and it's sort headers!
                 local doShowListAndHeaders = FCOGuildLottery.IsGuildMembersJoinDateListActive()
---d(">00000 GuildMembersJoinedListActive: " ..tos(doShowListAndHeaders))
+d(">00000 GuildMembersJoinedListActive: " ..tos(doShowListAndHeaders))
                 --Show the left TLC's currently shown list control and hide all others
                 hideLeftTLCListControlsExceptThis((doShowListAndHeaders == true and self) or nil, true)
 
