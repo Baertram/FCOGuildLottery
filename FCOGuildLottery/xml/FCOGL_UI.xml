@@ -722,7 +722,7 @@
                         -->
 						<Control name="$(parent)Name" inherits="FCOGLSortHeader">
 							<OnInitialized>
-								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_NAME), "name", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+								ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_MEMBER_NAME), "name", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
 							</OnInitialized>
 							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Rank" />
 							<Dimensions x="200" y="32" />

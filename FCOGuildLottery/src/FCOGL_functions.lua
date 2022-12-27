@@ -1225,15 +1225,27 @@ function FCOGuildLottery.GetGuildMembersJoinedListMemberCount(guildId, daysToGet
                                     local currentlyUsedGuildMembersJoinDateMemberCountLoc     = FCOGuildLottery.currentlyUsedGuildMembersJoinDateMemberCount
                                     FCOGuildLottery.currentlyUsedGuildMembersJoinDateMemberCount = currentlyUsedGuildMembersJoinDateMemberCountLoc + 1
                                 end
+
+                                local guildMemberIndex = GetGuildMemberIndexFromDisplayName(guildId, memberName)
+                                local isStillInGuild = false
+                                if guildMemberIndex ~= nil and guildMemberIndex > 0 then
+                                    local memberNameStillInGuild = GetGuildMemberInfo(guildId, guildMemberIndex)
+                                    if memberNameStillInGuild ~= nil and memberNameStillInGuild ~= "" then
+                                        isStillInGuild = true
+                                    end
+                                end
+
                                 table.insert(FCOGuildLottery.currentlyUsedGuildMembersJoinDateMemberListData, {
                                     --rank
                                     --memberName
                                     --optionalInviterDisplayName
                                     _eventTime  = eventTime,
+                                    _eventTimeFormated = guildMemberJoinedData.eventTimeFormated,
                                     rank        = -1,
+                                    memberIndex = guildMemberIndex,
+                                    isStillInGuild = isStillInGuild,
                                     memberName  = memberName,
                                     invitedBy   = guildMemberJoinedData.optionalInviterDisplayName,
-
                                 })
                             end
                         end

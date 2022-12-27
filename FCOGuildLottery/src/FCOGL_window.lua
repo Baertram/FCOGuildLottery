@@ -685,7 +685,6 @@ function fcoglWindowClass:SetupItemRow(control, data, listType)
             nameColumn.normalColor = ZO_DEFAULT_TEXT
             if not data.columnWidth then data.columnWidth = 200 end
             nameColumn:SetDimensions(data.columnWidth, 30)
-            nameColumn:SetText(data.name)
             nameColumn:SetAnchor(LEFT, rankColumn, RIGHT, 0, 0)
             nameColumn:SetText(data.name)
             nameColumn:SetHidden(false)
@@ -738,20 +737,17 @@ function fcoglWindowClass:SetupItemRow(control, data, listType)
             nameColumn.normalColor = ZO_DEFAULT_TEXT
             if not data.columnWidth then data.columnWidth = 200 end
             nameColumn:SetDimensions(data.columnWidth, 30)
-            nameColumn:SetText(data.name)
             nameColumn:SetAnchor(LEFT, rankColumn, RIGHT, 0, 0)
             nameColumn:SetText(data.name)
             nameColumn:SetHidden(false)
             nameColumn:SetMouseEnabled(true)
-            invitedByColumn:SetDimensions(data.columnWidth, 30)
-            invitedByColumn:SetText(data.name)
-            invitedByColumn:SetAnchor(LEFT, rankColumn, RIGHT, 0, 0)
-            invitedByColumn:SetText(data.name)
+            invitedByColumn:SetAnchor(LEFT, nameColumn, RIGHT, 0, 0)
+            invitedByColumn:SetText(data.invitedBy)
             invitedByColumn:SetHidden(false)
             invitedByColumn:SetMouseEnabled(true)
             infoColumn:SetHidden(false)
             infoColumn:ClearAnchors()
-            infoColumn:SetAnchor(LEFT, amountColumn, RIGHT, 0, 0)
+            infoColumn:SetAnchor(LEFT, invitedByColumn, RIGHT, 0, 0)
             infoColumn:SetAnchor(RIGHT, control, RIGHT, 0, 0)
             infoColumn:SetText(data.info)
             infoColumn:SetMouseEnabled(true)
@@ -890,6 +886,7 @@ function fcoglWindowClass:BuildSortKeys()
             ["tax"]                = { caseInsensitive = true,  tiebreaker = "name"  },
             ["amount"]             = { caseInsensitive = true,  tiebreaker = "name"  },
             ["info"]               = { caseInsensitive = true,  tiebreaker = "name"  },
+            ["invitedBy"]          = { caseInsensitive = true,  tiebreaker = "name"  },
 
             ["no"]                  = { isNumeric = true,       tiebreaker = "name"  },
             ["timestamp"]           = { isNumeric = true,       tiebreaker = "name"  },
@@ -1537,7 +1534,9 @@ end
 --- FCOGL window global functions XML
 ------------------------------------------------
 function FCOGL_UI_OnMouseEnter( rowControlEnter )
-	fcoglUIwindowFrame:Row_OnMouseEnter(rowControlEnter)
+    local listObject = getCurrentlyShownListsObject()
+    if listObject == nil or listObject.Row_OnMouseEnter == nil then return end
+    listObject:Row_OnMouseEnter(rowControlEnter)
     --[[
     local showAdditionalTextTooltip = false
     if showAdditionalTextTooltip then
@@ -1570,8 +1569,10 @@ function FCOGL_UI_OnMouseEnter( rowControlEnter )
 end
 
 function FCOGL_UI_OnMouseExit( rowControlExit )
-	fcoglUIwindowFrame:Row_OnMouseExit(rowControlExit)
     FCOGuildLottery.HideTooltip()
+    local listObject = getCurrentlyShownListsObject()
+    if listObject == nil or listObject.Row_OnMouseExit == nil then return end
+	listObject:Row_OnMouseExit(rowControlExit)
 end
 
 function FCOGL_UI_OnMouseUp( rowControlUp, button, upInside )
@@ -1710,12 +1711,15 @@ function fcoglWindowClass:CreateGuildMemberJoinedListEntry(item)
         --taxSum
         --amountSum
     ]]
+    --local guildIdOfMemberJoinedDateList = FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildId
+
     local guildMembersJoinedListLine = {
         type =      SCROLLLIST_DATATYPE_GUILDMEMBERSJOINEDLIST, -- for the search method to work -> Find the processor in zo_stringsearch:Process()
         rank =      item.rank,
         name =      item.memberName,
         invitedBy = item.invitedBy,
-        info =      "",
+        --Joined date formatted [boolean "is still in guild"/number "memberIndex"]
+        info =      item._eventTimeFormated .. " [" .. tos(item.isStillInGuild) .. "/" .. tos(item.memberIndex) .. "]",
     }
     return guildMembersJoinedListLine
 end
