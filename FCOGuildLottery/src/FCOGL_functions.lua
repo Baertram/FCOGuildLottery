@@ -277,7 +277,7 @@ local function isUICreatedAndShown()
     end
     return isWindowAlreadyShown, showUINow
 end
-FCOGuildLottery.UI.isUICreatedAndShown = isUICreatedAndShown()
+FCOGuildLottery.UI.isUICreatedAndShown = isUICreatedAndShown
 
 
 local function checkIfUIShouldBeShownOrUpdated(diceRollType, hideHistory, guildIndex)
@@ -2130,7 +2130,7 @@ df("[FCOGuildLottery.CheckBeforeStartNew] - index: %s, daysBefore: %s, dataWasRe
 
     elseif checkType == FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE then
         --Stop any active guild lottery?
-        FCOGuildLottery.StopGuildSalesLottery(nil, nil, "StartNewGuildMembersJoinDate", guildIndex, daysBefore, dataWasResetAlready)
+        FCOGuildLottery.StopGuildSalesLottery(nil, nil, "StartNewGuildMembersJoinDateList", guildIndex, daysBefore, dataWasResetAlready)
     end
 end
 
@@ -2154,7 +2154,7 @@ df("[FCOGuildLottery.StartNewGuildSalesLottery] - index: %s, daysBefore: %s, dat
 end
 
 function FCOGuildLottery.StartNewGuildMembersJoinDateList(guildIndex, daysBefore, dataWasResetAlready)
-df("[FCOGuildLottery.StartNewGuildMembersJoinDate] - index: %s, daysBefore: %s, dataWasResetAlready: %s", tos(guildIndex), tos(daysBefore), tos(dataWasResetAlready))
+df("[FCOGuildLottery.StartNewGuildMembersJoinDateList] - index: %s, daysBefore: %s, dataWasResetAlready: %s", tos(guildIndex), tos(daysBefore), tos(dataWasResetAlready))
     if not IsGuildIndexValid(guildIndex) or daysBefore == nil then
         showNewGSLSlashCommandHelp((FCOGuildLottery.noGuildIndex ~= nil and guildIndex == FCOGuildLottery.noGuildIndex) or false, nil, nil)
         return

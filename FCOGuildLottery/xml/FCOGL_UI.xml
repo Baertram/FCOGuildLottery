@@ -500,11 +500,11 @@
                     </Controls>
 				</Control>
 
-				<Label name="$(parent)GuildLotteryDateStartLabel" font="ZoFontGameSmall" horizontalAlignment="LEFT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="1">
+				<Label name="$(parent)GuildLotteryDateStartLabel" font="ZoFontGameSmall" horizontalAlignment="LEFT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="1" hidden="true">
 					<Anchor point="BOTTOMRIGHT" relativeTo="$(parent)SearchDropColonText" relativePoint="TOPRIGHT" offsetX="0" offsetY="2" />
 					<Dimensions x="300" y="32" />
 				</Label>
-				<Label name="$(parent)GuildMembersListDateStartLabel" font="ZoFontGameSmall" horizontalAlignment="LEFT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="1">
+				<Label name="$(parent)GuildMembersListDateStartLabel" font="ZoFontGameSmall" horizontalAlignment="LEFT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="1" hidden="true">
 					<Anchor point="BOTTOMRIGHT" relativeTo="$(parent)SearchDropColonText" relativePoint="TOPRIGHT" offsetX="0" offsetY="2" />
 					<Dimensions x="300" y="32" />
 				</Label>
