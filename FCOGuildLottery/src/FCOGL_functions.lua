@@ -1895,7 +1895,7 @@ function FCOGuildLottery.RollTheDiceForGuildMembersJoinDate(noChatOutput)
     --Was the setting of the daysBefore slider changed /was the slash command used to change the daysBefore?
     --But no reloadui was done after that?
     if FCOGuildLottery.MembersJoinDateDaysBeforeSliderWasChanged == true then
-        FCOGuildLottery.StopGuildMembersJoinDateList(true, true)
+        FCOGuildLottery.StopGuildMembersJoinDateList(true, true, nil, nil, nil, nil)
         showReloadUIMessage("daysbefore")
         return
     end
@@ -2478,11 +2478,11 @@ end
 
 --Stop the currently active guild sales lottery, via slash command
 function FCOGuildLottery.StopGuildSalesLotterySlashCommand()
-    FCOGuildLottery.StopGuildSalesLottery()
+    FCOGuildLottery.StopGuildSalesLottery(nil, nil, nil, nil, nil, nil)
 end
 
 function FCOGuildLottery.StopGuildMembersJoinedListSlashCommand()
-    FCOGuildLottery.StopGuildMembersJoinDateList()
+    FCOGuildLottery.StopGuildMembersJoinDateList(nil, nil, nil, nil, nil, nil)
 end
 
 --Show the last rolled chat output for a guild sales lottery again

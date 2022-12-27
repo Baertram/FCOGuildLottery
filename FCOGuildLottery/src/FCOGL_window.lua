@@ -1727,13 +1727,19 @@ function fcoglWindowClass:CreateGuildMemberJoinedListEntry(item)
         --isStillInGuild
         --memberIndex
     ]]
+    local isStillInGuild = item.isStillInGuild
+    local infoJoinedStr = item._eventTimeFormated
+    if isStillInGuild == true then
+        infoJoinedStr = infoJoinedStr .. " [" .. tos(bool2Str[isStillInGuild]) .. "/" .. tos(item.memberIndex) .. "]"
+    end
+
     local guildMembersJoinedListLine = {
         type =      SCROLLLIST_DATATYPE_GUILDMEMBERSJOINEDLIST, -- for the search method to work -> Find the processor in zo_stringsearch:Process()
         rank =      item.rank,
         name =      item.memberName,
         invitedBy = item.invitedBy,
         --Joined date formatted [boolean "is still in guild"/number "memberIndex"]
-        info =      item._eventTimeFormated .. " [" .. tos(bool2Str[item.isStillInGuild]) .. "/" .. tos(item.memberIndex) .. "]",
+        info =      infoJoinedStr,
         timestamp = item._eventTime
     }
     return guildMembersJoinedListLine
