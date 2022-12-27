@@ -28,6 +28,8 @@ locVars.boolean2String[true] = yesStr
 locVars.boolean2String[false] = noStr
 local bool2Str = locVars.boolean2String
 
+locVars.diceRollPrefix = GetString(FCOGL_DICE_PREFIX)
+
 
 
 --UI variables
@@ -577,10 +579,10 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
             if guildMemberJoinedListActive == true then
                 self.masterList = {}
 
-                local rankingData = FCOGuildLottery.currentlyUsedGuildMembersJoinDateMemberListData
-                if rankingData == nil or #rankingData == 0 then return false end
-                for i = 1, #rankingData do
-                    local item = rankingData[i]
+                local guildMembersJoinedListData = FCOGuildLottery.currentlyUsedGuildMembersJoinDateMemberListData
+                if guildMembersJoinedListData == nil or #guildMembersJoinedListData == 0 then return false end
+                for i = 1, #guildMembersJoinedListData do
+                    local item = guildMembersJoinedListData[i]
                     table.insert(self.masterList, self:CreateGuildMemberJoinedListEntry(item))
                 end
                 --self:updateSortHeaderAnchorsAndPositions(fcoglUI.CurrentTab, settings.maxNameColumnWidth, 32)
@@ -759,6 +761,8 @@ function fcoglWindowClass:SetupItemRow(control, data, listType)
             infoColumn:ClearAnchors()
             infoColumn:SetAnchor(LEFT, invitedByColumn, RIGHT, 0, 0)
             infoColumn:SetAnchor(RIGHT, control, RIGHT, 0, 0)
+            --local dateTimeStamp = data.timestamp
+            --local dateTimeStr = FCOGuildLottery.getDateTimeFormatted(dateTimeStamp)
             infoColumn:SetText(data.info)
             infoColumn:SetMouseEnabled(true)
         end
@@ -1711,18 +1715,18 @@ function fcoglWindowClass:CreateGuildSalesRankingEntry(item)
 end
 
 function fcoglWindowClass:CreateGuildMemberJoinedListEntry(item)
-    --local uniqueId = FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier
-    --local guildId = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId
+    --local uniqueId = FCOGuildLottery.currentlyUsedGuildMembersJoinDateUniqueIdentifier
+    --local guildId = FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildId
     --[[
         --Columns of "item":
+        --_eventTime
+        --_eventTimeFormated
         --rank
         --memberName
-        --soldSum
-        --taxSum
-        --amountSum
+        --invitedBy
+        --isStillInGuild
+        --memberIndex
     ]]
-    --local guildIdOfMemberJoinedDateList = FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildId
-
     local guildMembersJoinedListLine = {
         type =      SCROLLLIST_DATATYPE_GUILDMEMBERSJOINEDLIST, -- for the search method to work -> Find the processor in zo_stringsearch:Process()
         rank =      item.rank,
@@ -1730,6 +1734,7 @@ function fcoglWindowClass:CreateGuildMemberJoinedListEntry(item)
         invitedBy = item.invitedBy,
         --Joined date formatted [boolean "is still in guild"/number "memberIndex"]
         info =      item._eventTimeFormated .. " [" .. tos(bool2Str[item.isStillInGuild]) .. "/" .. tos(item.memberIndex) .. "]",
+        timestamp = item._eventTime
     }
     return guildMembersJoinedListLine
 end
@@ -1760,7 +1765,7 @@ function fcoglWindowClass:CreateDiceThrowHistoryEntry(diceRolledData)
         guildIndex = diceRolledData.guildIndex,
         nameText =  string.format("%s%s", (diceRolledData.guildId ~=nil and diceRolledData.rolledGuildMemberName) or diceRolledData.displayName, (diceRolledData.guildId == nil and " (" .. FCOGuildLottery.GetCharacterName(diceRolledData.characterId) .. ")") or ""),
         roll =      diceRolledData.roll,
-        rollText =  string.format("%s%s (%s)", GetString(FCOGL_DICE_PREFIX), tos(diceRolledData.diceSides), tos(diceRolledData.roll)),
+        rollText =  string.format("%s%s (%s)", locVars.diceRollPrefix, tos(diceRolledData.diceSides), tos(diceRolledData.roll)),
         timestamp = diceRolledData.timestamp,
     }
     return diceRolledHistoryLine

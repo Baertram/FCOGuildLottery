@@ -736,7 +736,7 @@
 						</Control>
                         <Control name="$(parent)Info" inherits="FCOGLSortHeader">
                             <OnInitialized>
-                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_JOINEDINFO), "info", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
+                                ZO_SortHeader_Initialize(self, GetString(FCOGL_HEADER_JOINEDINFO), "timestamp", ZO_SORT_ORDER_UP, TEXT_ALIGN_LEFT, "ZoFontGameLargeBold")
                             </OnInitialized>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)InvitedBy" />
 							<Anchor point="TOPRIGHT" offsetX="-16" />
