@@ -2183,7 +2183,8 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 --Hide the search dropdown and edit box?
                 self.searchDrop.m_container:SetHidden(not doShowListAndHeaders)
                 self.searchBox:SetHidden(not doShowListAndHeaders)
-
+                self.searchBox:Clear()
+                
                 --Hide currently unused tabs
                 frameControl:GetNamedChild("TabList"):SetEnabled(false)
                 frameControl:GetNamedChild("TabList"):SetHidden(true)
@@ -2249,6 +2250,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 --Hide the search dropdown and edit box?
                 self.searchDrop.m_container:SetHidden(not doShowListAndHeaders)
                 self.searchBox:SetHidden(not doShowListAndHeaders)
+                self.searchBox:Clear()
 
                 --Hide currently unused tabs
                 frameControl:GetNamedChild("TabList"):SetEnabled(false)
@@ -2314,15 +2316,14 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 self.headerDate:SetHidden(false)
                 self.headerName:SetHidden(false)
                 self.headerRoll:SetHidden(false)
-            end
 
-            --For both list types
-            --Unhide the search
-            self.searchBox:SetHidden(false)
-            self.frame:GetNamedChild("Search"):SetHidden(false)
-            --Unhide the dropdown boxes
-            self.frame:GetNamedChild("SearchDrop"):SetHidden(false)
-            self.searchBox:Clear()
+                --Unhide the search
+                self.searchBox:SetHidden(false)
+                self.frame:GetNamedChild("Search"):SetHidden(false)
+                --Unhide the dropdown boxes
+                self.frame:GetNamedChild("SearchDrop"):SetHidden(false)
+                self.searchBox:Clear()
+            end
 
             --Reset the sortGroupHeader
             -->Currently not needed as there is only 1 tab
