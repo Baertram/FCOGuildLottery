@@ -90,7 +90,7 @@ local getCurrentlyShownListsObject = fcoglUI.GetCurrentlyShownListsObject
 
 --Hide all list controls at the left TLC
 local function hideLeftTLCListControlsExceptThis(doNotHideThisListObject, hideOthers)
-    d(">---------------------------------->")
+    --d(">---------------------------------->")
     hideOthers = hideOthers or false
     df("hideLeftTLCListControlsExceptThis - doNotHideObject: %s, hideOthers: %s", tos(doNotHideThisListObject), tos(hideOthers))
     --Hide all other lists?
@@ -128,7 +128,7 @@ local function hideLeftTLCListControlsExceptThis(doNotHideThisListObject, hideOt
         df("<SHOWING: %s", tos(doNotHideThisListObject.control:GetName()))
         doNotHideThisListObject.control:SetHidden(false)
     end
-    d("<----------------------------------<")
+    --d("<----------------------------------<")
 end
 
 
@@ -1532,24 +1532,24 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
 end
 
 function fcoglWindowClass:SetSearchBoxLastSelected(UITab, searchBoxType, selectedIndex)
-d(">>>>> DEBUG SET DEBUG SET >>>>>")
+--d(">>>>> DEBUG SET DEBUG SET >>>>>")
     local listType = self:GetListType()
     df("SetSearchBoxLastSelected - UITab: %s, listType: %s, searchBoxType: %s, selectedIndex: %q", tos(UITab), tos(listType), tos(searchBoxType), tos(selectedIndex))
     if selectedIndex == nil then return end
     fcoglUI.searchBoxLastSelected[UITab]                = fcoglUI.searchBoxLastSelected[UITab] or {}
     fcoglUI.searchBoxLastSelected[UITab][listType]      = fcoglUI.searchBoxLastSelected[UITab][listType] or {}
     fcoglUI.searchBoxLastSelected[UITab][listType][searchBoxType] = selectedIndex
-d("<<<<< DEBUG SET DEBUG SET <<<<<")
+--d("<<<<< DEBUG SET DEBUG SET <<<<<")
 end
 
 function fcoglWindowClass:GetSearchBoxLastSelected(UITab, searchBoxType)
-d(">!!!! DEBUG GET DEBUG GET !!!!")
+--d(">!!!! DEBUG GET DEBUG GET !!!!")
     local listType = self:GetListType()
     local lastSelectedDropdownEntry = (fcoglUI.searchBoxLastSelected[UITab] and fcoglUI.searchBoxLastSelected[UITab][listType] and
             fcoglUI.searchBoxLastSelected[UITab][listType][searchBoxType]) or nil
     df("GetSearchBoxLastSelected - UITab: %s, listType: %s, searchBoxType: %s->lastSelectedDropdownEntry: %q", tos(UITab), tos(listType), tos(searchBoxType), tos(lastSelectedDropdownEntry))
     if lastSelectedDropdownEntry == nil then lastSelectedDropdownEntry = 1 end
-d("<!!!! DEBUG GET DEBUG GET")
+--d("<!!!! DEBUG GET DEBUG GET")
     return lastSelectedDropdownEntry
 end
 
@@ -2289,7 +2289,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 fcoglUI.CurrentListType = listType
                 --If no guild members joined list is active: Hide the total list and it's sort headers!
                 local doShowListAndHeaders = FCOGuildLottery.IsGuildMembersJoinDateListActive()
-d(">00000 GuildMembersJoinedListActive: " ..tos(doShowListAndHeaders))
+--d(">00000 GuildMembersJoinedListActive: " ..tos(doShowListAndHeaders))
                 --Show the left TLC's currently shown list control and hide all others
                 hideLeftTLCListControlsExceptThis((doShowListAndHeaders == true and self) or nil, true)
 
