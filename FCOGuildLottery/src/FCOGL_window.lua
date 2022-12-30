@@ -75,17 +75,24 @@ local SCROLLLIST_DATATYPE_GUILDMEMBERSJOINEDLIST= fcoglUI.SCROLLLIST_DATATYPE_GU
 
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
-function fcoglUI.GetCurrentlyShownListsObject()
-    --todo  20221218 Find the currently shown ZO_SortFilterList: Is it fcoglUIguildSalesLotteryWindow or fcoglUIguildMembersJoinedListWindow or
-    --todo  normal guild member list or no guild (normal dice roll) list
-    local currentListType = fcoglUI.CurrentListType
-    df("[FCOGLUI.GetCurrentlyShownListsObject]listType: %s", tos(currentListType))
-    if fcoglUIListTypeToListObject["left"][currentListType] ~= nil then
-        return fcoglUIListTypeToListObject["left"][currentListType]
+function fcoglUI.GetListsObjectByListType(listType)
+    df("[GetListsObjectByListType]listType: %s", tos(listType))
+    --Only the left lists (right list = dice roll history!) will be supported here
+    if fcoglUIListTypeToListObject["left"][listType] ~= nil then
+        return fcoglUIListTypeToListObject["left"][listType]
+    --[[
     elseif fcoglUIListTypeToListObject["right"][currentListType] ~= nil then
         return fcoglUIListTypeToListObject["right"][currentListType]
+    ]]
     end
     return nil
+end
+local getListsObjectByListType = fcoglUI.GetListsObjectByListType
+
+function fcoglUI.GetCurrentlyShownListsObject()
+    local currentListType = fcoglUI.CurrentListType
+    df("[FCOGLUI.GetCurrentlyShownListsObject]listType: %s", tos(currentListType))
+    return getListsObjectByListType(currentListType)
 end
 local getCurrentlyShownListsObject = fcoglUI.GetCurrentlyShownListsObject
 
@@ -98,7 +105,7 @@ end
 
 --Hide all list controls at the left TLC
 local function hideLeftTLCListControlsExceptThis(doNotHideThisListObject, hideOthers)
-    --d(">---------------------------------->")
+d(">---------------------------------->")
     hideOthers = hideOthers or false
     df("hideLeftTLCListControlsExceptThis - doNotHideObject: %s, hideOthers: %s", tos(doNotHideThisListObject), tos(hideOthers))
     --Hide all other lists?
@@ -136,7 +143,7 @@ local function hideLeftTLCListControlsExceptThis(doNotHideThisListObject, hideOt
         df("<SHOWING: %s", tos(doNotHideThisListObject.control:GetName()))
         doNotHideThisListObject.control:SetHidden(false)
     end
-    --d("<----------------------------------<")
+d("<----------------------------------<")
 end
 
 
@@ -1213,7 +1220,6 @@ local function setLastSelected()
     --Normal guild dice throws
     --Guild sales lottery           fcoglUIguildSalesLotteryWindow
     --Guild members joined list     fcoglUIguildMembersJoinedListWindow
-    --todo 20221218
     local currentlyShownListObject = getCurrentlyShownListsObject()
     if currentlyShownListObject == nil then return end
     currentlyShownListObject:SetSearchBoxLastSelected(fcoglUI.CurrentTab, "guilds", selectedGuildDropsData.selectedIndex)
@@ -1236,7 +1242,7 @@ function fcoglUI.resetGuildDropDownToNone()
     updateMaxDefaultDiceSides()
 
     --Set the current tab as active again to force the update of all lists and buttons
-    fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true)
+    fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true, nil)
 end
 
 function fcoglUI.resetGuildDropDownToGuild(guildIndex)
@@ -1257,7 +1263,7 @@ function fcoglUI.resetGuildDropDownToGuild(guildIndex)
     end
 
     --Set the current tab as active again to force the update of all lists and buttons
-    fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true)
+    fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true, nil)
 end
 
 function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, searchBoxType )
@@ -1368,7 +1374,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
             comboBoxOwner:SetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType, entry.selectedIndex)
 
             --Set the current tab as active again to force the update of all lists and buttons
-            fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true)
+            fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true, nil)
         end
 
         --[[
@@ -1960,14 +1966,14 @@ function fcoglUI.createWindow()
     end
 end
 
-local function showUIWindow(doShow, doShowDiceHistory)
+local function showUIWindow(doShow, doShowDiceHistory, listTypeToUpdate)
 df("showUIWindow: " ..tos(doShow))
     local windowFrame = fcoglUIwindowFrame or fcoglUIwindow.frame
     if windowFrame == nil then return end
     --Toggle show/hide
     if doShow == nil then
         --Recursively call
-        showUIWindow(windowFrame:IsControlHidden())
+        showUIWindow(windowFrame:IsControlHidden(), nil, listTypeToUpdate)
         return
     else
         --Explicitly show/hide
@@ -1981,7 +1987,12 @@ df("showUIWindow: " ..tos(doShow))
             --Normal guild dice throws      <no list control, only dice roll history at the right>
             --Guild sales lottery           fcoglUIguildSalesLotteryWindow
             --Guild members joined list     fcoglUIguildMembersJoinedListWindow
-            local currentlyShownListObject = getCurrentlyShownListsObject()
+            local currentlyShownListObject
+            if listTypeToUpdate ~= nil then
+                currentlyShownListObject = getListsObjectByListType(listTypeToUpdate)
+            else
+                currentlyShownListObject = getCurrentlyShownListsObject()
+            end
             if currentlyShownListObject == nil and FCOGuildLottery.UI.firstCallOfShowUIWindow == true then
                 FCOGuildLottery.UI.firstCallOfShowUIWindow = false
                 currentlyShownListObject = fcoglUIguildMembersJoinedWindow
@@ -1998,10 +2009,10 @@ df("showUIWindow: " ..tos(doShow))
     end
 end
 
-function fcoglUI.Show(doShow, doShowDiceHistory)
+function fcoglUI.Show(doShow, doShowDiceHistory, listTypeToUpdate)
 df("Show: %s", tos(doShow))
     fcoglUI.createWindow()
-    showUIWindow(doShow, doShowDiceHistory)
+    showUIWindow(doShow, doShowDiceHistory, listTypeToUpdate)
 end
 FCOGuildLottery.ToggleUI = fcoglUI.Show
 
@@ -2368,6 +2379,7 @@ end
 function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOverride)
     fcoglUI.CurrentState = state
     local listType = self:GetListType()
+    df("/////////////////////////////////////")
     df("[window:UpdateUI] state: %s, currentTab: %s, listType: %s, blockDiceHistoryUpdate: %s, diceHistoryOverride: %s", tos(state), tos(fcoglUI.CurrentTab), tos(listType), tos(blockDiceHistoryUpdate), tos(diceHistoryOverride))
     if listType == nil then return end
 
@@ -2389,7 +2401,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 fcoglUI.CurrentListType = listType
                 --If no guild sales lottery is active: Hide the total list and it's sort headers!
                 local doShowListAndHeaders = FCOGuildLottery.IsGuildSalesLotteryActive()
---d(">00000 GuildSalesLotteryActive: " ..tos(doShowListAndHeaders))
+d(">00000 GuildSalesLotteryActive: " ..tos(doShowListAndHeaders))
                 --Show the left TLC's currently shown list control and hide all others
                 hideLeftTLCListControlsExceptThis((doShowListAndHeaders == true and self) or nil, true)
 
@@ -2458,7 +2470,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 fcoglUI.CurrentListType = listType
                 --If no guild members joined list is active: Hide the total list and it's sort headers!
                 local doShowListAndHeaders = FCOGuildLottery.IsGuildMembersJoinDateListActive()
---d(">00000 GuildMembersJoinedListActive: " ..tos(doShowListAndHeaders))
+d(">00000 GuildMembersJoinedListActive: " ..tos(doShowListAndHeaders))
                 --Show the left TLC's currently shown list control and hide all others
                 hideLeftTLCListControlsExceptThis((doShowListAndHeaders == true and self) or nil, true)
 
@@ -2553,11 +2565,12 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
         end
         ------------------------------------------------------------------------------------------------------------------------
     end
+    df("////////////////////////////////////////////////")
     self:updateSortHeaderAnchorsAndPositions(fcoglUI.CurrentTab, nil, nil)
 end -- fcoglWindow:UpdateUI(state)
 
 --Change the tabs at the WishList menu
-function fcoglUI.SetTab(index, blockDiceHistoryUpdate, override)
+function fcoglUI.SetTab(index, blockDiceHistoryUpdate, override, listTypeToUpdate)
 df("[SetTab] - index: %s, override: %s", tos(index), tos(override))
     if not fcoglUIwindow or not fcoglUIwindowFrame then return end
     --fcoglUI.saveSortGroupHeader(fcoglUI.CurrentTab)
@@ -2579,7 +2592,14 @@ df("[SetTab] - index: %s, override: %s", tos(index), tos(override))
         --Normal guild dice throws
         --Guild sales lottery           fcoglUIguildSalesLotteryWindow
         --Guild members joined list     fcoglUIguildMembersJoinedListWindow --todo 20221218 if listType is FCOGL_LISTTYPE_NORMAL_THROWS or FCOGL_LISTTYPE_GUILD_MEMBER_THROWS: What list should be shown then? None?
-        local currentlyShownListObject = getCurrentlyShownListsObject()
+
+        -- Was a list type to update predefined and passed in by parameter?
+        local currentlyShownListObject
+        if listTypeToUpdate ~= nil then
+            currentlyShownListObject = getListsObjectByListType(listTypeToUpdate)
+        else
+            currentlyShownListObject = getCurrentlyShownListsObject()
+        end
         if currentlyShownListObject == nil then return end
         currentlyShownListObject:UpdateUI(fcoglUI.CurrentState, blockDiceHistoryUpdate, override)
     end
@@ -2834,24 +2854,24 @@ function fcoglUI.ResetWindowLists()
     fcoglUI.DeleteDiceHistoryList(false, nil, nil)
 end
 
-function fcoglUI.RefreshWindowLists(showUIifHidden)
+function fcoglUI.RefreshWindowLists(showUIifHidden, listTypeToUpdate)
     showUIifHidden = showUIifHidden or false
 df("RefreshWindowLists - showUIifHidden: %s", tos(showUIifHidden))
     --Is the UI existing already?
     if fcoglUIwindow ~= nil then
         local windowFrame = fcoglUIwindow.frame
-        local diceHistoryWindowFrame = fcoglUIDiceHistoryWindow and fcoglUIDiceHistoryWindow.frame
+        --local diceHistoryWindowFrame = fcoglUIDiceHistoryWindow and fcoglUIDiceHistoryWindow.frame
         if windowFrame ~= nil then
             --Is the UI currently shown?
             if windowFrame:IsControlHidden() then
                 --Setting "Show UI" -> Create UI now and show it
                 if showUIifHidden == true then
-                    fcoglUI.Show(true, true)
+                    fcoglUI.Show(true, true, listTypeToUpdate)
                 end
             end
             if not windowFrame:IsControlHidden() then
                 --Set the UI tab to "Guild Sales Lottery" and refresh the data
-                fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true) --activate even if already shown, to update it
+                fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true, listTypeToUpdate) --activate even if already shown, to update it
 --[[
                 if not diceHistoryWindowFrame:IsControlHidden() then
 d(">>DiceHistoryFrame is shown -> RefreshData()")
@@ -3087,7 +3107,7 @@ function fcoglUI.showTabButtonContextMenu(tabButton)
             fcoglUI.toggleWindowLayer()
         end)
         AddCustomMenuItem(GetString(FCOGL_CLOSE), function()
-            fcoglUI.Show(false)
+            fcoglUI.Show(false, nil, nil)
         end)
         ShowMenu(FCOGLFrameTabGuildSales)
     end

@@ -297,7 +297,7 @@ df(">isWindowAlreadyShown: false, showUINow: true, showUIForDiceRollType: %s", t
         if not showUIForDiceRollType then return end
 
         --Create (if not existing yet) and show the UI window, and the dice history according to setting
-        fcoglUI.Show(true, hideHistory)
+        fcoglUI.Show(true, hideHistory, nil)
 
         updateUIGuildsDropNow(diceRollType, guildIndex, false)
     elseif isWindowAlreadyShown == true then
@@ -1350,7 +1350,7 @@ function FCOGuildLottery.RollTheDiceAndUpdateUIIfShown(sidesOfDice, noChatOutput
     local diceRollData = FCOGuildLottery.RollTheDice(sidesOfDice, noChatOutput, diceRollTypeOverride)
     if diceRollData ~= nil then
         local showUiIfHidden = getSettingsForCurrentlyUsedDiceRollType(diceRollTypeOverride)
-        FCOGuildLottery.UI.RefreshWindowLists(showUiIfHidden)
+        FCOGuildLottery.UI.RefreshWindowLists(showUiIfHidden, nil)
     end
 end
 local rollTheDiceAndUpdateUIIfShown = FCOGuildLottery.RollTheDiceAndUpdateUIIfShown
@@ -1874,7 +1874,7 @@ function FCOGuildLottery.RollTheDiceForGuildSalesLottery(noChatOutput)
             FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentlyUsedGuildSalesLotteryUniqueIdentifier][currentlyUsedGuildSalesLotteryTimestamp][rolledData.timestamp] = rolledData
 
             local showUiIfHidden = getSettingsForCurrentlyUsedDiceRollType()
-            FCOGuildLottery.UI.RefreshWindowLists(showUiIfHidden)
+            FCOGuildLottery.UI.RefreshWindowLists(showUiIfHidden, FCOGL_LISTTYPE_GUILD_SALES_LOTTERY)
             FCOGuildLottery.UpdateMaxDiceSides(countMembersAtRank)
         end
     else
@@ -1984,7 +1984,7 @@ function FCOGuildLottery.RollTheDiceForGuildMembersJoinDate(noChatOutput)
             FCOGuildLottery.diceRollGuildMemberJoinedListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp][rolledData.timestamp] = rolledData
 
             local showUiIfHidden = getSettingsForCurrentlyUsedDiceRollType()
-            FCOGuildLottery.UI.RefreshWindowLists(showUiIfHidden)
+            FCOGuildLottery.UI.RefreshWindowLists(showUiIfHidden, FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE)
             FCOGuildLottery.UpdateMaxDiceSides(countJoinedMembers)
         end
     else
