@@ -367,6 +367,7 @@ function fcoglWindowClass:Setup(listType)
         self.headerInfo     = self.headers:GetNamedChild("Info")
 
         self.guildSalesDateStartLabel = self.frame:GetNamedChild("GuildLotteryDateStartLabel")
+        self.guildMembersListDateStartLabel = self.frame:GetNamedChild("GuildMembersListDateStartLabel")
 
         self.editBoxDiceSides = self.frame:GetNamedChild("EditDiceSidesBox")
         self.editBoxDiceSides:SetTextType(TEXT_TYPE_NUMERIC_UNSIGNED_INT)
@@ -456,6 +457,7 @@ function fcoglWindowClass:Setup(listType)
         self.headerInvitedBy= self.headers:GetNamedChild("InvitedBy")
         self.headerInfo     = self.headers:GetNamedChild("Info")
 
+        self.guildSalesDateStartLabel = self.frame:GetNamedChild("GuildLotteryDateStartLabel")
         self.guildMembersListDateStartLabel = self.frame:GetNamedChild("GuildMembersListDateStartLabel")
 
         self.editBoxDiceSides = self.frame:GetNamedChild("EditDiceSidesBox")
@@ -2307,18 +2309,27 @@ df("fcoglWindowClass:UpdateDiceHistoryInfoLabel")
     fcoglUI.updateGuildSalesLotteryHistoryDeleteDropdownEntries(self.guildHistoryDeleteDrop)
 end
 
-function fcoglWindowClass:UpdateGuildSalesDateStartLabel()
+function fcoglWindowClass:UpdateGuildSalesDateStartLabel(isGuildSalesLotteryActive, isGuildMembersJoinDateListActive)
 df("fcoglWindowClass:UpdateGuildSalesDateStartLabel")
     if not self.guildSalesDateStartLabel then return end
-    self.guildSalesDateStartLabel:SetHidden(true)
-    self.guildSalesDateStartLabel:SetResizeToFitDescendents(true)
-    self.guildSalesDateStartLabel:SetText("")
-    if self.guildMembersListDateStartLabel ~= nil then
+    if isGuildSalesLotteryActive == nil then
+        isGuildSalesLotteryActive = FCOGuildLottery.IsGuildSalesLotteryActive()
+    end
+    if isGuildMembersJoinDateListActive == nil then
+        isGuildMembersJoinDateListActive = FCOGuildLottery.IsGuildMembersJoinDateListActive()
+    end
+
+    if not isGuildSalesLotteryActive then
+        self.guildSalesDateStartLabel:SetHidden(true)
+        self.guildSalesDateStartLabel:SetResizeToFitDescendents(true)
+        self.guildSalesDateStartLabel:SetText("")
+    end
+    if self.guildMembersListDateStartLabel ~= nil and not isGuildMembersJoinDateListActive then
         self.guildMembersListDateStartLabel:SetHidden(true)
         self.guildMembersListDateStartLabel:SetResizeToFitDescendents(true)
         self.guildMembersListDateStartLabel:SetText("")
     end
-    if not FCOGuildLottery.IsGuildSalesLotteryActive() then return end
+    if not isGuildSalesLotteryActive then return end
     --[[
     local settings = FCOGuildLottery.settingsVars.settings
     local guildLotteryDateStartTimeStamp = settings.guildLotteryDateStart
@@ -2351,18 +2362,28 @@ df("fcoglWindowClass:UpdateGuildSalesDateStartLabel")
     self.guildSalesDateStartLabel:SetHidden(false)
 end
 
-function fcoglWindowClass:UpdateGuildMemberListDateStartLabel()
+function fcoglWindowClass:UpdateGuildMemberListDateStartLabel(isGuildSalesLotteryActive, isGuildMembersJoinDateListActive)
 df("fcoglWindowClass:UpdateGuildMemberListDateStartLabel")
     if not self.guildMembersListDateStartLabel then return end
-    self.guildMembersListDateStartLabel:SetHidden(true)
-    self.guildMembersListDateStartLabel:SetResizeToFitDescendents(true)
-    self.guildMembersListDateStartLabel:SetText("")
-    if self.guildSalesDateStartLabel ~= nil then
+
+    if isGuildSalesLotteryActive == nil then
+        isGuildSalesLotteryActive = FCOGuildLottery.IsGuildSalesLotteryActive()
+    end
+    if isGuildMembersJoinDateListActive == nil then
+        isGuildMembersJoinDateListActive = FCOGuildLottery.IsGuildMembersJoinDateListActive()
+    end
+
+    if not isGuildMembersJoinDateListActive then
+        self.guildMembersListDateStartLabel:SetHidden(true)
+        self.guildMembersListDateStartLabel:SetResizeToFitDescendents(true)
+        self.guildMembersListDateStartLabel:SetText("")
+    end
+    if self.guildSalesDateStartLabel ~= nil and not isGuildSalesLotteryActive then
         self.guildSalesDateStartLabel:SetHidden(true)
         self.guildSalesDateStartLabel:SetResizeToFitDescendents(true)
         self.guildSalesDateStartLabel:SetText("")
     end
-    if not FCOGuildLottery.IsGuildMembersJoinDateListActive() then return end
+    if not isGuildMembersJoinDateListActive then return end
 
     --Date end      ->  timestamp of the guild members list end
     --Date start    ->  Date start - Daten ed minus selected days of the guild members list
@@ -2396,19 +2417,22 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
             --WLW_UpdateSceneFragmentTitle(WISHLIST_SCENE_NAME, TITLE_FRAGMENT, "Label", GetString(WISHLIST_TITLE) ..  " - " .. zo_strformat(GetString(WISHLIST_SETS_LOADED), 0))
             --updateSceneFragmentTitle(WISHLIST_SCENE_NAME, TITLE_FRAGMENT, "Label", GetString(WISHLIST_TITLE) .. " - " .. GetString(WISHLIST_BUTTON_SEARCH_TT):upper())
 
+            local isGuildSalesLotteryActive = FCOGuildLottery.IsGuildSalesLotteryActive()
+            local isGuildMembersJoinDateListActive = FCOGuildLottery.IsGuildMembersJoinDateListActive()
+
+
             if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
+                --If no guild sales lottery is active: Hide the total list and it's sort headers!
+d(">00000 GuildSalesLotteryActive: " ..tos(isGuildSalesLotteryActive))
+                --Show the left TLC's currently shown list control and hide all others
+                hideLeftTLCListControlsExceptThis((isGuildSalesLotteryActive == true and self) or nil, true)
                 --Update the currently active listType
                 fcoglUI.CurrentListType = listType
-                --If no guild sales lottery is active: Hide the total list and it's sort headers!
-                local doShowListAndHeaders = FCOGuildLottery.IsGuildSalesLotteryActive()
-d(">00000 GuildSalesLotteryActive: " ..tos(doShowListAndHeaders))
-                --Show the left TLC's currently shown list control and hide all others
-                hideLeftTLCListControlsExceptThis((doShowListAndHeaders == true and self) or nil, true)
 
                 --Hide the search dropdown and edit box?
-                self.searchDrop.m_container:SetHidden(not doShowListAndHeaders)
-                self.searchBg:SetHidden(not doShowListAndHeaders)
-                self.searchBox:SetHidden(not doShowListAndHeaders)
+                self.searchDrop.m_container:SetHidden(not isGuildSalesLotteryActive)
+                self.searchBg:SetHidden(not isGuildSalesLotteryActive)
+                self.searchBox:SetHidden(not isGuildSalesLotteryActive)
                 self.searchBox:Clear()
 
                 --Hide currently unused tabs
@@ -2423,11 +2447,11 @@ d(">00000 GuildSalesLotteryActive: " ..tos(doShowListAndHeaders))
                 local isEnabled = self:checkNewGuildSalesLotteryButtonEnabled()
                 --self:checkRefreshGuildSalesLotteryButtonEnabled(isEnabled)
                 self:checkStopGuildSalesLotteryButtonEnabled(isEnabled)
-                self:UpdateGuildSalesDateStartLabel()
+                self:UpdateGuildSalesDateStartLabel(isGuildSalesLotteryActive, isGuildMembersJoinDateListActive)
 
                 local isEnabledNewGuildMemberList = self:checkNewGuildMemberJoinedButtonEnabled()
                 self:checkStopGuildMemberJoinedButtonEnabled(isEnabledNewGuildMemberList)
-                self:UpdateGuildMemberListDateStartLabel()
+                self:UpdateGuildMemberListDateStartLabel(isGuildSalesLotteryActive, isGuildMembersJoinDateListActive)
 
                 --Update the guild's dropdown box to select the currently active entry (if it was updated via slash commands)
                 -->Alsoupdate if guild sales lottery is enabled, but do not run the callback of the dropdown -> Just the visual update
@@ -2466,18 +2490,17 @@ d(">00000 GuildSalesLotteryActive: " ..tos(doShowListAndHeaders))
 
 
             elseif listType == FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE then
+                --If no guild members joined list is active: Hide the total list and it's sort headers!
+d(">00000 GuildMembersJoinedListActive: " ..tos(isGuildMembersJoinDateListActive))
+                --Show the left TLC's currently shown list control and hide all others
+                hideLeftTLCListControlsExceptThis((isGuildMembersJoinDateListActive == true and self) or nil, true)
                 --Update the currently active listType
                 fcoglUI.CurrentListType = listType
-                --If no guild members joined list is active: Hide the total list and it's sort headers!
-                local doShowListAndHeaders = FCOGuildLottery.IsGuildMembersJoinDateListActive()
-d(">00000 GuildMembersJoinedListActive: " ..tos(doShowListAndHeaders))
-                --Show the left TLC's currently shown list control and hide all others
-                hideLeftTLCListControlsExceptThis((doShowListAndHeaders == true and self) or nil, true)
 
                 --Hide the search dropdown and edit box?
-                self.searchDrop.m_container:SetHidden(not doShowListAndHeaders)
-                self.searchBg:SetHidden(not doShowListAndHeaders)
-                self.searchBox:SetHidden(not doShowListAndHeaders)
+                self.searchDrop.m_container:SetHidden(not isGuildMembersJoinDateListActive)
+                self.searchBg:SetHidden(not isGuildMembersJoinDateListActive)
+                self.searchBox:SetHidden(not isGuildMembersJoinDateListActive)
                 self.searchBox:Clear()
 
                 --Hide currently unused tabs
@@ -2492,11 +2515,11 @@ d(">00000 GuildMembersJoinedListActive: " ..tos(doShowListAndHeaders))
                 local isEnabled = self:checkNewGuildSalesLotteryButtonEnabled()
                 --self:checkRefreshGuildSalesLotteryButtonEnabled(isEnabled)
                 self:checkStopGuildSalesLotteryButtonEnabled(isEnabled)
-                self:UpdateGuildSalesDateStartLabel()
+                self:UpdateGuildSalesDateStartLabel(isGuildSalesLotteryActive, isGuildMembersJoinDateListActive)
 
                 local isEnabledNewGuildMemberList = self:checkNewGuildMemberJoinedButtonEnabled()
                 self:checkStopGuildMemberJoinedButtonEnabled(isEnabledNewGuildMemberList)
-                self:UpdateGuildMemberListDateStartLabel()
+                self:UpdateGuildMemberListDateStartLabel(isGuildSalesLotteryActive, isGuildMembersJoinDateListActive)
 
                 --Update the guild's dropdown box to select the currently active entry (if it was updated via slash commands)
                 -->Alsoupdate if guild sales lottery is enabled, but do not run the callback of the dropdown -> Just the visual update
