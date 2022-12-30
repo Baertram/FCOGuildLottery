@@ -50,6 +50,8 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_TOGGLE_DICE_ROLL_HISTORY              = "Zeigen/Verstecken der Würfel Wurf Historie",
     FCOGL_GUILD_SALES_LOTTERY                   = "Gilden Verkaufs-Lotterie",
     FCOGL_GUILD_SALES_LOTTERY_HISTORY           = "Gilden Verkaufs-Lotterie Historie",
+    FCOGL_GUILD_MEMBER_JOINED_LIST              = "Gilden Mitglieder Beitritt",
+    FCOGL_GUILD_MEMBER_JOINED_LIST_HISTORY      = "Gilden Mitglieder Beitritt Historie",
 
     FCOGL_DICE_PREFIX                           = "W",
 
@@ -79,10 +81,14 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_HISTORY                               = "Normaler Wurf",
     FCOGL_GUILD_HISTORY                         = "Gilden Wurf",
     FCOGL_GUILD_SALES_LOTTERY_HISTORY           = "Gilden Verkaufs-Lotterie Wurf",
+    FCOGL_GUILD_MEMBER_JOINED_LIST_HISTORY      = "Gilden Mitglieder Beitritt Wurf",
 
     FCOGL_CLEARED_HISTORY_COUNT                 = preFix .. " \'%s\' Historien Einträge wurden gelöscht",
 
     FCOGL_TOGGLE_WINDOW_DRAW_LAYER              = "Verändere die Darstellungsebene (über allen anderen/normal)",
+
+    FCOGL_DELETE_HEADER                         = "Löschen",
+    FCOGL_DELETE_ENTRY                          = "Eintrag #%s löschen",
 
     --LAM settings menu
     --Description

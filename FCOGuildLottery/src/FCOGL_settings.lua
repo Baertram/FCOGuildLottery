@@ -43,6 +43,7 @@ function FCOGuildLottery.getSettings()
         diceRollHistory = {},
         diceRollGuildsHistory = {},
         diceRollGuildLotteryHistory = {},
+        diceRollGuildMemberJoinedDateListHistory = {},
 
         --false: Like MasterMerchant determines the sales from the history -> Until current time.
         --true: cut-off at midnght of the current day

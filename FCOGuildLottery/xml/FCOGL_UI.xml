@@ -21,7 +21,7 @@
 
 <!-- ========================================================================================================================================================== -->
         <!-- Virtual Rows -->
-		<Control name="FCOGLRowGuildSales" mouseEnabled="true" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Control name="FCOGLRowGuildSales" mouseEnabled="true" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions y="30" />
 			<OnMouseEnter>
 				FCOGL_UI_OnMouseEnter(self)
@@ -74,7 +74,7 @@
 			</Controls>
 		</Control>
 
-		<Control name="FCOGLRowGuildMembersJoined" mouseEnabled="true" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Control name="FCOGLRowGuildMembersJoined" mouseEnabled="true" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions y="30" />
 			<OnMouseEnter>
 				FCOGL_UI_OnMouseEnter(self)
@@ -113,7 +113,7 @@
 			</Controls>
 		</Control>
 
-		<Control name="FCOGLRowDiceHistory" mouseEnabled="true" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Control name="FCOGLRowDiceHistory" mouseEnabled="true" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions y="30" />
 			<OnMouseEnter>
 				FCOGL_UI_OnMouseEnter(self)

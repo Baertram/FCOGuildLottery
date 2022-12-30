@@ -89,6 +89,9 @@ FCOGuildLottery.lang["en"] = {
 
     FCOGL_TOGGLE_WINDOW_DRAW_LAYER              = "Toggle draw layer",
 
+    FCOGL_DELETE_HEADER                         = "Delete",
+    FCOGL_DELETE_ENTRY                          = "Delete entry #%s",
+
     --LAM settings menu
     --Description
     FCOGL_LAM_DESCRIPTION                       = 'Helper addon for a guild lottery & dice rolls. Chat slash commands are:\n/fcogl   Toggle the UI.\n/fcogls   Toggle the settings menu.\n/dice <number>   Will roll a dice with <number> sides. If left empty the default value from the settings will be used!\n/diceG1 - /diceG5  Will roll a dice for the number of guild members of guild 1 - 5.\n/gslnew <guildIndex 1 to 5> will reset the currently active sales lottery and start a new one.\n/gsl will roll the next dice for the active guild sales lottery.\n/gslstop will stop the currently active guild sales lottery.\n/gsllast or /dicelast will show the last dice roll results in your local chat (or if you got it enabled: within the \'DebugLogViewer\' UI) again.',

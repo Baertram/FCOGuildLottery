@@ -2529,18 +2529,16 @@ end
 function FCOGuildLottery.ClearCurrentHistoryCheck()
     local questionHistoryName
     local isEnabled = FCOGuildLottery.UI.UpdateClearCurrentHistoryButton()
+df("ClearCurrentHistoryCheck - isEnabled: %s", tos(isEnabled))
     if not isEnabled then return end
 
     if FCOGuildLottery.IsGuildSalesLotteryActive() then
         questionHistoryName = GetString(FCOGL_GUILD_SALES_LOTTERY_HISTORY)
+    elseif FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+        questionHistoryName = GetString(FCOGL_GUILD_MEMBER_JOINED_LIST_HISTORY)
     else
         if FCOGuildLottery.currentlyUsedDiceRollGuildId ~= nil then
-            --todo 2022-11-20 find out if FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE 's history is shown or not
-            --if ... == FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE then
-                --questionHistoryName = GetString(FCOGL_GUILD_MEMBER_JOIN_DATE_HISTORY)
-            --else
-                questionHistoryName = GetString(FCOGL_GUILD_HISTORY)
-            --end
+            questionHistoryName = GetString(FCOGL_GUILD_HISTORY)
         else
             questionHistoryName = GetString(FCOGL_HISTORY)
         end
