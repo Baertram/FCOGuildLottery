@@ -42,16 +42,16 @@ FCOGuildLottery.lang["en"] = {
 
     FCOGL_DICE_SIDES                            = "# of sides of the dice",
     FCOGL_START_NEW_GUILD_SALES_LOTTERY         = "Start new guild sales lottery",
-    FCOGL_START_NEW_GUILD_MEMBER_JOINED_LIST    = "Start new guild member joined date list",
     FCOGL_ROLL_THE_DICE                         = "Roll the dice",
     FCOGL_REFRESH                               = "Refresh",
     FCOGL_STOP_GUILDSALESLOTTERY                = "Stop guild sales lottery",
-    FCOGL_STOP_GUILD_MEMBER_JOINED_LIST         = "Stop guild members joined date list",
     FCOGL_SETTINGS                              = "Open settings",
     FCOGL_CLOSE                                 = "Close",
     FCOGL_TOGGLE_DICE_ROLL_HISTORY              = "Toggle dice roll history",
     FCOGL_GUILD_SALES_LOTTERY                   = "Guild sales lottery",
     FCOGL_GUILD_SALES_LOTTERY_HISTORY           = "Guild sales lottery history",
+    FCOGL_START_NEW_GUILD_MEMBER_JOINED_LIST    = "Start new guild members joined date list",
+    FCOGL_STOP_GUILD_MEMBER_JOINED_LIST         = "Stop guild members joined date list",
 
     FCOGL_DICE_PREFIX                           = "D",
 

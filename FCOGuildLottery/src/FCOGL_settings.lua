@@ -126,6 +126,7 @@ function FCOGuildLottery.getSettings()
     FCOGuildLottery.diceRollHistory             = FCOGuildLottery.settingsVars.settings.diceRollHistory
     FCOGuildLottery.diceRollGuildsHistory       = FCOGuildLottery.settingsVars.settings.diceRollGuildsHistory
     FCOGuildLottery.diceRollGuildLotteryHistory = FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory
+    FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory = FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory
 
     --For the moment do not check if any date was manually chosen! Just use -7 days
     --if FCOGuildLottery.settingsVars.settings.guildLotteryDateStartSet == false then

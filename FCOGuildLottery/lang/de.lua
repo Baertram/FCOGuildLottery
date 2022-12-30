@@ -53,6 +53,9 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_GUILD_MEMBER_JOINED_LIST              = "Gilden Mitglieder Beitritt",
     FCOGL_GUILD_MEMBER_JOINED_LIST_HISTORY      = "Gilden Mitglieder Beitritt Historie",
 
+    FCOGL_START_NEW_GUILD_MEMBER_JOINED_LIST    = "Neue Gilden Mitglieder Beitritts-Liste",
+    FCOGL_STOP_GUILD_MEMBER_JOINED_LIST         = "Stoppe Gilden Mitglieder Beitritts-Liste",
+
     FCOGL_DICE_PREFIX                           = "W",
 
     FCOGL_CURRENTGUILSALESLOTTERY_TEXT              = "Start: %s / Ende: %s",

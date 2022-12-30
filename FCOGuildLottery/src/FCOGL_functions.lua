@@ -258,7 +258,7 @@ FCOGuildLottery.UI.updateUIGuildsDropNow = updateUIGuildsDropNow
 local function isUICreatedAndShown()
     df("isUICreatedAndShown")
     local fcoglUI = FCOGuildLottery.UI
-    local fcoglUIwindow = fcoglUI and fcoglUI.window
+    fcoglUIwindow = fcoglUI and fcoglUI.window
 
     local showUINow = false
     local isWindowAlreadyShown = false
@@ -1975,13 +1975,13 @@ function FCOGuildLottery.RollTheDiceForGuildMembersJoinDate(noChatOutput)
         --Roll the dice with the number of guild sales members rank of that guildId
         rolledData = FCOGuildLottery.RollTheDice(countJoinedMembers, noChatOutput)
         if rolledData ~= nil and rolledData.timestamp ~= nil then
-            FCOGuildLottery.diceRollGuildMemberJoinedListHistory[guildId] = FCOGuildLottery.diceRollGuildMemberJoinedListHistory[guildId] or {}
+            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId] = FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId] or {}
             local currentlyUsedGuildMembersJoinDateUniqueIdentifier = FCOGuildLottery.currentlyUsedGuildMembersJoinDateUniqueIdentifier
             local currentlyUsedGuildMembersJoinDateTimestamp = FCOGuildLottery.currentlyUsedGuildMembersJoinDateTimestamp
-            FCOGuildLottery.diceRollGuildMemberJoinedListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier] = FCOGuildLottery.diceRollGuildMemberJoinedListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier] or {}
-            FCOGuildLottery.diceRollGuildMemberJoinedListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp] = FCOGuildLottery.diceRollGuildMemberJoinedListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp] or {}
-            FCOGuildLottery.diceRollGuildMemberJoinedListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp]["daysBefore"] = FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore
-            FCOGuildLottery.diceRollGuildMemberJoinedListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp][rolledData.timestamp] = rolledData
+            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier] = FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier] or {}
+            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp] = FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp] or {}
+            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp]["daysBefore"] = FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore
+            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp][rolledData.timestamp] = rolledData
 
             local showUiIfHidden = getSettingsForCurrentlyUsedDiceRollType()
             FCOGuildLottery.UI.RefreshWindowLists(showUiIfHidden, FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE)

@@ -100,7 +100,7 @@ FCOGuildLottery.guildMembersJoinedStats        = {}
 FCOGuildLottery.diceRollHistory             = {}
 FCOGuildLottery.diceRollGuildsHistory       = {}
 FCOGuildLottery.diceRollGuildLotteryHistory = {}
-FCOGuildLottery.diceRollGuildMemberJoinedListHistory = {}
+FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory = {}
 ------------------------------------------------------------------------------------------------------------------------
 FCOGuildLottery.defaultGuildSalesLotteryUniqueIdentifiers = {
     [1] = nil,
