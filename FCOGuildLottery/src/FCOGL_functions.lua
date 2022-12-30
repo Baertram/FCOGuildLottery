@@ -1616,8 +1616,8 @@ local function showAskDialogNow(guildIndex, daysBefore, startingNewList, callbac
     local isGuildMemberJoined = (diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE and true) or false
 
     if resetGuildSalesLotteryDialogName ~= nil and not ZO_Dialogs_IsShowingDialog(resetGuildSalesLotteryDialogName) then
-        local defTitleText = ((isGuildSalesLottery and GetString(FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_TITLE)) or (isGuildMemberJoined and GetString(FCOGL_RESET_GUILD_MEMBER_JOINED_DIALOG_TITLE))) or ""
-        local defQuestionText = ((isGuildSalesLottery and GetString(FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_QUESTION)) or (isGuildMemberJoined and GetString(FCOGL_RESET_GUILD_MEMBER_JOINED_DIALOG_QUESTION))) or ""
+        local defTitleText = ((isGuildSalesLottery and GetString(FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_TITLE)) or (isGuildMemberJoined and GetString(FCOGL_RESET_GUILD_MEMBER_JOINED_LIST_DIALOG_TITLE))) or ""
+        local defQuestionText = ((isGuildSalesLottery and GetString(FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_QUESTION)) or (isGuildMemberJoined and GetString(FCOGL_RESET_GUILD_MEMBER_JOINED_LIST_DIALOG_QUESTION))) or ""
         local titleText = (dialogTextsTable ~= nil and dialogTextsTable.title ~= nil and dialogTextsTable.title) or defTitleText
         local questionText = (dialogTextsTable ~= nil and dialogTextsTable.question ~= nil and dialogTextsTable.question) or defQuestionText
         local data = {

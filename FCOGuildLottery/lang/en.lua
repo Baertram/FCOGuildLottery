@@ -61,13 +61,17 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_GUILDSALESLOTTERY_DELETE_HISTORY_DROP_TT  = "Select saved guild sales lottery history entries that you would like to delete, then click on the delete button at the right side of the selection box",
     FCOGL_GUILDSALESLOTTERY_DELETE_SELECTED         = "Delete selected saved guild sales lottery history entries",
 
+    FCOGL_GUILDMEMBERSJOINEDDATE_HISTORY_DROP_TT         = "Select a saved guild members joined list history.\nThis will re-open this members joined list for new dice throws.\nA currently active guild members joined list will be stopped!",
+    FCOGL_GUILDMEMBERSJOINEDDATE_DELETE_HISTORY_DROP_TT  = "Select saved guild members joined list history entries that you would like to delete, then click on the delete button at the right side of the selection box",
+    FCOGL_GUILDMEMBERSJOINEDDATE_DELETE_SELECTED         = "Delete selected saved guild members joined list history entries",
+
     FCOGL_DELETE_HISTORY_NONE_SELECTED              = "",
     FCOGL_DELETE_HISTORY_SOME_SELECTED              = "<<1>> selected, click button |t24:24:/esoui/art/tutorial/inventory_tabicon_junk_up.dds|t ->",
 
     FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_TITLE    = "Reset guild sales lottery",
     FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_QUESTION = "Do you want to reset the currently active guild\n sales lottery?\nThis will start a new lottery!",
-    FCOGL_RESET_GUILD_MEMBER_JOINED_DIALOG_TITLE    = "Reset guild member joined throws",
-    FCOGL_RESET_GUILD_MEMBER_JOINED_DIALOG_QUESTION = "Do you want to reset the currently active guild\n member joined list?\nThis will start a new guild member joined list!",
+    FCOGL_RESET_GUILD_MEMBER_JOINED_LIST_DIALOG_TITLE    = "Reset guild member joined list throws",
+    FCOGL_RESET_GUILD_MEMBER_JOINED_LIST_DIALOG_QUESTION = "Do you want to reset the currently active guild\n member joined list?\nThis will start a new guild member joined list!",
 
     FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_TITLE     = "Stop guild sales lottery",
     FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_QUESTION  = "Do you want to stop the currently active guild\nsales lottery?\nThis will enable the guild dice throws for the\nselected guild again.",

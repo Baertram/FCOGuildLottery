@@ -520,10 +520,11 @@ function fcoglWindowClass:Setup(listType)
 
         self.historyTypeLabel = self.frame:GetNamedChild("HistoryTypeLabel")
         self.guildSalesHistoryInfoLabel = self.frame:GetNamedChild("GuildSalesHistoryInfoLabel")
+        self.guildMembersJoinedDateHistoryInfoLabel = self.frame:GetNamedChild("GuildMembersJoinedDateHistoryInfoLabel")
 
+        --Guild sales lottery dropdown and multi select dropdown, delete button
         self.guildHistoryDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("GuildHistoryDrop"))
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "GuildSalesHistory")
-
         self.guildHistoryDeleteDropContainer = self.frame:GetNamedChild("GuildHistoryDeleteDrop")
         self.guildHistoryDeleteDrop = BuildMultiSelectDropdown(self.guildHistoryDeleteDropContainer,
                 GetString(FCOGL_DELETE_HISTORY_NONE_SELECTED),
@@ -536,9 +537,27 @@ function fcoglWindowClass:Setup(listType)
         --Hide the original background control and only show the BGNew backdrop
         self.guildHistoryDeleteDrop.bgControl = self.guildHistoryDeleteDropContainer:GetNamedChild("BG")
         self.guildHistoryDeleteDrop.bgControl:SetHidden(true)
-
         self.guildHistoryDeleteSelectedButton = self.frame:GetNamedChild("GuildHistoryDeleteSelected")
         self.guildHistoryDeleteSelectedButton:SetMouseEnabled(false)
+
+        --Guild members joined date dropdown and multi select dropdown, delete button
+        self.guildMembersJoinedDateHistoryDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("GuildMemberJoinedDateHistoryDrop"))
+        self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "GuildMembersJoinedDateHistory")
+        self.guildMembersJoinedDateHistoryDeleteDropContainer = self.frame:GetNamedChild("GuildMembersJoinedDateHistoryDeleteDrop")
+        self.guildMembersJoinedDateHistoryDeleteDrop = BuildMultiSelectDropdown(self.guildMembersJoinedDateHistoryDeleteDropContainer,
+                GetString(FCOGL_DELETE_HISTORY_NONE_SELECTED),
+                FCOGL_DELETE_HISTORY_SOME_SELECTED,
+                {}, --will be filled via function fcoglUI.updateDeleteSelectedGuildMembersJoinedDateHistoryButton()
+                function(selfVar)
+                    fcoglUI.updateDeleteSelectedGuildMembersJoinedDateHistoryButton(selfVar)
+                end
+        )
+        --Hide the original background control and only show the BGNew backdrop
+        self.guildMembersJoinedDateHistoryDeleteDrop.bgControl = self.guildMembersJoinedDateHistoryDeleteDropContainer:GetNamedChild("BG")
+        self.guildMembersJoinedDateHistoryDeleteDrop.bgControl:SetHidden(true)
+        self.guildMembersJoinedDateHistoryDeleteSelectedButton = self.frame:GetNamedChild("GuildMembersJoinedDateHistoryDeleteSelected")
+        self.guildMembersJoinedDateHistoryDeleteSelectedButton:SetMouseEnabled(false)
+
         self.clearHistoryButton = self.frame:GetNamedChild("ClearHistory")
         self.clearHistoryButton:SetMouseEnabled(false)
     end
@@ -1118,6 +1137,10 @@ df("initializeSearchDropdown - listType: %s, searchBoxType: %s", tos(currentList
                             }, --exclude the search entries from the search
                 },
                 ["GuildSalesHistory"] = {dropdown=self.guildHistoryDrop,  prefix=FCOGL_GUILDSALESHISTORYDROP_PREFIX,
+                                         entryCount=0,
+                                         exclude = {},
+                },
+                ["GuildMembersJoinedDateHistory"] = {dropdown=self.guildMembersJoinedDateHistoryDrop,  prefix=FCOGL_GUILDMEMBERSJOINEDDATEHISTORYDROP_PREFIX,
                                          entryCount=0,
                                          exclude = {},
                 },
@@ -2205,6 +2228,7 @@ df("fcoglWindowClass:UpdateDiceHistoryInfoLabel")
     self.historyTypeLabel:SetText("")
     if FCOGuildLottery.IsGuildSalesLotteryActive() then
         self.historyTypeLabel:SetText(GetString(FCOGL_GUILD_SALES_LOTTERY_HISTORY))
+
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "GuildSalesHistory")
         self.guildHistoryDrop.m_container:SetHidden(false)
         self.guildHistoryDeleteDrop.m_container:SetHidden(false)
@@ -2212,16 +2236,52 @@ df("fcoglWindowClass:UpdateDiceHistoryInfoLabel")
         self.guildSalesHistoryInfoLabel:SetHidden(false)
         self.guildSalesHistoryInfoLabel:SetText(
                 strfor(GetString(FCOGL_CURRENTGUILSALESLOTTERY_DICEHISTORY_TEXT),
-                    FCOGuildLottery.FormatDate(FCOGuildLottery.currentlyUsedGuildSalesLotteryTimestamp),
-                    tos(FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore)
+                        FCOGuildLottery.FormatDate(FCOGuildLottery.currentlyUsedGuildSalesLotteryTimestamp),
+                        tos(FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore)
                 )
         )
+
+        self.guildMembersJoinedDateHistoryDrop.m_container:SetHidden(true)
+        self.guildMembersJoinedDateHistoryDeleteDrop.m_container:SetHidden(true)
+        self.guildMembersJoinedDateHistoryDeleteSelectedButton:SetHidden(true)
+        self.guildMembersJoinedDateHistoryInfoLabel:SetHidden(true)
+        self.guildMembersJoinedDateHistoryInfoLabel:SetText("")
+
+    elseif FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+        self.historyTypeLabel:SetText(GetString(FCOGL_GUILD_MEMBER_JOINED_LIST_HISTORY))
+
+        self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "GuildMemberJoinedDateHistory")
+        self.guildMembersJoinedDateHistoryDrop.m_container:SetHidden(false)
+        self.guildMembersJoinedDateHistoryDeleteDrop.m_container:SetHidden(false)
+        self.guildMembersJoinedDateHistoryDeleteSelectedButton:SetHidden(false)
+        self.guildMembersJoinedDateHistoryInfoLabel:SetHidden(false)
+        self.guildMembersJoinedDateHistoryInfoLabel:SetText(
+                strfor(GetString(FCOGL_CURRENTGUILSALESLOTTERY_DICEHISTORY_TEXT),
+                        FCOGuildLottery.FormatDate(FCOGuildLottery.currentlyUsedGuildMembersJoinDateTimestamp),
+                        tos(FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore)
+                )
+        )
+
+        self.guildHistoryDrop.m_container:SetHidden(true)
+        self.guildHistoryDeleteDrop.m_container:SetHidden(true)
+        self.guildHistoryDeleteSelectedButton:SetHidden(true)
+        self.guildSalesHistoryInfoLabel:SetHidden(true)
+        self.guildSalesHistoryInfoLabel:SetText("")
+
     else
         self.guildHistoryDrop.m_container:SetHidden(true)
         self.guildHistoryDeleteDrop.m_container:SetHidden(true)
         self.guildHistoryDeleteSelectedButton:SetHidden(true)
         self.guildSalesHistoryInfoLabel:SetHidden(true)
         self.guildSalesHistoryInfoLabel:SetText("")
+
+
+        self.guildMembersJoinedDateHistoryDrop.m_container:SetHidden(true)
+        self.guildMembersJoinedDateHistoryDeleteDrop.m_container:SetHidden(true)
+        self.guildMembersJoinedDateHistoryDeleteSelectedButton:SetHidden(true)
+        self.guildMembersJoinedDateHistoryInfoLabel:SetHidden(true)
+        self.guildMembersJoinedDateHistoryInfoLabel:SetText("")
+
         if FCOGuildLottery.currentlyUsedDiceRollGuildId ~= nil then
             self.historyTypeLabel:SetText(GetString(FCOGL_DICE_HISTORY_GUILD))
         else
@@ -2230,6 +2290,7 @@ df("fcoglWindowClass:UpdateDiceHistoryInfoLabel")
     end
     self.historyTypeLabel:SetResizeToFitDescendents(true)
     self.guildSalesHistoryInfoLabel:SetResizeToFitDescendents(true)
+    self.guildMembersJoinedDateHistoryInfoLabel:SetResizeToFitDescendents(true)
 
     --Update the entries of the delete guild sales lottery history entries multi select dropdown
     fcoglUI.updateGuildSalesLotteryHistoryDeleteDropdownEntries(self.guildHistoryDeleteDrop)
@@ -2941,6 +3002,14 @@ function fcoglUI.updateDeleteSelectedGuildSalesLotteryHistoryButton(comboBoxDrop
     local numSelectedEntries = comboBoxDropdown:GetNumSelectedEntries()
     local doEnable = numSelectedEntries > 0 or false
     fcoglUIDiceHistoryWindow.guildHistoryDeleteSelectedButton:SetMouseEnabled(doEnable)
+end
+
+function fcoglUI.updateDeleteSelectedGuildMembersJoinedDateHistoryButton(comboBoxDropdown)
+    df("updateDeleteSelectedGuildMembersJoinedDateHistoryButton")
+    if not comboBoxDropdown then return end
+    local numSelectedEntries = comboBoxDropdown:GetNumSelectedEntries()
+    local doEnable = numSelectedEntries > 0 or false
+    fcoglUIDiceHistoryWindow.guildMembersJoinedDateHistoryDeleteSelectedButton:SetMouseEnabled(doEnable)
 end
 
 local function deleteSelectedGuildSalesLotteryHistoryEntriesNow(comboBoxDropdown)

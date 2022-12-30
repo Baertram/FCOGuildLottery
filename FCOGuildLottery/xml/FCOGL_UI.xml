@@ -772,6 +772,10 @@
 					<Anchor point="TOPLEFT" relativeTo="$(parent)HistoryTypeLabel" relativePoint="BOTTOMLEFT" offsetX="0" offsetY="3" />
 					<Dimensions x="300" y="32" />
 				</Label>
+				<Label name="$(parent)GuildMembersJoinedDateHistoryInfoLabel" font="ZoFontGameSmall" horizontalAlignment="LEFT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="1">
+					<Anchor point="TOPLEFT" relativeTo="$(parent)HistoryTypeLabel" relativePoint="BOTTOMLEFT" offsetX="0" offsetY="3" />
+					<Dimensions x="300" y="32" />
+				</Label>
 				<Control name="$(parent)GuildHistoryDrop" resizeToFitDescendents="true" mouseEnabled="true" tier="LOW" layer="CONTROLS" level="1">
 					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)HistoryTypeLabel" />
 					<OnInitialized>
@@ -794,6 +798,35 @@
 							</OnClicked>
 							<OnMouseEnter>
 								FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_GUILDSALESLOTTERY_HISTORY_DROP_TT))
+							</OnMouseEnter>
+							<OnMouseExit>
+								FCOGL.HideTooltip()
+							</OnMouseExit>
+						</Button>
+					</Controls>
+				</Control>
+				<Control name="$(parent)GuildMemberJoinedDateHistoryDrop" resizeToFitDescendents="true" mouseEnabled="true" tier="LOW" layer="CONTROLS" level="1">
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)HistoryTypeLabel" />
+					<OnInitialized>
+						ZO_ComboBox:New(self)
+					</OnInitialized>
+					<OnMouseUp>
+						if button == MOUSE_BUTTON_INDEX_LEFT and upInside then
+							ZO_ComboBox_DropdownClicked(self)
+						end
+					</OnMouseUp>
+					<Controls>
+						<Label name="$(parent)Anchor" inherits="FCOGLSearchLabel">
+							<Anchor point="RIGHT" />
+						</Label>
+						<Button name="$(parent)OpenDropdown" inherits="ZO_DropdownButton" tier="LOW" layer="CONTROLS" level="1">
+							<Dimensions x="16" y="16" />
+							<Anchor point="RIGHT" relativeTo="$(parent)Anchor" relativePoint="LEFT" offsetX="-3" />
+							<OnClicked>
+								ZO_ComboBox_DropdownClicked(self:GetParent())
+							</OnClicked>
+							<OnMouseEnter>
+								FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_GUILDMEMBERSJOINEDDATE_DELETE_HISTORY_DROP_TT))
 							</OnMouseEnter>
 							<OnMouseExit>
 								FCOGL.HideTooltip()
@@ -900,6 +933,20 @@
 
 				<Button name="$(parent)GuildHistoryDeleteSelected" inherits="FCOGLButtonDeleteSelectedHistory">
 					<Anchor point="LEFT" relativeTo="$(parent)GuildHistoryDeleteDrop" relativePoint="RIGHT" offsetX="0"  offsetY="0" />
+				</Button>
+
+				<Control name="$(parent)GuildMembersJoinedDateHistoryDeleteDrop" resizeToFitDescendents="true" mouseEnabled="true" inherits="FCOGLMultiselectComboBox">
+					<Anchor point="LEFT" relativeTo="$(parent)ClearHistory" relativePoint="RIGHT" offsetX="20"  offsetY="0" />
+					<OnMouseEnter>
+						FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_GUILDMEMBERSJOINEDDATE_DELETE_HISTORY_DROP_TT))
+					</OnMouseEnter>
+					<OnMouseExit>
+						FCOGL.HideTooltip()
+					</OnMouseExit>
+				</Control>
+
+				<Button name="$(parent)GuildMembersJoinedDateHistoryDeleteSelected" inherits="FCOGLButtonDeleteSelectedHistory">
+					<Anchor point="LEFT" relativeTo="$(parent)GuildMembersJoinedDateHistoryDeleteDrop" relativePoint="RIGHT" offsetX="0"  offsetY="0" />
 				</Button>
 
 				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="1">

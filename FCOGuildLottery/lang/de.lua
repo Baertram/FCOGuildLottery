@@ -61,6 +61,10 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_GUILDSALESLOTTERY_DELETE_HISTORY_DROP_TT  = "Wähle gespeicherte Gilden Verkaufs-Lotterie Historien Einträge, welche du löschen möchtest. Klicke danach auf den Löschen Knopf rechts neben dieser Mehrfach-Auswahl Dropdown-Box.",
     FCOGL_GUILDSALESLOTTERY_DELETE_SELECTED         = "Lösche ausgewählte Gilden Verkaufs-Lotterie Historien Einträge",
 
+    FCOGL_GUILDMEMBERSJOINEDDATE_HISTORY_DROP_TT         = "Wähle eine gespeicherte Gilden Mitglieder Beitritts-Liste Historie.\nDie gewählte Historie wird für neue Würfel Würfe erneut geöffnet.\nEine aktuell aktive Gilden Mitglieder Beitritts-Liste wird dabei gestoppt!!",
+    FCOGL_GUILDMEMBERSJOINEDDATE_DELETE_HISTORY_DROP_TT  = "Wähle gespeicherte Gilden Mitglieder Beitritts-Liste Historien Einträge, welche du löschen möchtest. Klicke danach auf den Löschen Knopf rechts neben dieser Mehrfach-Auswahl Dropdown-Box.",
+    FCOGL_GUILDMEMBERSJOINEDDATE_DELETE_SELECTED         = "Lösche ausgewählte Gilden Mitglieder Beitritts-Liste Historien Einträge",
+
     FCOGL_DELETE_HISTORY_NONE_SELECTED              = "",
     FCOGL_DELETE_HISTORY_SOME_SELECTED              = "<<1>> gewählt, drücke nun|t24:24:/esoui/art/tutorial/inventory_tabicon_junk_up.dds|t ->",
 
@@ -69,12 +73,14 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_TITLE     = "Stoppe Gilden Verkaufs-Lotterie",
     FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_QUESTION  = "Wilslt du die aktive Gilden Verkaufs-Lotterie stoppen?\nDies ermöglicht wieder Würfel Würfe für die\nausgewählte Gilde.",
 
+    FCOGL_RESET_GUILD_MEMBER_JOINED_LIST_DIALOG_TITLE    = "Gilden Mitglieder Beitritts-Liste zurücksetzen",
+    FCOGL_RESET_GUILD_MEMBER_JOINED_LIST_DIALOG_QUESTION = "Willst du die aktive Gilden Mitglieder Beitritts-Liste\n zurücksetzen? Dies startet eine neue Liste!",
     FCOGL_STOP_GUILD_MEMBER_JOINED_LIST_DIALOG_TITLE= "Stoppe Gilden Mitglied Beitritt Liste",
     FCOGL_STOP_GUILD_MEMBER_JOINED_LIST_DIALOG_QUESTION  = "Willst du die aktive Gilden Mitglied Beitritt\n Liste stoppen?\nDies ermöglicht wieder Würfel Würfe für die\nausgewählte Gilde.",
 
     FCOGL_CLEAR_HISTORY                             = "Leere die angezeigte Historien Liste",
     FCOGL_CLEAR_HISTORY_DIALOG_TITLE                = "Historien Liste leeren?",
-    FCOGL_CLEAR_HISTORY_DIALOG_QUESTION             = "Willst du die \'%s\' Historien Liste\n leeren? Dies wird alle Einträge löschen!",
+    FCOGL_CLEAR_HISTORY_DIALOG_QUESTION             = "Willst du die \'%s\' Historien \nListe leeren? Dies wird alle Einträge löschen!",
     FCOGL_DELETE_HISTORY_ENTRIES_DIALOG_TITLE       = "Lösche ausgewählte Historien Einträge",
     FCOGL_DELETE_HISTORY_ENTRIES_DIALOG_QUESTION    = "Willst du die ausgewählten #\'%s\' Historien\nEinträge/Listen löschen?",
 
