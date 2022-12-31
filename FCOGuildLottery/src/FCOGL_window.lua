@@ -2733,38 +2733,47 @@ local function deleteHistoryEntryNow(alsoDeleteSV, entryData, deleteSingleEntry)
             end
 
             if FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId] ~= nil and
-                    FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId] ~= nil and
-                    FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] ~= nil then
+                    FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId] ~= nil
+                --and FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] ~= nil then
+                then
                 if FCOGuildLottery.diceRollGuildLotteryHistory[guildId] ~= nil and
-                        FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId] ~= nil and
-                        FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] ~= nil then
-                    countDeletedItems = NonContiguousCount(FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp])
-                    if countDeletedItems > 1 then countDeletedItems = countDeletedItems - 1 end --subtract 1 because of the "daysBefore" entry!
+                        FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId] ~= nil
+                        --and FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] ~= nil then
+                    then
                     if entryData ~= nil then
-                        if deleteSingleEntry == true and timestamp ~= nil and FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp][timestamp] ~= nil then
+                        if deleteSingleEntry == true and timestamp ~= nil and FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp]
+                                and FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp][timestamp] ~= nil then
                             df(">>sv 1 entry set = nil")
                             FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp][timestamp] = nil
                             FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp][timestamp] = nil
                             countDeletedItems = 1
                             wasDeleted = true
-                        else
+                        elseif deleteSingleEntry == false then
                             if timestamp ~= nil and FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][timestamp] ~= nil then
                                 df(">>sv 1 timestamp table set = nil")
+                                countDeletedItems = NonContiguousCount(FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][timestamp])
+                                if countDeletedItems > 1 then countDeletedItems = countDeletedItems - 1 end --subtract 1 because of the "daysBefore" entry!
                                 FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][timestamp]                       = nil
                                 FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][timestamp] = nil
                                 wasDeleted = true
                             else
                                 df(">>sv 1 set = nil")
+                                countDeletedItems = NonContiguousCount(FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp])
+                                if countDeletedItems > 1 then countDeletedItems = countDeletedItems - 1 end --subtract 1 because of the "daysBefore" entry!
                                 FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] = nil
                                 FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] = nil
                                 wasDeleted = true
                             end
                         end
                     else
-                        df(">>sv ALL set = {}")
-                        FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] = {}
-                        FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] = {}
-                        wasDeleted = true
+                        if FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] ~= nil then
+                            countDeletedItems = NonContiguousCount(FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp])
+                            if countDeletedItems > 1 then countDeletedItems = countDeletedItems - 1 end --subtract 1 because of the "daysBefore" entry!
+                            df(">>sv ALL set = {}")
+                            FCOGuildLottery.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] = {}
+                            FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][currentGuildSalesLotteryUniqueId][currentGuildSalesLotteryTimeStamp] = {}
+                            wasDeleted = true
+                        end
                     end
                     df("Guild sales lottery history data deleted, guildId %s, uniqueId %s lotteryTimeStamp %s", tos(guildId), tos(currentGuildSalesLotteryUniqueId), tos(currentGuildSalesLotteryTimeStamp))
                 end
@@ -2782,38 +2791,49 @@ local function deleteHistoryEntryNow(alsoDeleteSV, entryData, deleteSingleEntry)
             currentGuildMembersJoinedDateListTimeStamp = FCOGuildLottery.currentlyUsedGuildMembersJoinDateTimestamp
 
             if FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId] ~= nil and
-                    FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId] ~= nil and
-                    FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp] ~= nil then
+                    FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId] ~= nil
+                --and FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp] ~= nil then
+                then
                 if FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId] ~= nil and
-                        FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId] ~= nil and
-                        FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp] ~= nil then
-                    countDeletedItems = NonContiguousCount(FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp])
-                    if countDeletedItems > 1 then countDeletedItems = countDeletedItems - 1 end --subtract 1 because of the "daysBefore" entry!
+                        FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId] ~= nil
+                        --and FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp] ~= nil then
+                    then
                     if entryData ~= nil then
-                        if deleteSingleEntry == true and timestamp ~= nil and FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp][timestamp] ~= nil then
+                        if deleteSingleEntry == true and timestamp ~= nil and FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId]
+                                and FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp][timestamp] ~= nil then
                             df(">>sv 1 entry set = nil")
                             FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp][timestamp]                       = nil
                             FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp][timestamp] = nil
                             countDeletedItems = 1
                             wasDeleted = true
-                        else
+                        elseif deleteSingleEntry == false then
                             if timestamp ~= nil and FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][timestamp] ~= nil then
+                                countDeletedItems = NonContiguousCount(FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][timestamp])
+                                if countDeletedItems > 1 then countDeletedItems = countDeletedItems - 1 end --subtract 1 because of the "daysBefore" entry!
                                 df(">>sv 1 timestamp table set = nil")
                                 FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][timestamp]                       = nil
                                 FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][timestamp] = nil
                                 wasDeleted = true
                             else
-                                df(">>sv 1 set = nil")
-                                FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp]                       = nil
-                                FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp] = nil
-                                wasDeleted = true
+                                if FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp] ~= nil then
+                                    df(">>sv 1 set = nil")
+                                    countDeletedItems = NonContiguousCount(FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp])
+                                    if countDeletedItems > 1 then countDeletedItems = countDeletedItems - 1 end --subtract 1 because of the "daysBefore" entry!
+                                    FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp]                       = nil
+                                    FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp] = nil
+                                    wasDeleted = true
+                                end
                             end
                         end
                     else
-                        df(">>sv ALL set = {}")
-                        FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp]                       = {}
-                        FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp] = {}
-                        wasDeleted = true
+                        if FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp] ~= nil then
+                            df(">>sv ALL set = {}")
+                            countDeletedItems = NonContiguousCount(FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp])
+                            if countDeletedItems > 1 then countDeletedItems = countDeletedItems - 1 end --subtract 1 because of the "daysBefore" entry!
+                            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp]                       = {}
+                            FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId][currentGuildMembersJoinedDateListUniqueId][currentGuildMembersJoinedDateListTimeStamp] = {}
+                            wasDeleted = true
+                        end
                     end
                     df("Guild members joined date history data deleted, guildId %s, uniqueId %s timeStamp %s", tos(guildId), tos(currentGuildMembersJoinedDateListUniqueId), tos(currentGuildMembersJoinedDateListTimeStamp))
                 end
