@@ -57,9 +57,6 @@ d("guildId: " ..tos(guildId) .. ", uniqueId: " ..tos(uniqueIdentifier) .. ", tim
 end
 
 local function buildDropdownEntries(diceRollType)
-    local helperTabChoices = {}
-    local helperTabChoicesValues = {}
-
     if diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY then
         guildSalesLotterySavedDaysBeforeChoices = {}
         guildSalesLotterySavedDaysBeforeChoicesValues = {}
@@ -77,28 +74,21 @@ local function buildDropdownEntries(diceRollType)
                             local uniqueIdentifier = buildUniqueId(guildId, daysBeforeDetected, nil, FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY)
                             if uniqueIdentifier ~= nil and uniqueIdentifier == uniqueIdEntry then
                                 local numEntries = NonContiguousCount(timeStampsTable) - 1 -- subtract 1 because of the "daysBefore" entry
-                                for timeStampOfRoll, rollDataOfTimeStamp in pairs(timeStampsTable) do
-                                    if timeStampOfRoll ~= "daysBefore" then
-                                        local timeStr = formatDate(timeStampOfRoll)
+                                --for timeStampOfRoll, rollDataOfTimeStamp in pairs(timeStampsTable) do
+                                    --if timeStampOfRoll ~= "daysBefore" then
+                                        local timeStr = formatDate(timeStampsOfDaysBefore)
                                         --local guildSalesLotterySavedDaysBeforeChoiceEntry = strfor("[%s(%s)]%s (%s)", tos(guildName), tos(guildId), tos(timeStr), tos(timeStampOfRoll))
                                         local guildSalesLotterySavedDaysBeforeChoiceEntry = strfor("[%s]%s: %s (#%s)", tos(guildName), tos(daysBeforeDetected), tos(timeStr), tos(numEntries))
                                         tins(guildSalesLotterySavedDaysBeforeChoices, guildSalesLotterySavedDaysBeforeChoiceEntry)
-                                        tins(guildSalesLotterySavedDaysBeforeChoicesValues, tos(guildId) .. savedVarsCleanDelimiter .. tos(uniqueIdentifier) .. savedVarsCleanDelimiter .. tos(timeStampOfRoll))
-                                    end
-                                end
+                                        tins(guildSalesLotterySavedDaysBeforeChoicesValues, tos(guildId) .. savedVarsCleanDelimiter .. tos(uniqueIdentifier) .. savedVarsCleanDelimiter .. tos(timeStampsOfDaysBefore))
+                                    --end
+                                --end
                             end
                         end
                     end
                 end
             end
         end
-
-        --[[
-        local numEntries = #helperTabChoices
-        if numEntries > 0 and numEntries == #helperTabChoicesValues then
-            table.sort(helperTabChoices)
-        end
-        ]]
 
     elseif diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE then
         guildMemberJoinedDateListSavedDaysBeforeChoices = {}
@@ -116,15 +106,15 @@ local function buildDropdownEntries(diceRollType)
                             local uniqueIdentifier = buildUniqueId(guildId, daysBeforeDetected, nil, FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE)
                             if uniqueIdentifier ~= nil and uniqueIdentifier == uniqueIdEntry then
                                 local numEntries = NonContiguousCount(timeStampsTable) - 1 -- subtract 1 because of the "daysBefore" entry
-                                for timeStampOfRoll, rollDataOfTimeStamp in pairs(timeStampsTable) do
-                                    if timeStampOfRoll ~= "daysBefore" then
-                                        local timeStr = formatDate(timeStampOfRoll)
+                                --for timeStampOfRoll, rollDataOfTimeStamp in pairs(timeStampsTable) do
+                                    --if timeStampOfRoll ~= "daysBefore" then
+                                        local timeStr = formatDate(timeStampsOfDaysBefore)
                                         --local guildMemberJoinedDateListSavedDaysBeforeChoiceEntry = strfor("[%s(%s)]%s (%s)", tos(guildName), tos(guildId), tos(timeStr), tos(timeStampOfRoll))
                                         local guildMemberJoinedDateListSavedDaysBeforeChoiceEntry = strfor("[%s]%s: %s (#%s)", tos(guildName), tos(daysBeforeDetected), tos(timeStr), tos(numEntries))
                                         tins(guildMemberJoinedDateListSavedDaysBeforeChoices, guildMemberJoinedDateListSavedDaysBeforeChoiceEntry)
-                                        tins(guildMemberJoinedDateListSavedDaysBeforeChoicesValues, tos(guildId) .. savedVarsCleanDelimiter .. tos(uniqueIdentifier) .. savedVarsCleanDelimiter .. tos(timeStampOfRoll))
-                                    end
-                                end
+                                        tins(guildMemberJoinedDateListSavedDaysBeforeChoicesValues, tos(guildId) .. savedVarsCleanDelimiter .. tos(uniqueIdentifier) .. savedVarsCleanDelimiter .. tos(timeStampsOfDaysBefore))
+                                    --end
+                                --end
                             end
                         end
                     end
