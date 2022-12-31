@@ -5,6 +5,11 @@ local addonVars = FCOGuildLottery.addonVars
 local addonName = addonVars.addonName
 local addonNamePre = "["..addonName.."]"
 
+local tos = tostring
+local strgma =  string.gmatch
+local strfor = string.format
+local tins = table.insert
+
 --Debug messages
 local df    = FCOGuildLottery.df
 local dfa   = FCOGuildLottery.dfa
@@ -12,8 +17,179 @@ local dfe   = FCOGuildLottery.dfe
 local dfv   = FCOGuildLottery.dfv
 local dfw   = FCOGuildLottery.dfw
 
+local savedVarsCleanDelimiter = "-|-"
+
+local buildUniqueId = FCOGuildLottery.BuildUniqueId
+local formatDate = FCOGuildLottery.FormatDate
+
 ------------------------------------------------------------------------------------------------------------------------
 --LibAddonMenu-2.0 SETTINGS MENU
+local guildSalesLotterySavedDaysBeforeChoices
+local guildSalesLotterySavedDaysBeforeChoicesValues
+local guildSalesLotteryChosenSavedDaysBefore
+local guildMemberJoinedDateListSavedDaysBeforeChoices
+local guildMemberJoinedDateListSavedDaysBeforeChoicesValues
+local guildMemberJoinedDateListChosenSavedDaysBefore
+
+
+local function splitStr(inputstr, sep)
+   if sep == nil then
+      sep = "%s"
+   end
+   local t={}
+   for str in strgma(inputstr, "([^"..sep.."]+)") do
+      tins(t, str)
+   end
+   return t
+end
+
+local function splitDropdownChoiceValueAtDelimiter(dropdownChoiceValue)
+    if dropdownChoiceValue == nil or dropdownChoiceValue == "" then return nil, nil, nil end
+    local t = splitStr(dropdownChoiceValue, savedVarsCleanDelimiter)
+    return t[1], t[2], t[3]
+end
+
+local function getDataOfSelectedDropdownEntry(dropdownChoiceValue)
+    --tos(guildId) .. savedVarsCleanDelimiter .. tos(uniqueIdentifier) .. savedVarsCleanDelimiter .. tos(timeStampOfRoll)
+    local guildId, uniqueIdentifier, timeStamp = splitDropdownChoiceValueAtDelimiter(dropdownChoiceValue)
+d("guildId: " ..tos(guildId) .. ", uniqueId: " ..tos(uniqueIdentifier) .. ", timeStamp: " ..tos(timeStamp))
+    return guildId, uniqueIdentifier, timeStamp
+end
+
+local function buildDropdownEntries(diceRollType)
+    local helperTabChoices = {}
+    local helperTabChoicesValues = {}
+
+    if diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY then
+        guildSalesLotterySavedDaysBeforeChoices = {}
+        guildSalesLotterySavedDaysBeforeChoicesValues = {}
+        guildSalesLotteryChosenSavedDaysBefore = 0
+
+        --Read the current SavedVariables for the guild sales lottery
+        for guildId, daysBeforeTab in pairs(FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory) do
+            if guildId ~= nil and type(guildId) == "number" then
+                local guildName = GetGuildName(guildId)
+
+                for uniqueIdEntry, daysBeforeData in pairs(daysBeforeTab) do
+                    for timeStampsOfDaysBefore, timeStampsTable in pairs(daysBeforeData) do
+                        local daysBeforeDetected = timeStampsTable["daysBefore"]
+                        if daysBeforeDetected ~= nil then
+                            local uniqueIdentifier = buildUniqueId(guildId, daysBeforeDetected, nil, FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY)
+                            if uniqueIdentifier ~= nil and uniqueIdentifier == uniqueIdEntry then
+                                local numEntries = NonContiguousCount(timeStampsTable) - 1 -- subtract 1 because of the "daysBefore" entry
+                                for timeStampOfRoll, rollDataOfTimeStamp in pairs(timeStampsTable) do
+                                    if timeStampOfRoll ~= "daysBefore" then
+                                        local timeStr = formatDate(timeStampOfRoll)
+                                        --local guildSalesLotterySavedDaysBeforeChoiceEntry = strfor("[%s(%s)]%s (%s)", tos(guildName), tos(guildId), tos(timeStr), tos(timeStampOfRoll))
+                                        local guildSalesLotterySavedDaysBeforeChoiceEntry = strfor("[%s]%s: %s (#%s)", tos(guildName), tos(daysBeforeDetected), tos(timeStr), tos(numEntries))
+                                        tins(guildSalesLotterySavedDaysBeforeChoices, guildSalesLotterySavedDaysBeforeChoiceEntry)
+                                        tins(guildSalesLotterySavedDaysBeforeChoicesValues, tos(guildId) .. savedVarsCleanDelimiter .. tos(uniqueIdentifier) .. savedVarsCleanDelimiter .. tos(timeStampOfRoll))
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        --[[
+        local numEntries = #helperTabChoices
+        if numEntries > 0 and numEntries == #helperTabChoicesValues then
+            table.sort(helperTabChoices)
+        end
+        ]]
+
+    elseif diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE then
+        guildMemberJoinedDateListSavedDaysBeforeChoices = {}
+        guildMemberJoinedDateListSavedDaysBeforeChoicesValues = {}
+        guildMemberJoinedDateListChosenSavedDaysBefore = 0
+        --Read the current SavedVariables for the guild members joined date list
+        for guildId, daysBeforeTab in pairs(FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory) do
+            if guildId ~= nil and type(guildId) == "number" and daysBeforeTab ~= nil then
+                local guildName = GetGuildName(guildId)
+
+                for uniqueIdEntry, daysBeforeData in pairs(daysBeforeTab) do
+                    for timeStampsOfDaysBefore, timeStampsTable in pairs(daysBeforeData) do
+                        local daysBeforeDetected = timeStampsTable["daysBefore"]
+                        if daysBeforeDetected ~= nil then
+                            local uniqueIdentifier = buildUniqueId(guildId, daysBeforeDetected, nil, FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE)
+                            if uniqueIdentifier ~= nil and uniqueIdentifier == uniqueIdEntry then
+                                local numEntries = NonContiguousCount(timeStampsTable) - 1 -- subtract 1 because of the "daysBefore" entry
+                                for timeStampOfRoll, rollDataOfTimeStamp in pairs(timeStampsTable) do
+                                    if timeStampOfRoll ~= "daysBefore" then
+                                        local timeStr = formatDate(timeStampOfRoll)
+                                        --local guildMemberJoinedDateListSavedDaysBeforeChoiceEntry = strfor("[%s(%s)]%s (%s)", tos(guildName), tos(guildId), tos(timeStr), tos(timeStampOfRoll))
+                                        local guildMemberJoinedDateListSavedDaysBeforeChoiceEntry = strfor("[%s]%s: %s (#%s)", tos(guildName), tos(daysBeforeDetected), tos(timeStr), tos(numEntries))
+                                        tins(guildMemberJoinedDateListSavedDaysBeforeChoices, guildMemberJoinedDateListSavedDaysBeforeChoiceEntry)
+                                        tins(guildMemberJoinedDateListSavedDaysBeforeChoicesValues, tos(guildId) .. savedVarsCleanDelimiter .. tos(uniqueIdentifier) .. savedVarsCleanDelimiter .. tos(timeStampOfRoll))
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function deleteChosenSavedGuildSalesLottery()
+    if guildSalesLotterySavedDaysBeforeChoices == nil or guildSalesLotterySavedDaysBeforeChoicesValues == nil
+            or guildSalesLotteryChosenSavedDaysBefore == nil or guildSalesLotteryChosenSavedDaysBefore == 0 then return end
+    d("Delete Guild Sales Lottery - days before: " ..tos(guildSalesLotteryChosenSavedDaysBefore))
+    local guildId, uniqueIdentifier, timeStamp = getDataOfSelectedDropdownEntry(guildSalesLotteryChosenSavedDaysBefore)
+    if guildId == nil or uniqueIdentifier == nil or timeStamp == nil then
+d("<Exit: GuildId or other data missing!")
+        guildSalesLotteryChosenSavedDaysBefore = 0
+        return
+    end
+    if FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId] ~= nil
+            and FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][uniqueIdentifier] ~= nil
+            and FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][uniqueIdentifier][timeStamp] ~= nil then
+        FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][uniqueIdentifier][timeStamp] = nil
+        if FCOGuildLottery.diceRollGuildLotteryHistory[guildId] ~= nil and
+                FCOGuildLottery.diceRollGuildLotteryHistory[guildId][uniqueIdentifier] ~= nil and
+                FCOGuildLottery.diceRollGuildLotteryHistory[guildId][uniqueIdentifier][timeStamp] ~= nil then
+            FCOGuildLottery.diceRollGuildLotteryHistory[guildId][uniqueIdentifier][timeStamp] = nil
+        end
+
+        buildDropdownEntries(FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY)
+        if FCOGL_LAM_DROPDOWN_CLEAR_SAVEDVARIABLES_GUILD_SALES_LOTERY ~= nil then
+            FCOGL_LAM_DROPDOWN_CLEAR_SAVEDVARIABLES_GUILD_SALES_LOTERY:UpdateChoices(guildSalesLotterySavedDaysBeforeChoices, guildSalesLotterySavedDaysBeforeChoicesValues)
+        end
+    end
+    guildSalesLotteryChosenSavedDaysBefore = 0
+end
+
+local function deleteChosenSavedGuildMemberJoinedDateList()
+    if guildMemberJoinedDateListSavedDaysBeforeChoices == nil or guildMemberJoinedDateListSavedDaysBeforeChoicesValues == nil
+        or guildMemberJoinedDateListChosenSavedDaysBefore == nil or guildMemberJoinedDateListChosenSavedDaysBefore == 0 then return end
+d("Delete Guild Members Joined Date List - days before: " ..tos(guildMemberJoinedDateListChosenSavedDaysBefore))
+    local guildId, uniqueIdentifier, timeStamp = getDataOfSelectedDropdownEntry(guildMemberJoinedDateListChosenSavedDaysBefore)
+    if guildId == nil or uniqueIdentifier == nil or timeStamp == nil then
+d("<Exit: GuildId or other data missing!")
+        guildMemberJoinedDateListChosenSavedDaysBefore = 0
+        return
+    end
+    if FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId] ~= nil
+        and FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId][uniqueIdentifier] ~= nil
+        and FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId][uniqueIdentifier][timeStamp] ~= nil then
+        FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId][uniqueIdentifier][timeStamp] = nil
+        if FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId] ~= nil and
+                FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][uniqueIdentifier] ~= nil and
+                FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][uniqueIdentifier][timeStamp] ~= nil then
+            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][uniqueIdentifier][timeStamp] = nil
+        end
+
+        buildDropdownEntries(FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE)
+        if FCOGL_LAM_DROPDOWN_CLEAR_SAVEDVARIABLES_GUILD_MEMBER_JOINED_DATE_LIST ~= nil then
+            FCOGL_LAM_DROPDOWN_CLEAR_SAVEDVARIABLES_GUILD_MEMBER_JOINED_DATE_LIST:UpdateChoices(guildMemberJoinedDateListSavedDaysBeforeChoices, guildMemberJoinedDateListSavedDaysBeforeChoicesValues)
+        end
+
+    end
+    guildMemberJoinedDateListChosenSavedDaysBefore = 0
+end
 
 function FCOGuildLottery.ShowLAMSettings()
     if FCOGuildLottery.FCOSettingsPanel == nil then return end
@@ -32,7 +208,7 @@ function FCOGuildLottery.buildAddonMenu()
         name 				= addonVars.addonNameMenu,
         displayName 		= addonVars.addonNameMenuDisplay,
         author 				= addonVars.addonAuthor,
-        version 			= tostring(addonVars.addonVersion),
+        version 			= tos(addonVars.addonVersion),
         registerForRefresh 	= true,
         registerForDefaults = true,
         slashCommand        = "/fcogls",
@@ -42,9 +218,12 @@ function FCOGuildLottery.buildAddonMenu()
     }
     FCOGuildLottery.FCOSettingsPanel = FCOGuildLottery.LAM:RegisterAddonPanel(addonName .. "_LAM", panelData)
 
+    buildDropdownEntries(FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY)
+    buildDropdownEntries(FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE)
+
     local savedVariablesOptions = {
-        [1] = 'Each character',
-        [2] = 'Account wide'
+        [1] = GetString(FCOGL_LAM_SAVE_TYPE_PER_CHARACTER),
+        [2] = GetString(FCOGL_LAM_SAVE_TYPE_PER_ACCOUNT),
     }
     local savedVariablesOptionsValues = {
         [1] = 1,
@@ -307,12 +486,77 @@ function FCOGuildLottery.buildAddonMenu()
         },
         {
             type    = "checkbox",
-            name    = GetString(FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANEDED),
-            tooltip = GetString(FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANEDED_TT),
+            name    = GetString(FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANDED),
+            tooltip = GetString(FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANDED_TT),
             getFunc = function() return settings.hideGuildMembersJoinedDateListDisbanded end,
             setFunc = function(value) settings.hideGuildMembersJoinedDateListDisbanded = value end,
             default = function() return defaults.hideGuildMembersJoinedDateListDisbanded end,
         },
+
+        --==============================================================================
+        {
+            type = 'submenu',
+            name = GetString(FCOGL_LAM_CLEAR_SAVEDVARIABLES_OPTIONS),
+            controls = {
+                {
+                    type = 'header',
+                    name = GetString(FCOGL_LAM_GUILD_LOTTERY_OPTIONS)
+                },
+                {
+                    type = 'dropdown',
+                    name = GetString(FCOGL_LAM_CLEAR_SAVEDVARIABLES_DAYS_BEFORE),
+                    tooltip = GetString(FCOGL_LAM_CLEAR_SAVEDVARIABLES_DAYS_BEFORE_TT),
+                    choices = guildSalesLotterySavedDaysBeforeChoices,
+                    choicesValues = guildSalesLotterySavedDaysBeforeChoicesValues,
+                    getFunc = function()
+                        return guildSalesLotteryChosenSavedDaysBefore end,
+                    setFunc = function(value)
+                        guildSalesLotteryChosenSavedDaysBefore = value
+                    end,
+                    scrollable = true,
+                    sort = "value-up",
+                    reference = "FCOGL_LAM_DROPDOWN_CLEAR_SAVEDVARIABLES_GUILD_SALES_LOTERY"
+                },
+                {
+                    type = 'button',
+                    name = GetString(FCOGL_LAM_CLEAR_SAVEDVARIABLES_DELETE),
+                    tooltip = GetString(FCOGL_LAM_CLEAR_SAVEDVARIABLES_DELETE_TT),
+                    func = function() deleteChosenSavedGuildSalesLottery() end,
+                    disabled = function() return guildSalesLotteryChosenSavedDaysBefore == nil or guildSalesLotteryChosenSavedDaysBefore == 0 end,
+                },
+
+
+                {
+                    type = 'header',
+                    name = GetString(FCOGL_LAM_GUILD_MEMBERS_JOINED_OPTIONS)
+                },
+                {
+                    type = 'dropdown',
+                    name = GetString(FCOGL_LAM_CLEAR_SAVEDVARIABLES_DAYS_BEFORE),
+                    tooltip = GetString(FCOGL_LAM_CLEAR_SAVEDVARIABLES_DAYS_BEFORE_TT),
+                    choices = guildMemberJoinedDateListSavedDaysBeforeChoices,
+                    choicesValues = guildMemberJoinedDateListSavedDaysBeforeChoicesValues,
+                    getFunc = function()
+                        return guildMemberJoinedDateListChosenSavedDaysBefore end,
+                    setFunc = function(value)
+                        guildMemberJoinedDateListChosenSavedDaysBefore = value
+                    end,
+                    scrollable = true,
+                    sort = "value-up",
+                    reference = "FCOGL_LAM_DROPDOWN_CLEAR_SAVEDVARIABLES_GUILD_MEMBER_JOINED_DATE_LIST"
+                },
+                {
+                    type = 'button',
+                    name = GetString(FCOGL_LAM_CLEAR_SAVEDVARIABLES_DELETE),
+                    tooltip = GetString(FCOGL_LAM_CLEAR_SAVEDVARIABLES_DELETE_TT),
+                    func = function() deleteChosenSavedGuildMemberJoinedDateList() end,
+                    disabled = function() return guildMemberJoinedDateListChosenSavedDaysBefore == nil or guildMemberJoinedDateListChosenSavedDaysBefore == 0 end,
+                },
+
+
+            }
+        },
+
 
         --==============================================================================
         {

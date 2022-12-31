@@ -126,6 +126,8 @@ FCOGuildLottery.lang["de"] = {
 
     FCOGL_LAM_SAVE_TYPE                         = 'Einstellungen - Speicher Modus',
     FCOGL_LAM_SAVE_TYPE_TT                      = 'Nutze Account weite Einstellungen für alle Charaktere, oder speichere die Einstellungen unterschiedliche für jeden Charakter.',
+    FCOGL_LAM_SAVE_TYPE_PER_CHARACTER           = 'Jeder Charakter einzeln',
+    FCOGL_LAM_SAVE_TYPE_PER_ACCOUNT             = 'Account weit',
 
     --Options
     FCOGL_LAM_DEFAULT_DICE_SIDES                            = "Standard Würfel Seiten",
@@ -147,14 +149,20 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_DAYS_BEFORE_TT = "Die Anzahl Tage die die Gilden Mitglieder Beitritts-Liste rückwärts lesen soll (von heute an), um das Raking aufzubauen. Der Standard Wert sind 31 Tage.\n\nAchtung: Je mehr Tage hier selektiert werden, desto mehr Gilden Historien Daten müssen gelesen werden. Stelle bitte sicher, dass diese Daten in der Gilden Historie der entsprechenden Gilde ermittelt wurde, prüfe den Gilden Historien Reiter und die \'LibHistoire\' Daten, ob diese aktualisiert und verbunden sind! Ansonsten musst du sehr wahrscheinlich per \'Benutzen\' Taste auf dem Historien Reiter die Daten manuell aktualisieren! Andernfalls erhältst du sehr wahrscheinlich falsche oder gar keine Werte!",
 
     FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_SHOW_UI_ON_DICE_ROLL_TT = "Zeige die Oberfläche automatisch an, wenn ein Würfel Wurf per Chat Kommando ausgeführt wurde.\n\nDie Würfel Wurf Historie wird dabei ebenfalls ausgeklappt.\nInfo: Die Würfel Historie wird jedoch nicht den Historientyp ändern (/diceg1 soll z.B. zur Gilde 1 Würfel Wurf Historie wechseln), wenn gerade eine Gilden Mitglieder Beitritts-Liste aktiv ist!!",
-    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANEDED = "Verstecke ausgetretene Mitglieder",
-    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANEDED_TT = "Verstecke/Filtere die Mitglieder welche bereits wieder aus der Gilde ausgetreten sind",
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANDED = "Verstecke ausgetretene Mitglieder",
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANDED_TT = "Verstecke/Filtere die Mitglieder welche bereits wieder aus der Gilde ausgetreten sind",
 
 
     FCOGL_LAM_USE_24h_FORMAT                    = "Nutze 24 Stunden Format",
     FCOGL_LAM_USE_24h_FORMAT_TT                 = "Nutze das 24 Stunden Format für Datum und Uhrzeit",
     FCOGL_LAM_USE_CUSTOM_DATETIME_FORMAT        = "Eigenes Datum & Zeit Format",
     FCOGL_LAM_USE_CUSTOM_DATETIME_FORMAT_TT     = "Spezifiziere dein eigenes Datum & Zeit Format.\nLAsse das Editfeld leer, um das Standard Format zu verwenden.\nDie möglichen Platzhalter sind in der lua Sprache bereits vordefiniert wie folgt:\n\n%a	abbreviated weekday name (e.g., Wed)\n%A	full weekday name (e.g., Wednesday)\n%b	abbreviated month name (e.g., Sep)\n%B	full month name (e.g., September)\n%c	date and time (e.g., 09/16/98 23:48:10)\n%d	day of the month (16) [01-31]\n%H	hour, using a 24-hour clock (23) [00-23]\n%I	hour, using a 12-hour clock (11) [01-12]\n%M	minute (48) [00-59]\n%m	month (09) [01-12]\n%p	either \"am\" or \"pm\" (pm)\n%S	second (10) [00-61]\n%w	weekday (3) [0-6 = Sunday-Saturday]\n%x	date (e.g., 09/16/98)\n%X	time (e.g., 23:48:10)\n%Y	full year (1998)\n%y	two-digit year (98) [00-99]\n%%	the character `%´",
+
+    FCOGL_LAM_CLEAR_SAVEDVARIABLES_OPTIONS          = "SavedVariables bereinigen",
+    FCOGL_LAM_CLEAR_SAVEDVARIABLES_DAYS_BEFORE      = "'Tage rückwärts' auswählen",
+    FCOGL_LAM_CLEAR_SAVEDVARIABLES_DAYS_BEFORE_TT   = "Wähle die bereits gespeicherten 'Tage rückwärts' aus, welche du löschen möchtest.\n\nDu kannst hier auch einfach nachgucken welche Tage schon einmal zuvor gespeichert wurden und dann entsprechend den Schieberegler wieder auf diese Tage-Einstellung verändern und die Benutzeroberfläche neuladen. Danach kannst du in der FCOGuildLottery Historien Oberfläche die gespeicherten Daten einsehen und einzelne Datensätze, oder die gesamten gespeicherten Daten zu dieser Tage-Einstellung, über die Knöpfe oder Kontextmenüs der Historien UI löschen.",
+    FCOGL_LAM_CLEAR_SAVEDVARIABLES_DELETE      = "Löschen",
+    FCOGL_LAM_CLEAR_SAVEDVARIABLES_DELETE_TT   = "Die ausgewählten Einträge löschen",
 
     FCOGL_LAM_DEBUG_CHAT_OUTPUT_TOO             = "Chat Ausgabe ebenfalls aktivieren (LibDebugLogger)",
     FCOGL_LAM_DEBUG_CHAT_OUTPUT_TOO_TT          = "Wenn LibDebugLogger aktiv ist wird der Log nur in der DebugLogViewer Oberfläche (falls aktiv), oder in der SavedVariables file LibDebugLogger.lua ausgegeben.\nWenn du diese Option aktivierst wird zusätzlich im Chat der Text ausgegben, aber nur wenn\n|c5F5F5F\'LibDebugLogger\' geladen ist UND \'DebugLogViewer\' aktuell nicht aktiv ist!|r.",

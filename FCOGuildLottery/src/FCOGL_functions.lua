@@ -947,6 +947,7 @@ end
 local function buildUniqueId(guildId, daysToGetBefore, defaultDaysBefore, diceRolltype)
     if not diceRolltype then return end
     daysToGetBefore = daysToGetBefore or defaultDaysBefore
+    if daysToGetBefore == nil or daysToGetBefore <= 0 then return end
     local guildName = GetGuildName(guildId)
     --Changed at 20210214, removed GuildName as the uniqueId will be used inside tables where the unique guildId is already given as a top level filter
     local uniqueId = string.format(FCOGuildLottery.constStr[diceRolltype], tos(daysToGetBefore))
