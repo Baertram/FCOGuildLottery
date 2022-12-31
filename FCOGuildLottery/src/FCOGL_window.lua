@@ -2276,6 +2276,10 @@ df("fcoglWindowClass:UpdateDiceHistoryInfoLabel")
         self.guildMembersJoinedDateHistoryInfoLabel:SetHidden(true)
         self.guildMembersJoinedDateHistoryInfoLabel:SetText("")
 
+
+        --Update the entries of the delete guild sales lottery history entries multi select dropdown
+        fcoglUI.updateGuildSalesLotteryHistoryDeleteDropdownEntries(self.guildHistoryDeleteDrop)
+
     elseif FCOGuildLottery.IsGuildMembersJoinDateListActive() then
         self.historyTypeLabel:SetText(GetString(FCOGL_GUILD_MEMBER_JOINED_LIST_HISTORY))
 
@@ -2297,6 +2301,9 @@ df("fcoglWindowClass:UpdateDiceHistoryInfoLabel")
         self.guildSalesHistoryInfoLabel:SetHidden(true)
         self.guildSalesHistoryInfoLabel:SetText("")
 
+        --Update the entries of the delete guild members joined date list history entries multi select dropdown
+        fcoglUI.updateGuildMembersJoinedDateListHistoryDeleteDropdownEntries(self.guildMembersJoinedDateHistoryDeleteDrop)
+        
     else
         self.guildHistoryDrop.m_container:SetHidden(true)
         self.guildHistoryDeleteDrop.m_container:SetHidden(true)
@@ -2320,9 +2327,6 @@ df("fcoglWindowClass:UpdateDiceHistoryInfoLabel")
     self.historyTypeLabel:SetResizeToFitDescendents(true)
     self.guildSalesHistoryInfoLabel:SetResizeToFitDescendents(true)
     self.guildMembersJoinedDateHistoryInfoLabel:SetResizeToFitDescendents(true)
-
-    --Update the entries of the delete guild sales lottery history entries multi select dropdown
-    fcoglUI.updateGuildSalesLotteryHistoryDeleteDropdownEntries(self.guildHistoryDeleteDrop)
 end
 
 function fcoglWindowClass:UpdateGuildSalesDateStartLabel(isGuildSalesLotteryActive, isGuildMembersJoinDateListActive)
