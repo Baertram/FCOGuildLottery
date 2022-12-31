@@ -1196,6 +1196,7 @@ local function abortUpdateNow(p_searchBoxType, p_lastIndex)
     df(">abortUpdateNow - lastIndex: %s, searchBoxType: %s", tos(p_lastIndex), tos(p_searchBoxType))
 
     FCOGuildLottery.currentlyUsedGuildSalesLotteryChosenData = nil
+    FCOGuildLottery.currentlyUsedGuildMembersJoinDateChosenData = nil
 
     --Select the before selected dropdown entry but without calling the callback
     fcoglUI.SelectLastDropdownEntry(p_searchBoxType, p_lastIndex, false)
@@ -1373,11 +1374,12 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
         local function updateEntryGuildSalesHistoryNow(guildIndex, daysBefore)
             df(">>updateEntryGuildSalesHistoryNow - selectedIndex: %s, CurrentTab: %s searchBoxType: %s", tos(entry.selectedIndex), tos(fcoglUI.CurrentTab), tos(searchBoxType))
             FCOGuildLottery.currentlyUsedGuildSalesLotteryChosenData = nil
+            FCOGuildLottery.currentlyUsedGuildMembersJoinDateChosenData = nil
 
             comboBoxOwner:SetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType, entry.selectedIndex)
 
             --Set the current tab as active again to force the update of all lists and buttons
-            fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true, nil)
+            fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true, FCOGL_LISTTYPE_GUILD_SALES_LOTTERY)
         end
 
         --[[
@@ -1399,6 +1401,42 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
 
         FCOGuildLottery.ResetCurrentGuildSalesLotteryData(false, true, entry.guildIndex, daysBefore,
                 updateEntryGuildSalesHistoryNow,
+                function() abortUpdateNow(searchBoxType, lastSelectedIndex) end
+        )
+    end
+
+    local function entryCallbackGuildMemberJoinedDateListHistory( _, _, entry, _ ) --comboBox, entryText, entry, selectionChanged )
+        df(">entryCallbackGuildMemberJoinedDateListHistory - selectedIndex: %s, id: %s, searchBoxType: %s", tos(entry.selectedIndex), tos(entry.guildId), tos(searchBoxType))
+        local function updateEntryGuildMemberJoinedDateListHistoryNow(guildIndex, daysBefore)
+            df(">>updateEntryGuildMemberJoinedDateListHistoryNow - selectedIndex: %s, CurrentTab: %s searchBoxType: %s", tos(entry.selectedIndex), tos(fcoglUI.CurrentTab), tos(searchBoxType))
+            FCOGuildLottery.currentlyUsedGuildMembersJoinDateChosenData = nil
+            FCOGuildLottery.currentlyUsedGuildSalesLotteryChosenData = nil
+
+            comboBoxOwner:SetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType, entry.selectedIndex)
+
+            --Set the current tab as active again to force the update of all lists and buttons
+            fcoglUI.SetTab(FCOGL_TAB_GUILDSALESLOTTERY, true, true, FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE)
+        end
+
+        --[[
+            entry.guildId
+            entry.guildIndex
+            entry.name
+            entry.timestamp
+            entry.selectedIndex
+        ]]
+        --Guild sales lottery history entry selected
+        local lastSelectedIndex = comboBoxOwner:GetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType)
+        --Show ask dialog and reset the guild members joined date list to the chosen guild members joined date list timestamp if "yes" is chosen at the dialog
+        --or reset to the before chosen dropdown entry
+        --TODO: Get daysBefore from editbox at UI!
+        local daysBefore = entry.daysBefore or FCOGL_DEFAULT_GUILD_MEMBERS_JOIN_DATE_HISTORY_DAYS --31 days
+        --Set the entries data like timestamp, daysBefore as "chosen at the UI" -> Will be used in FCOGuildLottery.RollTheDiceForGuildMembersJoinDate()
+        --to overwrite FCOGuildLottery.currentlyUsedGuildMembersJoinDateTimestamp etc. than!
+        FCOGuildLottery.currentlyUsedGuildMembersJoinDateChosenData = entry
+
+        FCOGuildLottery.ResetCurrentGuildMembersJoinDateData(false, true, entry.guildIndex, daysBefore,
+                updateEntryGuildMemberJoinedDateListHistoryNow,
                 function() abortUpdateNow(searchBoxType, lastSelectedIndex) end
         )
     end
@@ -1578,7 +1616,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
                     local countDiceThrowData = NonContiguousCount(guildMembersJoinDateListHistoryEntryData)
                     if countDiceThrowData > 1 then countDiceThrowData = countDiceThrowData -1 end --subtract 1 because of the "daysBefore" entry
                     local dateTimeString = strfor(FCOGuildLottery.FormatDate(timeStampOfGuildMembersJoinDateListHistoryEntry) .. " (#%s)", tos(countDiceThrowData))
-                    entry = ZO_ComboBox:CreateItemEntry(dateTimeString, entryCallbackGuildLotteryHistory)
+                    entry = ZO_ComboBox:CreateItemEntry(dateTimeString, entryCallbackGuildMemberJoinedDateListHistory)
                     entry.guildId       = selectedGuildId
                     entry.guildIndex    = FCOGuildLottery.GetGuildIndexById(selectedGuildId)
                     entry.name          = dateTimeString
