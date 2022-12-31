@@ -55,7 +55,7 @@ FCOGuildLottery.lang["en"] = {
 
     FCOGL_DICE_PREFIX                           = "D",
 
-    FCOGL_CURRENTGUILSALESLOTTERY_TEXT              = "Start: %s / End: %s",
+    FCOGL_CURRENTGUILSALESLOTTERY_TEXT              = "Start: %s / End: %s (%s days)",
     FCOGL_CURRENTGUILSALESLOTTERY_DICEHISTORY_TEXT  = "From: %s / -%s days",
     FCOGL_GUILDSALESLOTTERY_HISTORY_DROP_TT         = "Select a saved guild sales lottery history.\nThis will re-open this sales lottery for new dice throws.\nA currently active guild sales lottery will be stopped!",
     FCOGL_GUILDSALESLOTTERY_DELETE_HISTORY_DROP_TT  = "Select saved guild sales lottery history entries that you would like to delete, then click on the delete button at the right side of the selection box",

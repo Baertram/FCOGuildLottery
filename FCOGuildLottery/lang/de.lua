@@ -58,7 +58,7 @@ FCOGuildLottery.lang["de"] = {
 
     FCOGL_DICE_PREFIX                           = "W",
 
-    FCOGL_CURRENTGUILSALESLOTTERY_TEXT              = "Start: %s / Ende: %s",
+    FCOGL_CURRENTGUILSALESLOTTERY_TEXT              = "Start: %s / Ende: %s (%s Tage)",
     FCOGL_CURRENTGUILSALESLOTTERY_DICEHISTORY_TEXT  = "Von: %s / -%s Tage",
     FCOGL_GUILDSALESLOTTERY_HISTORY_DROP_TT         = "Wähle eine gespeicherte Gilden Verkaufs-Lotterie Historie.\nDie gewählte Historie wird für neue Würfel Würfe erneut geöffnet.\nEine aktuell aktive Gilden Verkaufs-Lotterie wird dabei gestoppt!!",
     FCOGL_GUILDSALESLOTTERY_DELETE_HISTORY_DROP_TT  = "Wähle gespeicherte Gilden Verkaufs-Lotterie Historien Einträge, welche du löschen möchtest. Klicke danach auf den Löschen Knopf rechts neben dieser Mehrfach-Auswahl Dropdown-Box.",

@@ -2167,13 +2167,18 @@ function fcoglWindowClass:checkNewGuildSalesLotteryButtonEnabled()
     local newGuildSalesLotteryButton = self.frame:GetNamedChild("NewGuildSalesLottery")
     if not newGuildSalesLotteryButton then return end
     local isEnabled = true
-    --No guildId selected?
-    local selectedGuildDropsData = fcoglUI.getSelectedGuildsDropEntry()
-    local guildIndex = selectedGuildDropsData.index
-    local gotTrader = selectedGuildDropsData.gotTrader
-    if guildIndex == nil or guildIndex == FCOGuildLottery.noGuildIndex or
-            not FCOGuildLottery.IsGuildIndexValid(guildIndex) or not gotTrader then
+    if checkIfButtonIsEnabled(FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE) then
         isEnabled = false
+    end
+    if isEnabled then
+        --No guildId selected?
+        local selectedGuildDropsData = fcoglUI.getSelectedGuildsDropEntry()
+        local guildIndex = selectedGuildDropsData.index
+        local gotTrader = selectedGuildDropsData.gotTrader
+        if guildIndex == nil or guildIndex == FCOGuildLottery.noGuildIndex or
+                not FCOGuildLottery.IsGuildIndexValid(guildIndex) or not gotTrader then
+            isEnabled = false
+        end
     end
     newGuildSalesLotteryButton:SetEnabled(isEnabled)
     newGuildSalesLotteryButton:SetMouseEnabled(isEnabled)
@@ -2199,12 +2204,17 @@ function fcoglWindowClass:checkNewGuildMemberJoinedButtonEnabled()
     local newGuildMemberJoinedListButton = self.frame:GetNamedChild("StartGuildMemberJoinedList")
     if not newGuildMemberJoinedListButton then return end
     local isEnabled = true
-    --No guildId selected?
-    local selectedGuildDropsData = fcoglUI.getSelectedGuildsDropEntry()
-    local guildIndex = selectedGuildDropsData.index
-    if guildIndex == nil or guildIndex == FCOGuildLottery.noGuildIndex or
-            not FCOGuildLottery.IsGuildIndexValid(guildIndex) then
+    if checkIfButtonIsEnabled(FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY) then
         isEnabled = false
+    end
+    if isEnabled then
+        --No guildId selected?
+        local selectedGuildDropsData = fcoglUI.getSelectedGuildsDropEntry()
+        local guildIndex = selectedGuildDropsData.index
+        if guildIndex == nil or guildIndex == FCOGuildLottery.noGuildIndex or
+                not FCOGuildLottery.IsGuildIndexValid(guildIndex) then
+            isEnabled = false
+        end
     end
     newGuildMemberJoinedListButton:SetEnabled(isEnabled)
     newGuildMemberJoinedListButton:SetMouseEnabled(isEnabled)
@@ -2384,13 +2394,14 @@ df("fcoglWindowClass:UpdateGuildSalesDateStartLabel")
 
     --Date end      ->  timestamp of the guild sales lottery
     --Date start    ->  Date start - selected days of the guild sales lottery of the chosen timestamp
-    local guildLotteryDateStart, guildLotteryDateEnd
+    local guildLotteryDateStart, guildLotteryDateEnd, daysBefore
     local guildSalesLotteryTimestamp = FCOGuildLottery.currentlyUsedGuildSalesLotteryTimestamp
     guildLotteryDateEnd     = FCOGuildLottery.FormatDate(guildSalesLotteryTimestamp)
-    local guildLotteryDateStartTimeStamp =FCOGuildLottery.minusNDays(guildSalesLotteryTimestamp, FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore, FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS)
+    daysBefore = FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore
+    local guildLotteryDateStartTimeStamp =FCOGuildLottery.minusNDays(guildSalesLotteryTimestamp, daysBefore, FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS)
     guildLotteryDateStart   = FCOGuildLottery.FormatDate(guildLotteryDateStartTimeStamp)
 
-    self.guildSalesDateStartLabel:SetText(strfor(GetString(FCOGL_CURRENTGUILSALESLOTTERY_TEXT), guildLotteryDateStart, guildLotteryDateEnd))
+    self.guildSalesDateStartLabel:SetText(strfor(GetString(FCOGL_CURRENTGUILSALESLOTTERY_TEXT), guildLotteryDateStart, guildLotteryDateEnd, daysBefore))
     self.guildSalesDateStartLabel:SetHidden(false)
 end
 
@@ -2419,13 +2430,14 @@ df("fcoglWindowClass:UpdateGuildMemberListDateStartLabel")
 
     --Date end      ->  timestamp of the guild members list end
     --Date start    ->  Date start - Daten ed minus selected days of the guild members list
-    local guildMembersListDateStart, guildMembersListDateEnd
+    local guildMembersListDateStart, guildMembersListDateEnd, daysBefore
     local guildMembersListTimestamp = FCOGuildLottery.currentlyUsedGuildMembersJoinDateTimestamp
+    daysBefore = FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore
     guildMembersListDateEnd = FCOGuildLottery.FormatDate(guildMembersListTimestamp)
-    local guildMembersListDateStartTimeStamp = FCOGuildLottery.minusNDays(guildMembersListTimestamp, FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore, FCOGL_DEFAULT_GUILD_MEMBERS_JOIN_DATE_HISTORY_DAYS)
+    local guildMembersListDateStartTimeStamp = FCOGuildLottery.minusNDays(guildMembersListTimestamp, daysBefore, FCOGL_DEFAULT_GUILD_MEMBERS_JOIN_DATE_HISTORY_DAYS)
     guildMembersListDateStart                = FCOGuildLottery.FormatDate(guildMembersListDateStartTimeStamp)
 
-    self.guildMembersListDateStartLabel:SetText(strfor(GetString(FCOGL_CURRENTGUILSALESLOTTERY_TEXT), guildMembersListDateStart, guildMembersListDateEnd))
+    self.guildMembersListDateStartLabel:SetText(strfor(GetString(FCOGL_CURRENTGUILSALESLOTTERY_TEXT), guildMembersListDateStart, guildMembersListDateEnd, daysBefore))
     self.guildMembersListDateStartLabel:SetHidden(false)
 end
 
