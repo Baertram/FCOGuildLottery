@@ -2377,7 +2377,7 @@ df("fcoglWindowClass:UpdateDiceHistoryInfoLabel")
     elseif FCOGuildLottery.IsGuildMembersJoinDateListActive() then
         self.historyTypeLabel:SetText(GetString(FCOGL_GUILD_MEMBER_JOINED_LIST_HISTORY))
 
-        self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "GuildMemberJoinedDateHistory")
+        self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "GuildMembersJoinedDateHistory")
         self.guildMembersJoinedDateHistoryDrop.m_container:SetHidden(false)
         self.guildMembersJoinedDateHistoryDeleteDrop.m_container:SetHidden(false)
         self.guildMembersJoinedDateHistoryDeleteSelectedButton:SetHidden(false)
