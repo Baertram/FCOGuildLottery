@@ -72,7 +72,7 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_DELETE_HISTORY_SOME_SELECTED              = "<<1>> gewählt, drücke nun|t24:24:/esoui/art/tutorial/inventory_tabicon_junk_up.dds|t ->",
 
     FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_TITLE    = "Gilden Verkaufs-Lotterie zurücksetzen",
-    FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_QUESTION = "Willst du die aktive Gilden Verkaufs-Lotterie zurücksetzen?\nDies startet eine neue Lotterie!",
+    FCOGL_RESET_GUILD_SALES_LOTTERY_DIALOG_QUESTION = "Willst du die aktive Gilden Verkaufs-Lotterie\nzurücksetzen? Dies startet eine neue Lotterie!",
     FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_TITLE     = "Stoppe Gilden Verkaufs-Lotterie",
     FCOGL_STOP_GUILD_SALES_LOTTERY_DIALOG_QUESTION  = "Wilslt du die aktive Gilden Verkaufs-Lotterie stoppen?\nDies ermöglicht wieder Würfel Würfe für die\nausgewählte Gilde.",
 
