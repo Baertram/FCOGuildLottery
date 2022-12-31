@@ -420,6 +420,23 @@
 			</OnMouseExit>
 		</Button>
 
+		<Button name="FCOGLButtonDeleteSelectedGuildMemberJoinedDateListHistory" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+			<Dimensions x="24" y="24" />
+			<Textures normal="/esoui/art/inventory/inventory_tabicon_junk_up.dds"
+					  mouseOver="/esoui/art/inventory/inventory_tabicon_junk_over.dds"
+                      pressed="/esoui/art/inventory/inventory_tabicon_junk_down.dds"
+                      disabled="/esoui/art/inventory/inventory_tabicon_junk_disabled.dds" />
+			<OnClicked>
+				FCOGL.UI.checkDeleteSelectedGuildMemberJoinedDateListHistoryEntries()
+			</OnClicked>
+			<OnMouseEnter>
+				FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_GUILDMEMBERSJOINEDDATE_DELETE_SELECTED))
+			</OnMouseEnter>
+			<OnMouseExit>
+				FCOGL.HideTooltip()
+			</OnMouseExit>
+		</Button>
+
 <!-- ========================================================================================================================================================== -->
 <!-- ========================================================================================================================================================== -->
 <!-- ========================================================================================================================================================== -->
@@ -945,7 +962,7 @@
 					</OnMouseExit>
 				</Control>
 
-				<Button name="$(parent)GuildMembersJoinedDateHistoryDeleteSelected" inherits="FCOGLButtonDeleteSelectedHistory">
+				<Button name="$(parent)GuildMembersJoinedDateHistoryDeleteSelected" inherits="FCOGLButtonDeleteSelectedGuildMemberJoinedDateListHistory">
 					<Anchor point="LEFT" relativeTo="$(parent)GuildMembersJoinedDateHistoryDeleteDrop" relativePoint="RIGHT" offsetX="0"  offsetY="0" />
 				</Button>
 

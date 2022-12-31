@@ -2303,7 +2303,7 @@ df("fcoglWindowClass:UpdateDiceHistoryInfoLabel")
 
         --Update the entries of the delete guild members joined date list history entries multi select dropdown
         fcoglUI.updateGuildMembersJoinedDateListHistoryDeleteDropdownEntries(self.guildMembersJoinedDateHistoryDeleteDrop)
-        
+
     else
         self.guildHistoryDrop.m_container:SetHidden(true)
         self.guildHistoryDeleteDrop.m_container:SetHidden(true)
@@ -3145,6 +3145,22 @@ local function deleteSelectedGuildSalesLotteryHistoryEntriesNow(comboBoxDropdown
     end
 end
 
+local function deleteSelectedGuildMemberJoinedDateListHistoryEntriesNow(comboBoxDropdown)
+    local guildMemberJoinedDateListHistoryEntriesToDelete = {}
+    for _, item in ipairs(comboBoxDropdown:GetItems()) do
+        if comboBoxDropdown:IsItemSelected(item) then
+            table.insert(guildMemberJoinedDateListHistoryEntriesToDelete, item.entryData)
+        end
+    end
+    if #guildMemberJoinedDateListHistoryEntriesToDelete > 0 then
+        fcoglUI.DeleteDiceHistoryList(true, nil, guildMemberJoinedDateListHistoryEntriesToDelete, false)
+        comboBoxDropdown:ClearAllSelections()
+        fcoglUI.updateDeleteSelectedGuildMembersJoinedDateHistoryButton(comboBoxDropdown)
+        fcoglUI.UpdateClearCurrentHistoryButton()
+    end
+end
+
+
 function fcoglUI.checkDeleteSelectedGuildSalesLotteryHistoryEntries()
     df("checkDeleteSelectedGuildSalesLotteryHistoryEntries")
     local comboBoxDropdown = fcoglUIDiceHistoryWindow.guildHistoryDeleteDrop
@@ -3166,6 +3182,29 @@ function fcoglUI.checkDeleteSelectedGuildSalesLotteryHistoryEntries()
         true
     )
 end
+
+function fcoglUI.checkDeleteSelectedGuildMemberJoinedDateListHistoryEntries()
+    df("checkDeleteSelectedGuildMemberJoinedDateListHistoryEntries")
+    local comboBoxDropdown = fcoglUIDiceHistoryWindow.guildMembersJoinedDateHistoryDeleteDrop
+    if not comboBoxDropdown then return end
+    local numSelectedEntries = comboBoxDropdown:GetNumSelectedEntries()
+    if numSelectedEntries <= 0 then return end
+    --df(">selected %s entries!", tos(numSelectedEntries))
+
+    --Show dialog asking if you really want to delete the entries
+    FCOGuildLottery.showAskDialogNow(nil, nil, false,
+        function()
+            deleteSelectedGuildMemberJoinedDateListHistoryEntriesNow(comboBoxDropdown)
+        end,
+        function()  end,
+        {
+            title       = GetString(FCOGL_DELETE_HISTORY_ENTRIES_DIALOG_TITLE),
+            question    = strfor(GetString(FCOGL_DELETE_HISTORY_ENTRIES_DIALOG_QUESTION), tos(numSelectedEntries)),
+        },
+        true
+    )
+end
+
 
 function fcoglUI.toggleWindowLayer()
 df("fcoglUI.toggleWindowLayer")
