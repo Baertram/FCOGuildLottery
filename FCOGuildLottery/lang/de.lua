@@ -101,12 +101,27 @@ FCOGuildLottery.lang["de"] = {
 
     --LAM settings menu
     --Description
-    FCOGL_LAM_DESCRIPTION                       = 'AddOn für Gilden Verkaufs-Lotterien & Würfel Würfe. Chat Kommandos:\n/fcogl   Zeige/Verstecke die Oberfläche.\n/fcogls   Öffene das Einstellungsmenü.\n/dice <Nummer>   Wirft einen Würfel mit der <number> Anzahl Seiten. Wird die Nummer leer gelassen, so wird die Standard Anzahl aus den Einstellungen verwendet!\n/diceG1 - /diceG5  Wirft einen Würfel für die entsprechende Gilde (der bis zu 5 Gilden) mit der Anzahl Seiten = Gilden Mitglieder.\n/gslnew <GildenIndex 1 bis 5> wird die aktive Gilden Verkaufs-Lottery zurücksetzen und eine neue starten.\n/gsl wirft einen Würfel für die aktuelle Gilden Verkaufs-Lotterie.\n/gslstop stoppt die aktuelle Gilden Verkaufs-Lotterie.\n/gsllast bzw. /dicelast zeigt das letzte Würfelergebnis im Chat noch einmal an (oder falls akiviert: in der \'DebugLogViewer\' UI).',
+    FCOGL_LAM_DESCRIPTION                       = 'AddOn für Gilden Verkaufs-Lotterien/Mitglieder Beitritt Listen/Mitglieder & normale Würfel Würfe.',
+    FCOGL_LAM_HEADER_CHAT_COMMANDS              = 'Chat Kommandos',
+    FCOGL_LAM_CHAT_COMMANDS                     = 'Chat Kommandos sind:\n/fcogl   Zeige/Verstecke die Oberfläche.\n'..
+            '/fcogls   Öffene das Einstellungsmenü.\n'..
+            '/dice <Nummer>   Wirft einen Würfel mit der <number> Anzahl Seiten. Wird die Nummer leer gelassen, so wird die Standard Anzahl aus den Einstellungen verwendet!\n'..
+            '/diceG1 - /diceG5  Wirft einen Würfel für die entsprechende Gilde (der bis zu 5 Gilden) mit der Anzahl Seiten = Gilden Mitglieder.\n\n'..
+            '/gslnew <GildenIndex 1 bis 5> wird die aktive Gilden Verkaufs-Lottery zurücksetzen und eine neue starten.\n'..
+            '/gsl wirft einen Würfel für die aktuelle Gilden Verkaufs-Lotterie.\n'..
+            '/gslstop stoppt die aktuelle Gilden Verkaufs-Lotterie.\n\n'..
+            '/gmjnew <GildenIndex 1 bis 5> wird die aktive Gilden Mitglieder Beitritts-Liste zurücksetzen und eine neue starten.\n'..
+            '/gmj wirft einen Würfel für die aktuelle Gilden Mitglieder Beitritts-Liste.\n'..
+            '/gmjstop stoppt die aktuelle Gilden Mitglieder Beitritts-Liste.\n\n'..
+            '/gsllast bzw. /gmjlast bzw. /dicelast zeigt das letzte Würfelergebnis im Chat noch einmal an (oder falls akiviert: in der \'DebugLogViewer\' UI).',
+
+
     --Headlines
     FCOGL_LAM_FORMAT_OPTIONS                    = "Ausgabe Format",
     FCOGL_LAM_DICE_OPTIONS                      = 'Würfel Einstellungen',
     FCOGL_LAM_GUILD_ROLL_OPTIONS                = 'Gilden Wurf Einstellungen',
     FCOGL_LAM_GUILD_LOTTERY_OPTIONS             = 'Gilden Verkaufs-Lotterie Einstellungen',
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_OPTIONS      = 'Gilden Mitglieder Beitritts-Liste Einstellungen',
     FCOGL_LAM_DEBUG_OPTIONS                     = 'Debug',
 
     FCOGL_LAM_SAVE_TYPE                         = 'Einstellungen - Speicher Modus',
@@ -118,15 +133,23 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_LAM_GUILD_DICE_ROLL_RESULT_TO_CHAT_EDIT           = "Chat Text Box: Würfel Wurf Ergebnis",
     FCOGL_LAM_GUILD_DICE_ROLL_RESULT_TO_CHAT_EDIT_TT        = "Definiere den Text der im Chat angezeigt werden soll, nachdem ein normaler Würfel geworfen wurde.\n\nDu kannst die folgenden Platzhalter verwenden:\n<<1>>   Wurf Ergebnis #\n<<2>>   @AccountName des Gilden Mitglieds (nur wenn es ein Gilden Wurf war).",
     FCOGL_LAM_GUILD_LOTTERY_DICE_ROLL_RESULT_TO_CHAT_EDIT_TT= "Definiere den Text der im Chat angezeigt werden soll, nachdem ein Gilden Verkaufs-Lotterie Wurf gewürfelt wurde, und ein Mitglieds-Name ermittelt wurde.\n\nDu kannst die folgenden Platzhalter verwenden:\n<<1>>   Wurf Ergebnis #\n<<2>>   @AccountName des Verkäufers.",
+    FCOGL_LAM_GUILD_MEMBER_JOIN_DATE_DICE_ROLL_RESULT_TO_CHAT_EDIT_TT = "Definiere den Text der im Chat angezeigt werden soll, nachdem ein Gilden Mitglieder Beitritts-Liste Wurf gewürfelt wurde, und ein Mitglieds-Name ermittelt wurde.\n\nDu kannst die folgenden Platzhalter verwenden:\n<<1>>   Wurf Ergebnis #\n<<2>>   @AccountName des beigetretenen Mitglieds.",
+
 
     FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT     = "Abschneiden um 00:00 des aktuellen Tages",
-    FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT_TT  = "Gilden Verkaufs-Lotterie um 00:00 am aktuellen Tag abschneiden.\nEs werden keine Gilden-Events von LibHistoire in das Ranking einfließen, die nach 00:00 Uhr liegen!\nIst diese Option deaktiviert (standard Einstellung) verwendet das Ranking dieselben Werte wie z.B. Master Merchant: 7 Tage Verkaufs Ranking.",
+    FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT_TT  = "Um 00:00 am aktuellen Tag abschneiden.\nEs werden keine Gilden-Events von LibHistoire in das Ranking einfließen, die nach 00:00 Uhr liegen!\nIst diese Option deaktiviert (standard Einstellung) verwendet das Ranking (Gilden Lotterie) dieselben Werte wie z.B. Master Merchant: 7 Tage Verkaufs Ranking.",
     FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL    = "Zeige die Oberfläche nach Würfel Wurf",
     FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL_TT = "Zeige die Oberfläche automatisch an, wenn ein Würfel Wurf per Chat Kommando ausgeführt wurde.\n\nDie Würfel Wurf Historie wird dabei ebenfalls ausgeklappt.\nInfo: Die Würfel Historie wird jedoch nicht den Historientyp ändern (/diceg1 soll z.B. zur Gilde 1 Würfel Wurf Historie wechseln), wenn gerade eine Gilden Verkaufs-Lotterie aktiv ist!!",
     FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE             = "Tage rückwärts, von heute an",
     FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE_TT          = "Die Anzahl Tage die die Gilden Verkaufs-Lotterie rückwärts lesen soll (von heute an), um das Raking aufzubauen. Der Standard Wert sind 7 Tage.\n\nAchtung: Je mehr Tage hier selektiert werden, desto mehr Gilden Historien Daten müssen gelesen werden. Stelle bitte sicher, dass diese Daten in der Gilden Historie der entsprechenden Gilde ermittelt wurde, prüfe den Gilden Historien Reiter und die \'LibHistoire\' Daten, ob diese aktualisiert und verbunden sind! Ansonsten musst du sehr wahrscheinlich per \'Benutzen\' Taste auf dem Historien Reiter die Daten manuell aktualisieren! Andernfalls erhältst du sehr wahrscheinlich falsche oder gar keine Werte!",
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM               = "Datum von",
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM_TT            = "Das Start Datum der Gilden Verkaufs-Lotterie. Der Standard Wert ist heute - 7 Tage (bis Mitternacht).",
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_DAYS_BEFORE_TT = "Die Anzahl Tage die die Gilden Mitglieder Beitritts-Liste rückwärts lesen soll (von heute an), um das Raking aufzubauen. Der Standard Wert sind 31 Tage.\n\nAchtung: Je mehr Tage hier selektiert werden, desto mehr Gilden Historien Daten müssen gelesen werden. Stelle bitte sicher, dass diese Daten in der Gilden Historie der entsprechenden Gilde ermittelt wurde, prüfe den Gilden Historien Reiter und die \'LibHistoire\' Daten, ob diese aktualisiert und verbunden sind! Ansonsten musst du sehr wahrscheinlich per \'Benutzen\' Taste auf dem Historien Reiter die Daten manuell aktualisieren! Andernfalls erhältst du sehr wahrscheinlich falsche oder gar keine Werte!",
+
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_SHOW_UI_ON_DICE_ROLL_TT = "Zeige die Oberfläche automatisch an, wenn ein Würfel Wurf per Chat Kommando ausgeführt wurde.\n\nDie Würfel Wurf Historie wird dabei ebenfalls ausgeklappt.\nInfo: Die Würfel Historie wird jedoch nicht den Historientyp ändern (/diceg1 soll z.B. zur Gilde 1 Würfel Wurf Historie wechseln), wenn gerade eine Gilden Mitglieder Beitritts-Liste aktiv ist!!",
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANEDED = "Verstecke ausgetretene Mitglieder",
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANEDED_TT = "Verstecke/Filtere die Mitglieder welche bereits wieder aus der Gilde ausgetreten sind",
+
 
     FCOGL_LAM_USE_24h_FORMAT                    = "Nutze 24 Stunden Format",
     FCOGL_LAM_USE_24h_FORMAT_TT                 = "Nutze das 24 Stunden Format für Datum und Uhrzeit",

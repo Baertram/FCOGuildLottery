@@ -58,6 +58,18 @@ function FCOGuildLottery.buildAddonMenu()
             type = 'description',
             text = GetString(FCOGL_LAM_DESCRIPTION),
         },
+        --==============================================================================
+        {
+            type = "submenu",
+            name = GetString(FCOGL_LAM_HEADER_CHAT_COMMANDS),
+            controls = {
+                {
+                    type = 'description',
+                    text = GetString(FCOGL_LAM_CHAT_COMMANDS),
+                }
+            },
+        },
+        --==============================================================================
         {
             type = 'dropdown',
             name = GetString(FCOGL_LAM_SAVE_TYPE),
@@ -239,7 +251,7 @@ function FCOGuildLottery.buildAddonMenu()
         {
             type    = "slider",
             name    = GetString(FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE),
-            tooltip = GetString(FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE_TT),
+            tooltip = GetString(FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_DAYS_BEFORE_TT),
             min = 1,
             max = FCOGL_MAX_DAYS_GUILD_MEMBERS_BEFORE,
             step = 1,
@@ -288,10 +300,18 @@ function FCOGuildLottery.buildAddonMenu()
         {
             type    = "checkbox",
             name    = GetString(FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL),
-            tooltip = GetString(FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL_TT),
+            tooltip = GetString(FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_SHOW_UI_ON_DICE_ROLL_TT),
             getFunc = function() return settings.showUIForDiceRollTypes[FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE] end,
             setFunc = function(value) settings.showUIForDiceRollTypes[FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE] = value end,
             default = function() return defaults.showUIForDiceRollTypes[FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE] end,
+        },
+        {
+            type    = "checkbox",
+            name    = GetString(FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANEDED),
+            tooltip = GetString(FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANEDED_TT),
+            getFunc = function() return settings.hideGuildMembersJoinedDateListDisbanded end,
+            setFunc = function(value) settings.hideGuildMembersJoinedDateListDisbanded = value end,
+            default = function() return defaults.hideGuildMembersJoinedDateListDisbanded end,
         },
 
         --==============================================================================

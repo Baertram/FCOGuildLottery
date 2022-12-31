@@ -98,7 +98,19 @@ FCOGuildLottery.lang["en"] = {
 
     --LAM settings menu
     --Description
-    FCOGL_LAM_DESCRIPTION                       = 'Helper addon for a guild lottery & dice rolls. Chat slash commands are:\n/fcogl   Toggle the UI.\n/fcogls   Toggle the settings menu.\n/dice <number>   Will roll a dice with <number> sides. If left empty the default value from the settings will be used!\n/diceG1 - /diceG5  Will roll a dice for the number of guild members of guild 1 - 5.\n/gslnew <guildIndex 1 to 5> will reset the currently active sales lottery and start a new one.\n/gsl will roll the next dice for the active guild sales lottery.\n/gslstop will stop the currently active guild sales lottery.\n/gsllast or /dicelast will show the last dice roll results in your local chat (or if you got it enabled: within the \'DebugLogViewer\' UI) again.',
+    FCOGL_LAM_DESCRIPTION                       = 'Helper addon for a guild lottery/member joined list/member & normal dice rolls.',
+    FCOGL_LAM_HEADER_CHAT_COMMANDS              = 'Chat slash commands',
+    FCOGL_LAM_CHAT_COMMANDS                     = 'Chat slash commands are:\n'..
+            '/fcogl   Toggle the UI.\n/fcogls   Toggle the settings menu.\n'..
+            '/dice <number>   Will roll a dice with <number> sides. If left empty the default value from the settings will be used!\n' ..
+            '/diceG1 - /diceG5  Will roll a dice for the number of guild members of guild 1 - 5.\n\n'..
+            '/gslnew <guildIndex 1 to 5> will reset the currently active sales lottery and start a new one.\n'..
+            '/gsl will roll the next dice for the active guild sales lottery.\n'..
+            '/gslstop will stop the currently active guild sales lottery.\n\n'..
+            '/gmjnew <guildIndex 1 to 5> will reset the currently active guild members joined date list and start a new one.\n'..
+            '/gmj will roll the next dice for the active guild members joined date list.\n'..
+            '/gmjstop will stop the currently active guild members joined date list.\n\n'..
+            '/gsllast or /gmjlast or /dicelast will show the last dice roll results in your local chat (or if you got it enabled: within the \'DebugLogViewer\' UI) again.',
     --Headlines
     FCOGL_LAM_FORMAT_OPTIONS                    = "Output format",
     FCOGL_LAM_DICE_OPTIONS                      = 'Dice settings',
@@ -115,15 +127,21 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_LAM_DEFAULT_DICE_SIDES_TT                         = "The standard sides of a dice which you roll via the \'/dice\' slash command, or via the keybind \'Roll dice with def. sides\'",
     FCOGL_LAM_GUILD_DICE_ROLL_RESULT_TO_CHAT_EDIT           = "Chat edit box: Dice roll result",
     FCOGL_LAM_GUILD_DICE_ROLL_RESULT_TO_CHAT_EDIT_TT        = "Define the text that should be shown in the chat after a normal guild dice roll was done, and a member index was determined\n\nYou can use the following placeholders:\n<<1>>   Dice roll #\n<<2>>   @AccountName of guild member.",
-    FCOGL_LAM_GUILD_MEMBER_JOIN_DATE_DICE_ROLL_RESULT_TO_CHAT_EDIT_TT = "Define the text that should be shown in the chat after a normal guild dice roll was done, and a member index was determined\n\nYou can use the following placeholders:\n<<1>>   Dice roll #\n<<2>>   @AccountName of guild member.",
     FCOGL_LAM_GUILD_LOTTERY_DICE_ROLL_RESULT_TO_CHAT_EDIT_TT= "Define the text that should be shown in the chat after a guild sales lottery dice roll was done, and a member rank was determined\n\nYou can use the following placeholders:\n<<1>>   Dice roll #\n<<2>>   @AccountName of seller.",
+    FCOGL_LAM_GUILD_MEMBER_JOIN_DATE_DICE_ROLL_RESULT_TO_CHAT_EDIT_TT = "Define the text that should be shown in the chat after a guild member joined date list dice roll was done, and a member index was determined\n\nYou can use the following placeholders:\n<<1>>   Dice roll #\n<<2>>   @AccountName of joined guild member.",
 
     FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT     = "Cut-off at 00:00 current day",
-    FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT_TT  = "Cut-off the data at the current day at 00:00.\nNo newer events coming in after 00:00 via LibHistoire will be used for the list entries!\nOnly for the guild lottery ranking: If this setting is disabled (default setting) the ranking will be using the same values as Master Merchant e.g. does for the 7 days ranking.",
+    FCOGL_LAM_GUILD_LOTTERY_CUT_OFF_AT_MIDNIGHT_TT  = "Cut-off the data at the current day at 00:00.\nNo newer events coming in after 00:00 via LibHistoire will be used for the list entries!\nOnly for the guild lottery ranking: If this setting is disabled (default setting) the ranking (Guild sales lottery) will be using the same values as Master Merchant e.g. does for the 7 days ranking.",
     FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL    = "Show UI after dice roll",
     FCOGL_LAM_GUILD_LOTTERY_SHOW_UI_ON_DICE_ROLL_TT = "Automatically show the UI after a dice roll was done via a slash command.\n\nThe dice roll history will be expanded as well then.\nInfo: The dice roll history will not change to the dice throw type (e.g. /diceg1 should switch to the guild 1 dice history) if a guild sales lottery or guild member joined list is currently active!",
     FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE             = "Days backwards from today",
-    FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE_TT          = "The days the guild should read backwards from today and collect the sales/member data. Default value is 7/31 days.\n\nAttention: The more days you select here the more guild sales/member events need to be read! Make sure ALL the selected days are given in your guild  history, check the guild tabs and if \'LibHistoire\' did read all the needed data, is aligned and updated! Else you'll most probably not be able to start the dice rolls, or you'll get false results!",
+    FCOGL_LAM_GUILD_LOTTERY_DAYS_BEFORE_TT          = "The days the guild should read backwards from today and collect the sales data. Default value is 7 days.\n\nAttention: The more days you select here the more guild sales events need to be read! Make sure ALL the selected days are given in your guild  history, check the guild tabs and if \'LibHistoire\' did read all the needed data, is aligned and updated! Else you'll most probably not be able to start the dice rolls, or you'll get false results!",
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_DAYS_BEFORE_TT = "The days the guild should read backwards from today and collect the member joined data. Default value is 31 days.\n\nAttention: The more days you select here the more guild member events need to be read! Make sure ALL the selected days are given in your guild  history, check the guild tabs and if \'LibHistoire\' did read all the needed data, is aligned and updated! Else you'll most probably not be able to start the dice rolls, or you'll get false results!",
+
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_SHOW_UI_ON_DICE_ROLL_TT = "Automatically show the UI after a dice roll was done via a slash command.\n\nThe dice roll history will be expanded as well then.\nInfo: The dice roll history will not change to the dice throw type (e.g. /diceg1 should switch to the guild 1 dice history) if a guild sales lottery or guild member joined list is currently active!",
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANEDED = "Hide disbanded members",
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANEDED_TT = "Hide/filter the guild members which have disbanded again already",
+
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM               = "Date from",
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM_TT            = "The start date of the guild sales lottery. Default value is today - 7 days (at midnight).",
 

@@ -105,7 +105,7 @@ end
 
 --Hide all list controls at the left TLC
 local function hideLeftTLCListControlsExceptThis(doNotHideThisListObject, hideOthers)
-d(">---------------------------------->")
+--d(">---------------------------------->")
     hideOthers = hideOthers or false
     df("hideLeftTLCListControlsExceptThis - doNotHideObject: %s, hideOthers: %s", tos(doNotHideThisListObject), tos(hideOthers))
     --Hide all other lists?
@@ -143,7 +143,7 @@ d(">---------------------------------->")
         df("<SHOWING: %s", tos(doNotHideThisListObject.control:GetName()))
         doNotHideThisListObject.control:SetHidden(false)
     end
-d("<----------------------------------<")
+--d("<----------------------------------<")
 end
 
 
@@ -336,7 +336,13 @@ function fcoglWindowClass:Setup(listType)
         --Search box and search functions
         self.searchBg = self.frame:GetNamedChild("Search")
         self.searchBox = self.frame:GetNamedChild("SearchBox")
-        self.searchBox:SetHandler("OnTextChanged", function() self:RefreshFilters() end)
+        self.searchBox:SetHandler("OnTextChanged", function()
+            --Get the currently shown list and use it's search method
+            local listObject = getCurrentlyShownListsObject()
+            if listObject ~= nil then
+                listObject:RefreshFilters()
+            end
+        end)
         self.searchBox:SetHandler("OnMouseUp", function(ctrl, mouseButton, upInside)
             --[[
             if mouseButton == MOUSE_BUTTON_INDEX_RIGHT and upInside then
@@ -430,7 +436,13 @@ function fcoglWindowClass:Setup(listType)
         --Search box and search functions
         self.searchBg = self.frame:GetNamedChild("Search")
         self.searchBox = self.frame:GetNamedChild("SearchBox")
-        self.searchBox:SetHandler("OnTextChanged", function() self:RefreshFilters() end)
+        self.searchBox:SetHandler("OnTextChanged", function()
+            --Get the currently shown list and use it's search method
+            local listObject = getCurrentlyShownListsObject()
+            if listObject ~= nil then
+                listObject:RefreshFilters()
+            end
+        end)
         --self.searchBox:SetHandler("OnMouseUp", function(ctrl, mouseButton, upInside)
             --[[
             if mouseButton == MOUSE_BUTTON_INDEX_RIGHT and upInside then
@@ -2443,7 +2455,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
 
             if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
                 --If no guild sales lottery is active: Hide the total list and it's sort headers!
-d(">00000 GuildSalesLotteryActive: " ..tos(isGuildSalesLotteryActive))
+--d(">00000 GuildSalesLotteryActive: " ..tos(isGuildSalesLotteryActive))
                 --Show the left TLC's currently shown list control and hide all others
                 hideLeftTLCListControlsExceptThis((isGuildSalesLotteryActive == true and self) or nil, true)
                 --Update the currently active listType
@@ -2511,7 +2523,7 @@ d(">00000 GuildSalesLotteryActive: " ..tos(isGuildSalesLotteryActive))
 
             elseif listType == FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE then
                 --If no guild members joined list is active: Hide the total list and it's sort headers!
-d(">00000 GuildMembersJoinedListActive: " ..tos(isGuildMembersJoinDateListActive))
+--d(">00000 GuildMembersJoinedListActive: " ..tos(isGuildMembersJoinDateListActive))
                 --Show the left TLC's currently shown list control and hide all others
                 hideLeftTLCListControlsExceptThis((isGuildMembersJoinDateListActive == true and self) or nil, true)
                 --Update the currently active listType

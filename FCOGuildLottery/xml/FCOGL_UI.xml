@@ -11,7 +11,7 @@
 
 <!-- ========================================================================================================================================================== -->
         <!--Virtual sort headers -->
-        <Control name="FCOGLSortHeader" inherits="ZO_SortHeaderBehavior" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+        <Control name="FCOGLSortHeader" inherits="ZO_SortHeaderBehavior" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Controls>
                 <Label name="$(parent)Name" font="MyFontGame20" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_NORMAL"  horizontalAlignment="CENTER" verticalAlignment="CENTER" wrapMode="ELLIPSIS" tier="LOW" layer="CONTROLS" level="1">
 					<AnchorFill />
@@ -167,7 +167,7 @@
 
 <!-- ========================================================================================================================================================== -->
 		<!-- Virtual comboboxes -->
-		<Control name="FCOGLMultiselectComboBox" mouseEnabled="true" inherits="ZO_MultiselectComboBox" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Control name="FCOGLMultiselectComboBox" mouseEnabled="true" inherits="ZO_MultiselectComboBox" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="230" y="28" />
 			<Controls>
 				<Backdrop name="$(parent)BGNew" inherits="FCOGL_MultiSeletComboBoxBG">
@@ -183,7 +183,7 @@
             <Anchor point="TOPLEFT" offsetX="2" offsetY="2"/>
             <Anchor point="BOTTOMRIGHT" offsetX="-2" offsetY="-2"/>
         </EditBox>
-		<EditBox name="FCOGLEditDefaultText" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<EditBox name="FCOGLEditDefaultText" virtual="true" tier="LOW" layer="CONTROLS" level="2">
             <OnTextChanged>
                 ZO_EditDefaultText_OnTextChanged(self)
             </OnTextChanged>
@@ -203,7 +203,7 @@
 
 <!-- ========================================================================================================================================================== -->
 		<!-- Virtual Buttons -->
-		<Button name="FCOGLButtonGuildSales" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Button name="FCOGLButtonGuildSales" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="50" y="50" />
 			<Textures normal="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_up.dds"
 					  mouseOver="/esoui/art/tradinghouse/tradinghouse_sell_tabicon_up.dds"
@@ -225,7 +225,7 @@
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-		<Button name="FCOGLButtonList" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Button name="FCOGLButtonList" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="50" y="50" />
 			<Textures normal="/esoui/art/journal/journal_tabicon_cadwell_up.dds"
 					  mouseOver="/esoui/art/journal/journal_tabicon_cadwell_over.dds"
@@ -240,7 +240,7 @@
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-		<Button name="FCOGLButtonDiceHistory" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Button name="FCOGLButtonDiceHistory" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="50" y="50" />
 			<Textures normal="/esoui/art/guild/tabicon_history_up.dds"
 					  mouseOver="/esoui/art/guild/tabicon_history_over.dds"
@@ -257,7 +257,7 @@
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-		<Button name="FCOGLButtonSettings" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Button name="FCOGLButtonSettings" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="28" y="28" />
 			<Textures normal="/esoui/art/chatwindow/chat_options_up.dds"
 					  pressed="/esoui/art/chatwindow/chat_options_down.dds"
@@ -273,7 +273,7 @@
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-		<Button name="FCOGLButtonClose" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Button name="FCOGLButtonClose" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="36" y="36" />
 			<Textures normal="/esoui/art/buttons/closebutton_up.dds"
 					  pressed="/esoui/art/buttons/closebutton_down.dds"
@@ -289,7 +289,7 @@
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-		<Button name="FCOGLButtonReload" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Button name="FCOGLButtonReload" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="24" y="24" />
 			<Textures normal="/esoui/art/help/help_tabicon_feedback_up.dds"
 					  mouseOver="/esoui/art/help/help_tabicon_feedback_over.dds"
@@ -305,7 +305,7 @@
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-		<Button name="FCOGLButtonStop" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Button name="FCOGLButtonStop" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="24" y="24" />
 			<Textures normal="/esoui/art/buttons/cancel_up.dds"
 					  mouseOver="/esoui/art/buttons/cancel_over.dds"
@@ -321,7 +321,7 @@
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-		<Button name="FCOGLButtonNewGuildSalesLottery" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Button name="FCOGLButtonNewGuildSalesLottery" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="30" y="30" />
 			<Textures normal="/esoui/art/buttons/large_rightarrow_up.dds"
 					  mouseOver="/esoui/art/buttons/large_rightarrow_over.dds"
@@ -337,7 +337,7 @@
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-		<Button name="FCOGLButtonStopGuildMemberJoinedList" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Button name="FCOGLButtonStopGuildMemberJoinedList" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="24" y="24" />
 			<Textures normal="/esoui/art/buttons/cancel_up.dds"
 					  mouseOver="/esoui/art/buttons/cancel_over.dds"
@@ -353,7 +353,7 @@
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-		<Button name="FCOGLButtonNewGuildMemberJoinedList" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Button name="FCOGLButtonNewGuildMemberJoinedList" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="34" y="34" />
 			<Textures normal="/esoui/art/icons/guildranks/guild_indexicon_member_up.dds"
 					  mouseOver="/esoui/art/icons/guildranks/guild_indexicon_member_over.dds"
@@ -369,7 +369,7 @@
 				FCOGL.HideTooltip()
 			</OnMouseExit>
 		</Button>
-		<Button name="FCOGLButtonRollTheDice" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Button name="FCOGLButtonRollTheDice" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="30" y="30" />
 			<Textures normal="/esoui/art/lfg/gamepad/gp_lfg_menuicon_random.dds"
 					  mouseOver="/esoui/art/lfg/gamepad/gp_lfg_menuicon_random.dds"
@@ -386,7 +386,7 @@
 			</OnMouseExit>
 		</Button>
 
-		<Button name="FCOGLButtonClearHistory" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Button name="FCOGLButtonClearHistory" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="24" y="24" />
 			<Textures normal="/esoui/art/buttons/pointsminus_up.dds"
 					  mouseOver="/esoui/art/buttons/pointsminus_over.dds"
@@ -403,7 +403,7 @@
 			</OnMouseExit>
 		</Button>
 
-		<Button name="FCOGLButtonDeleteSelectedHistory" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Button name="FCOGLButtonDeleteSelectedHistory" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="24" y="24" />
 			<Textures normal="/esoui/art/inventory/inventory_tabicon_junk_up.dds"
 					  mouseOver="/esoui/art/inventory/inventory_tabicon_junk_over.dds"
@@ -420,7 +420,7 @@
 			</OnMouseExit>
 		</Button>
 
-		<Button name="FCOGLButtonDeleteSelectedGuildMemberJoinedDateListHistory" virtual="true" tier="LOW" layer="CONTROLS" level="1">
+		<Button name="FCOGLButtonDeleteSelectedGuildMemberJoinedDateListHistory" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="24" y="24" />
 			<Textures normal="/esoui/art/inventory/inventory_tabicon_junk_up.dds"
 					  mouseOver="/esoui/art/inventory/inventory_tabicon_junk_over.dds"
@@ -442,7 +442,7 @@
 <!-- ========================================================================================================================================================== -->
 
 		<!-- Frame/Window - Standard UI with border -->
-		<TopLevelControl name="FCOGLFrame" mouseEnabled="true" movable="true" clampedToScreen="true" hidden="true" tier="LOW" layer="CONTROLS" level="1"> <!--inherits="ZO_RightPanelFootPrint"-->
+		<TopLevelControl name="FCOGLFrame" mouseEnabled="true" movable="true" clampedToScreen="true" hidden="true" tier="LOW" layer="CONTROLS" level="0"> <!--inherits="ZO_RightPanelFootPrint"-->
 			<Dimensions x="730" y="690" />
 			<DimensionConstraints minX="400" minY="300" />
 			<Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER" offsetX="300" offsetY="-100"/>
@@ -618,7 +618,7 @@
 
 
 		<!-- Guild Sales Lottery -->
-		<Control name="FCOGLFrameSalesLottery" mouseEnabled="true" movable="false" hidden="true" tier="LOW" layer="CONTROLS" level="1">
+		<Control name="FCOGLFrameSalesLottery" mouseEnabled="true" movable="false" hidden="true" tier="LOW" layer="CONTROLS" level="0">
 			<Dimensions x="730" y="690" />
 			<DimensionConstraints minX="400" minY="300" />
 			<Anchor point="TOPLEFT" relativeTo="FCOGLFrameRollTheDice" relativePoint="BOTTOMLEFT" offsetX="0" offsetY="5"/>
@@ -694,12 +694,12 @@
 					</Controls>
 				</Control>
 
-				<Control name="$(parent)List" inherits="ZO_ScrollList" tier="LOW" layer="CONTROLS" level="1">
+				<Control name="$(parent)List" inherits="ZO_ScrollList" tier="LOW" layer="CONTROLS" level="2">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)Headers" relativePoint="BOTTOMLEFT" offsetY="3" />
 					<Anchor point="BOTTOMRIGHT" relativeTo="$(parent)" relativePoint="BOTTOMRIGHT" offsetX="-15" offsetY="-73" />
 				</Control>
 
-				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="1">
+				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="2">
 					<Anchor point="TOPRIGHT" relativeTo="$(parent)List" relativePoint="BOTTOMRIGHT" offsetY="6" />
 				</Label>
 
@@ -709,7 +709,7 @@
 <!-- ========================================================================================================================================================== -->
 
 		<!-- Guild Members Joined List -->
-		<Control name="FCOGLFrameMembersJoined" movable="false" hidden="true" tier="LOW" layer="CONTROLS" level="1">
+		<Control name="FCOGLFrameMembersJoined" movable="false" hidden="true" tier="LOW" layer="CONTROLS" level="0">
 			<Dimensions x="730" y="690" />
 			<DimensionConstraints minX="400" minY="300" />
 			<Anchor point="TOPLEFT" relativeTo="FCOGLFrameRollTheDice" relativePoint="BOTTOMLEFT" offsetX="0" offsetY="5"/>
@@ -762,12 +762,12 @@
 					</Controls>
 				</Control>
 
-				<Control name="$(parent)List" inherits="ZO_ScrollList" tier="LOW" layer="CONTROLS" level="1">
+				<Control name="$(parent)List" inherits="ZO_ScrollList" tier="LOW" layer="CONTROLS" level="2">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)Headers" relativePoint="BOTTOMLEFT" offsetY="3" />
 					<Anchor point="BOTTOMRIGHT" relativeTo="$(parent)" relativePoint="BOTTOMRIGHT" offsetX="-15" offsetY="-73" />
 				</Control>
 
-				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="1">
+				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="2">
 					<Anchor point="TOPRIGHT" relativeTo="$(parent)List" relativePoint="BOTTOMRIGHT" offsetY="6" />
 				</Label>
 			</Controls>
@@ -776,7 +776,7 @@
 
 <!-- ========================================================================================================================================================== -->
 		<!-- FCOGLFrameDiceHistory -->
-		<TopLevelControl name="FCOGLFrameDiceHistory" mouseEnabled="true" movable="false" clampedToScreen="true" hidden="true" > <!--inherits="ZO_RightPanelFootPrint"-->
+		<TopLevelControl name="FCOGLFrameDiceHistory" mouseEnabled="true" movable="false" clampedToScreen="true" hidden="true" tier="LOW" layer="CONTROLS" level="0"> <!--inherits="ZO_RightPanelFootPrint"-->
 			<Dimensions x="500" y="690" />
 			<DimensionConstraints minX="500" minY="300" />
 			<Anchor point="TOPLEFT" relativeTo="FCOGLFrame" relativePoint="TOPRIGHT" offsetX="0" offsetY="0"/>
@@ -929,7 +929,7 @@
 					</Controls>
 				</Control>
 
-				<Control name="$(parent)List" inherits="ZO_ScrollList" tier="LOW" layer="CONTROLS" level="1">
+				<Control name="$(parent)List" inherits="ZO_ScrollList" tier="LOW" layer="CONTROLS" level="2">
 					<Anchor point="TOPLEFT" relativeTo="$(parent)Headers" relativePoint="BOTTOMLEFT" offsetY="3" />
 					<Anchor point="BOTTOMRIGHT" offsetX="-15" offsetY="-32" />
 				</Control>
@@ -966,7 +966,7 @@
 					<Anchor point="LEFT" relativeTo="$(parent)GuildMembersJoinedDateHistoryDeleteDrop" relativePoint="RIGHT" offsetX="0"  offsetY="0" />
 				</Button>
 
-				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="1">
+				<Label name="$(parent)Counter" font="ZoFontGameSmall" horizontalAlignment="RIGHT" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_DISABLED" tier="LOW" layer="CONTROLS" level="2">
 					<Anchor point="TOPRIGHT" relativeTo="$(parent)List" relativePoint="BOTTOMRIGHT" offsetY="6" />
 				</Label>
 
