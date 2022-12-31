@@ -53,7 +53,7 @@ local function getDataOfSelectedDropdownEntry(dropdownChoiceValue)
     --tos(guildId) .. savedVarsCleanDelimiter .. tos(uniqueIdentifier) .. savedVarsCleanDelimiter .. tos(timeStampOfRoll)
     local guildId, uniqueIdentifier, timeStamp = splitDropdownChoiceValueAtDelimiter(dropdownChoiceValue)
 d("guildId: " ..tos(guildId) .. ", uniqueId: " ..tos(uniqueIdentifier) .. ", timeStamp: " ..tos(timeStamp))
-    return guildId, uniqueIdentifier, timeStamp
+    return tonumber(guildId), uniqueIdentifier, tonumber(timeStamp)
 end
 
 local function buildDropdownEntries(diceRollType)
@@ -61,6 +61,9 @@ local function buildDropdownEntries(diceRollType)
         guildSalesLotterySavedDaysBeforeChoices = {}
         guildSalesLotterySavedDaysBeforeChoicesValues = {}
         guildSalesLotteryChosenSavedDaysBefore = 0
+
+        tins(guildSalesLotterySavedDaysBeforeChoices, GetString(FCOGL_LAM_NONE))
+        tins(guildSalesLotterySavedDaysBeforeChoicesValues, 0)
 
         --Read the current SavedVariables for the guild sales lottery
         for guildId, daysBeforeTab in pairs(FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory) do
@@ -94,6 +97,10 @@ local function buildDropdownEntries(diceRollType)
         guildMemberJoinedDateListSavedDaysBeforeChoices = {}
         guildMemberJoinedDateListSavedDaysBeforeChoicesValues = {}
         guildMemberJoinedDateListChosenSavedDaysBefore = 0
+
+        tins(guildMemberJoinedDateListSavedDaysBeforeChoices, GetString(FCOGL_LAM_NONE))
+        tins(guildMemberJoinedDateListSavedDaysBeforeChoicesValues, 0)
+
         --Read the current SavedVariables for the guild members joined date list
         for guildId, daysBeforeTab in pairs(FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory) do
             if guildId ~= nil and type(guildId) == "number" and daysBeforeTab ~= nil then
@@ -134,13 +141,26 @@ d("<Exit: GuildId or other data missing!")
         guildSalesLotteryChosenSavedDaysBefore = 0
         return
     end
+
+    if FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId] ~= nil then
+d(">guildId found: " ..tos(guildId))
+        if FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][uniqueIdentifier] ~= nil then
+d(">uniqueIdentifier found: " ..tos(uniqueIdentifier))
+            if FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][uniqueIdentifier][timeStamp] ~= nil then
+d(">timeStamp found: " ..tos(timeStamp))
+            end
+        end
+    end
+
     if FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId] ~= nil
             and FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][uniqueIdentifier] ~= nil
             and FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][uniqueIdentifier][timeStamp] ~= nil then
+d(">>found SV - set = nil")
         FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory[guildId][uniqueIdentifier][timeStamp] = nil
         if FCOGuildLottery.diceRollGuildLotteryHistory[guildId] ~= nil and
                 FCOGuildLottery.diceRollGuildLotteryHistory[guildId][uniqueIdentifier] ~= nil and
                 FCOGuildLottery.diceRollGuildLotteryHistory[guildId][uniqueIdentifier][timeStamp] ~= nil then
+d(">>found internal SV table - set = nil")
             FCOGuildLottery.diceRollGuildLotteryHistory[guildId][uniqueIdentifier][timeStamp] = nil
         end
 

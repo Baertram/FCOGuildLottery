@@ -157,6 +157,7 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_LAM_CLEAR_SAVEDVARIABLES_DAYS_BEFORE_TT   = "Choose the saved 'Days before', which you want to delete.\n\nYou can use this list as overview too, to see which day-range was selected before already. By changing the appropriate slider above to the same days-range and reladoing the UI afterwards, you can use the FCO GuildLottery history UI afterwards to see the saved data and delete single entries, or the whole saved day-range, via the history UIs buttons and context menus.",
     FCOGL_LAM_CLEAR_SAVEDVARIABLES_DELETE      = "Delete",
     FCOGL_LAM_CLEAR_SAVEDVARIABLES_DELETE_TT   = "Delete the chosen entries",
+    FCOGL_LAM_NONE                             = "-None-",
 
     FCOGL_LAM_DEBUG_CHAT_OUTPUT_TOO             = "Chat output too (LibDebugLogger)",
     FCOGL_LAM_DEBUG_CHAT_OUTPUT_TOO_TT          = "If LibDebugLogger is enabled the logging will only be shown in the UI DebugLogViewer, or within the SavedVariables file LibDebugLogger.lua.\nIf you enable the setting there also will be a chat output shown for you, but only if:\n|c5F5F5F\'LibDebugLogger\' is loaded AND \'DebugLogViewer\' is currently not loaded|r.",

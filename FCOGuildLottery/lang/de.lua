@@ -163,6 +163,7 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_LAM_CLEAR_SAVEDVARIABLES_DAYS_BEFORE_TT   = "Wähle die bereits gespeicherten 'Tage rückwärts' aus, welche du löschen möchtest.\n\nDu kannst hier auch einfach nachgucken welche Tage schon einmal zuvor gespeichert wurden und dann entsprechend den Schieberegler wieder auf diese Tage-Einstellung verändern und die Benutzeroberfläche neuladen. Danach kannst du in der FCOGuildLottery Historien Oberfläche die gespeicherten Daten einsehen und einzelne Datensätze, oder die gesamten gespeicherten Daten zu dieser Tage-Einstellung, über die Knöpfe oder Kontextmenüs der Historien UI löschen.",
     FCOGL_LAM_CLEAR_SAVEDVARIABLES_DELETE      = "Löschen",
     FCOGL_LAM_CLEAR_SAVEDVARIABLES_DELETE_TT   = "Die ausgewählten Einträge löschen",
+    FCOGL_LAM_NONE                             = "-Keiner-",
 
     FCOGL_LAM_DEBUG_CHAT_OUTPUT_TOO             = "Chat Ausgabe ebenfalls aktivieren (LibDebugLogger)",
     FCOGL_LAM_DEBUG_CHAT_OUTPUT_TOO_TT          = "Wenn LibDebugLogger aktiv ist wird der Log nur in der DebugLogViewer Oberfläche (falls aktiv), oder in der SavedVariables file LibDebugLogger.lua ausgegeben.\nWenn du diese Option aktivierst wird zusätzlich im Chat der Text ausgegben, aber nur wenn\n|c5F5F5F\'LibDebugLogger\' geladen ist UND \'DebugLogViewer\' aktuell nicht aktiv ist!|r.",
