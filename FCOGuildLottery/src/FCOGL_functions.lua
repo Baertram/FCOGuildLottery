@@ -174,6 +174,21 @@ local function resetCurrentGuildMembersJoinDateData(startingNewMembersJoinDate, 
     end
 end
 
+function FCOGuildLottery.IsGuildSalesLotteryActive()
+    return (FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier ~= nil and
+           FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= nil and
+           FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId ~= nil) or false
+end
+local isGuildSalesLotteryActive = FCOGuildLottery.IsGuildSalesLotteryActive
+
+function FCOGuildLottery.IsGuildMembersJoinDateListActive()
+    return (FCOGuildLottery.currentlyUsedGuildMembersJoinDateUniqueIdentifier ~= nil and
+           FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildIndex ~= nil and
+           FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildId ~= nil) or false
+end
+local isGuildMembersJoinDateListActive = FCOGuildLottery.IsGuildMembersJoinDateListActive
+
+
 local function IsGuildIndexValid(guildIndex)
     return (guildIndex ~= nil and guildIndex >= 1 and guildIndex <= MAX_GUILDS) or false
 end
@@ -240,11 +255,11 @@ local function updateUIGuildsDropNow(diceRollType, guildIndex, updateIfGuildSale
             tos(diceRollType), tos(guildIndex), tos(updateIfGuildSalesLottery), tos(updateIfGuildMemberJoinedDateList), tos(noCallBack))
     --Set the guilds dropdownbox at the UI, if no active guild sales lottery
     local fcoglUI = FCOGuildLottery.UI
-    if updateIfGuildSalesLottery == true and FCOGuildLottery.IsGuildSalesLotteryActive() then
+    if updateIfGuildSalesLottery == true and isGuildSalesLotteryActive() then
         if diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY and guildIndex ~= nil then
             fcoglUI.ChangeGuildsDropSelectedByGuildIndex(guildIndex, noCallBack)
         end
-    elseif updateIfGuildMemberJoinedDateList == true and FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+    elseif updateIfGuildMemberJoinedDateList == true and isGuildMembersJoinDateListActive() then
         if diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE and guildIndex ~= nil then
             fcoglUI.ChangeGuildsDropSelectedByGuildIndex(guildIndex, noCallBack)
         end
@@ -322,9 +337,9 @@ end
 function FCOGuildLottery.getCurrentDiceRollTypeAndGuildIndex()
     local diceRollType = FCOGuildLottery.currentlyUsedDiceRollType
     local guildIndex
-    if FCOGuildLottery.IsGuildSalesLotteryActive() then
+    if isGuildSalesLotteryActive() then
         guildIndex = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex
-    elseif FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+    elseif isGuildMembersJoinDateListActive() then
         guildIndex = FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildIndex
     else
         local guildId = FCOGuildLottery.currentlyUsedDiceRollGuildId
@@ -403,20 +418,20 @@ function FCOGuildLottery.UpdateCurrentDiceRollType(uiWindow)
             --Get the guilds dropdown selected data
             local selectedGuildsDropdownData = fcoglUI.getSelectedGuildsDropEntry()
             local selectedIndex = selectedGuildsDropdownData.selectedIndex
-            local isGuild = selectedGuildsDropdownData.isGuild
+            --local isGuild = selectedGuildsDropdownData.isGuild
             local guildIndex = selectedGuildsDropdownData.index
-            local guildId = selectedGuildsDropdownData.id
-            local isGuildSalesLotteryActive = FCOGuildLottery.IsGuildSalesLotteryActive()
-            local isGuildMemberJoinedListActive = FCOGuildLottery.IsGuildMembersJoinDateListActive()
+            local guildId                            = selectedGuildsDropdownData.id
+            local isGuildSalesLotteryCurrentlyActive     = isGuildSalesLotteryActive()
+            local isGuildMemberJoinedListCurrentlyActive = isGuildMembersJoinDateListActive()
 
             local currentDiceRollType = FCOGuildLottery.currentlyUsedDiceRollType
             df(">frame not hidden - currentDiceRollType: %s, guildsDropSelectedIndex: %s", tos(currentDiceRollType), tos(selectedIndex))
             local newDiceRolltype
             if currentDiceRollType == FCOGL_DICE_ROLL_TYPE_GENERIC then
                 if IsGuildIndexValid(guildIndex) then
-                    if isGuildSalesLotteryActive then
+                    if isGuildSalesLotteryCurrentlyActive then
                         newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY
-                    elseif isGuildMemberJoinedListActive then
+                    elseif isGuildMemberJoinedListCurrentlyActive then
                         newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE
                     else
                         newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC
@@ -427,9 +442,9 @@ function FCOGuildLottery.UpdateCurrentDiceRollType(uiWindow)
                     currentDiceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY or
                     currentDiceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE then
                 if guildId ~= nil and IsGuildIndexValid(guildIndex) then
-                    if isGuildSalesLotteryActive then
+                    if isGuildSalesLotteryCurrentlyActive then
                         newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY
-                    elseif isGuildMemberJoinedListActive then
+                    elseif isGuildMemberJoinedListCurrentlyActive then
                         newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE
                     else
                         newDiceRolltype = FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC
@@ -1201,10 +1216,11 @@ function FCOGuildLottery.GetGuildMembersJoinedListMemberCount(guildId, daysToGet
                 if memberJoinedStatsDetailsOfGuildId ~= nil then
                     --df(">got here 2 - uniqueId data found")
                     FCOGuildLottery.currentlyUsedGuildMembersJoinDateData = memberJoinedStatsDetailsOfGuildId
-                    local currentlyUsedGuildMembersJoinDateMemberSellCounts = FCOGuildLottery.currentlyUsedGuildMembersJoinDateMemberSellCounts
+                    --local currentlyUsedGuildMembersJoinDateMemberSellCounts = FCOGuildLottery.currentlyUsedGuildMembersJoinDateMemberSellCounts
 
                     local settings = FCOGuildLottery.settingsVars.settings
                     local cutOffGuildMembersJoinedCurrentDateMidnight = settings.cutOffGuildMembersJoinedCurrentDateMidnight
+                    local hideGuildMembersJoinedDateListWhoLeftAlready = settings.hideGuildMembersJoinedDateListWhoLeftAlready
 
                     --Count the sells of each different seller name
                     --    local eventTimeFormated = os.date("%c", eventTime)
@@ -1240,19 +1256,20 @@ function FCOGuildLottery.GetGuildMembersJoinedListMemberCount(guildId, daysToGet
                                         isStillInGuild = true
                                     end
                                 end
-
-                                table.insert(FCOGuildLottery.currentlyUsedGuildMembersJoinDateMemberListData, {
-                                    --rank
-                                    --memberName
-                                    --optionalInviterDisplayName
-                                    _eventTime  = eventTime,
-                                    _eventTimeFormated = guildMemberJoinedData.eventTimeFormated,
-                                    rank        = -1,
-                                    memberIndex = guildMemberIndex,
-                                    isStillInGuild = isStillInGuild,
-                                    memberName  = memberName,
-                                    invitedBy   = guildMemberJoinedData.optionalInviterDisplayName,
-                                })
+                                if not hideGuildMembersJoinedDateListWhoLeftAlready or (hideGuildMembersJoinedDateListWhoLeftAlready == true and isStillInGuild == true) then
+                                    table.insert(FCOGuildLottery.currentlyUsedGuildMembersJoinDateMemberListData, {
+                                        --rank
+                                        --memberName
+                                        --optionalInviterDisplayName
+                                        _eventTime  = eventTime,
+                                        _eventTimeFormated = guildMemberJoinedData.eventTimeFormated,
+                                        rank        = -1,
+                                        memberIndex = guildMemberIndex,
+                                        isStillInGuild = isStillInGuild,
+                                        memberName  = memberName,
+                                        invitedBy   = guildMemberJoinedData.optionalInviterDisplayName,
+                                    })
+                                end
                             end
                         end
                     end
@@ -1580,18 +1597,6 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 --Lottery functions
 
-function FCOGuildLottery.IsGuildSalesLotteryActive()
-    return (FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier ~= nil and
-           FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= nil and
-           FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId ~= nil) or false
-end
-
-function FCOGuildLottery.IsGuildMembersJoinDateListActive()
-    return (FCOGuildLottery.currentlyUsedGuildMembersJoinDateUniqueIdentifier ~= nil and
-           FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildIndex ~= nil and
-           FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildId ~= nil) or false
-end
-
 
 function FCOGuildLottery.UpdateMaxDiceSides(numDiceSides)
     df("UpdateMaxDiceSides - numDiceSides: %s", tos(numDiceSides))
@@ -1611,7 +1616,7 @@ end
 
 function FCOGuildLottery.ReloadGuildSalesLotteryRanks()
     df("ReloadGuildSalesLotteryRanks")
-    --if not FCOGuildLottery.IsGuildSalesLotteryActive() then return end
+    --if not isGuildSalesLotteryActive() then return end
 end
 
 local function showAskDialogNow(guildIndex, daysBefore, startingNewList, callbackYes, callbackNo, dialogTextsTable, noStandardYesCallback, diceRollType)
@@ -1666,7 +1671,7 @@ function FCOGuildLottery.ResetCurrentGuildSalesLotteryData(noSecurityQuestion, s
     if noSecurityQuestion == true and startingNewLottery == false and guildIndex == nil and daysBefore == nil then
         resetDataNow = true
     else
-        if FCOGuildLottery.IsGuildSalesLotteryActive() then
+        if isGuildSalesLotteryActive() then
             if not noSecurityQuestion then
                 --Show security question dialog
                 --Do you really want to reset... ?
@@ -1705,7 +1710,7 @@ function FCOGuildLottery.ResetCurrentGuildMembersJoinDateData(noSecurityQuestion
     if noSecurityQuestion == true and startingNewMembersJoinDate == false and guildIndex == nil and daysBefore == nil then
         resetDataNow = true
     else
-        if FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+        if isGuildMembersJoinDateListActive() then
             if not noSecurityQuestion then
                 --Show security question dialog
                 --Do you really want to reset... ?
@@ -1793,7 +1798,7 @@ function FCOGuildLottery.RollTheDiceForGuildSalesLottery(noChatOutput)
     end
 
     --Build the unique identifier and set the other needed variables
-    if not FCOGuildLottery.IsGuildSalesLotteryActive() then
+    if not isGuildSalesLotteryActive() then
         --Which guildIndex and Id should be used? And how many days backwards?
         -->All chosen via the slash command /gsl /guildsaleshistory or /dicegsl
         guildIndex = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex
@@ -1907,7 +1912,7 @@ function FCOGuildLottery.RollTheDiceForGuildMembersJoinDate(noChatOutput)
     end
 
     --Build the unique identifier and set the other needed variables
-    if not FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+    if not isGuildMembersJoinDateListActive() then
         --Which guildIndex and Id should be used? And how many days backwards?
         -->All chosen via the slash command /gsl /guildsaleshistory or /dicegsl
         guildIndex = FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildIndex
@@ -2194,7 +2199,7 @@ function FCOGuildLottery.StopGuildSalesLottery(override, forceCallbackYes, callb
         callbackYes = function() return FCOGuildLottery[callbackFuncToUseForYes](guildIndex, daysBefore, dataWasResetAlready) end
     end
 
-    if not FCOGuildLottery.IsGuildSalesLotteryActive() then
+    if not isGuildSalesLotteryActive() then
         if callbackYes ~= nil then
             callbackYes()
         end
@@ -2228,7 +2233,7 @@ function FCOGuildLottery.StopGuildMembersJoinDateList(override, forceCallbackYes
         callbackYes = function() return FCOGuildLottery[callbackFuncToUseForYes](guildIndex, daysBefore, dataWasResetAlready) end
     end
 
-    if not FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+    if not isGuildMembersJoinDateListActive() then
         if callbackYes ~= nil then
             callbackYes()
         end
@@ -2292,14 +2297,14 @@ df("[FCOGuildLottery.RollTheDiceNormalForGuildMemberCheck] - index: %s, noChatOu
         return
     end
     --Is currently any guild lottery active? As a normal guild dice roll would interrupt it we need to ask if we want to
-    if FCOGuildLottery.IsGuildSalesLotteryActive() then
+    if isGuildSalesLotteryActive() then
         --Show dialog and ask if we really want to! If yes is chosen: Try the dice throw again now, after resetting the current guild lottery
         FCOGuildLottery.ResetCurrentGuildSalesLotteryData(false, false, nil, nil, FCOGuildLottery.normalGuildMemeberDiceRollSlashCommand, nil)
         --Abort here now and let the dialog Yes callback function try again, or no do nothing
         return
     end
     --Is any Guildmember jined date list active? As a normal guild dice roll would interrupt it we need to ask if we want to
-    if FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+    if isGuildMembersJoinDateListActive() then
         --Show dialog and ask if we really want to! If yes is chosen: Try the dice throw again now, after resetting the current guild member joined list
         FCOGuildLottery.ResetCurrentGuildMembersJoinDateData(false, false, nil, nil, FCOGuildLottery.normalGuildMemeberDiceRollSlashCommand, nil)
         --Abort here now and let the dialog Yes callback function try again, or no do nothing
@@ -2321,9 +2326,9 @@ end
 function FCOGuildLottery.RollTheDiceCheck(noChatOutput)
     noChatOutput = noChatOutput or false
     df( "------------[ RollTheDiceCheck - noChatOutput: %s ]------------ ", tos(noChatOutput))
-    if FCOGuildLottery.IsGuildSalesLotteryActive() then
+    if isGuildSalesLotteryActive() then
         FCOGuildLottery.RollTheDiceForGuildSalesLottery(noChatOutput)
-    elseif FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+    elseif isGuildMembersJoinDateListActive() then
         FCOGuildLottery.RollTheDiceForGuildMembersJoinDate(noChatOutput)
     else
         FCOGuildLottery.RollTheDiceWithDefaultSides(noChatOutput)
@@ -2453,10 +2458,10 @@ end
 
 --Start (if not started yet) or roll a dice for the current guild sales lottery, via slash command
 function FCOGuildLottery.GuildSalesLotterySlashCommand(args)
-    if FCOGuildLottery.IsGuildMembersJoinDateListActive() then return end
+    if isGuildMembersJoinDateListActive() then return end
 
     --Is a guild sales lottery active so we can go on with this "dice roll"?
-    if not FCOGuildLottery.IsGuildSalesLotteryActive() then
+    if not isGuildSalesLotteryActive() then
         showNewGSLSlashCommandHelp(nil, true, nil)
     else
         --Just roll next guild sales lottery dice
@@ -2466,10 +2471,10 @@ end
 
 --Start (if not started yet) or roll a dice for the current guild member joined list, via slash command
 function FCOGuildLottery.GuildMembersJoinedListSlashCommand(args)
-    if FCOGuildLottery.IsGuildSalesLotteryActive() then return end
+    if isGuildSalesLotteryActive() then return end
 
     --Is a guild sales lottery active so we can go on with this "dice roll"?
-    if not FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+    if not isGuildMembersJoinDateListActive() then
         showNewGSLSlashCommandHelp(nil, nil, true)
     else
         --Just roll next guild sales lottery dice
@@ -2549,9 +2554,9 @@ function FCOGuildLottery.ClearCurrentHistoryCheck()
 df("ClearCurrentHistoryCheck - isEnabled: %s", tos(isEnabled))
     if not isEnabled then return end
 
-    if FCOGuildLottery.IsGuildSalesLotteryActive() then
+    if isGuildSalesLotteryActive() then
         questionHistoryName = GetString(FCOGL_GUILD_SALES_LOTTERY_HISTORY)
-    elseif FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+    elseif isGuildMembersJoinDateListActive() then
         questionHistoryName = GetString(FCOGL_GUILD_MEMBER_JOINED_LIST_HISTORY)
     else
         if FCOGuildLottery.currentlyUsedDiceRollGuildId ~= nil then
