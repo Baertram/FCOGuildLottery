@@ -2384,6 +2384,11 @@ function FCOGuildLottery.parseSlashCommandArguments(args, firstArg)
         end
         if guildIndex ~= nil and daysBefore ~= nil then
             if daysBeforeLastUsedGuildSalesLottery == nil then
+                if FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore ~= nil then
+                    daysBeforeLastUsedGuildSalesLottery = FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore
+                end
+            end
+            if daysBeforeLastUsedGuildSalesLottery == nil then
                 daysBeforeLastUsedGuildSalesLottery = daysBefore
             else
                 FCOGuildLottery.guildLotteryDaysBeforeSliderWasChanged = true
@@ -2424,6 +2429,11 @@ function FCOGuildLottery.parseSlashCommandArguments(args, firstArg)
             daysBefore = FCOGuildLottery.GetGuildMemberJoinedDateStartDate()
         end
         if guildIndex ~= nil and daysBefore ~= nil then
+            if daysBeforeLastUsedGuildMemberJoinedDateList == nil then
+                if FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore ~= nil then
+                    daysBeforeLastUsedGuildMemberJoinedDateList = FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore
+                end
+            end
             if daysBeforeLastUsedGuildMemberJoinedDateList == nil then
                 daysBeforeLastUsedGuildMemberJoinedDateList = daysBefore
             else
