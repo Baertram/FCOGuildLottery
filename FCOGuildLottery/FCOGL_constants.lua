@@ -172,4 +172,4 @@ FCOGuildLottery.prevVars = {
 }
 FCOGuildLottery.guildLotteryDaysBeforeSliderWasChanged = false
 
-FCOGuildLottery.membersDataDaysBeforeSliderWasChanged = false
+FCOGuildLottery.guildMembersJoinedDateListDaysBeforeSliderWasChanged = false

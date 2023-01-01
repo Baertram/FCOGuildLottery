@@ -459,28 +459,28 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
 --Slash command functions
-local function showNewGSLSlashCommandHelp(noGuildSelected, guildSalesLotteryActive, guildMemberJoinedListActive)
+local function showNewGSLSlashCommandHelp(noGuildSelected, guildSalesLotteryWanted, guildMemberJoinedListWanted)
     noGuildSelected = noGuildSelected or false
     local newGSLChatErrorMessage
-    local uiWindow = FCOGuildLottery.UI and FCOGuildLottery.UI.window and FCOGuildLottery.UI.window.control
-    if uiWindow ~= nil and uiWindow:IsControlHidden() == false then
-        fcoglUIwindow = fcoglUIwindow or FCOGuildLottery.UI.window
-        fcoglUIwindowFrame = fcoglUIwindowFrame or FCOGuildLottery.UI.window.frame
+    --local uiWindow = FCOGuildLottery.UI and FCOGuildLottery.UI.window and FCOGuildLottery.UI.window.control
+    --if uiWindow ~= nil and uiWindow:IsControlHidden() == false then
+--        fcoglUIwindow = fcoglUIwindow or FCOGuildLottery.UI.window
+--        fcoglUIwindowFrame = fcoglUIwindowFrame or FCOGuildLottery.UI.window.frame
 
         if noGuildSelected == true then
             newGSLChatErrorMessage = GetString(FCOGL_ERROR_NO_GUILD_ONLY_GENERIC_DICE_THROW)
         else
-            if not guildSalesLotteryActive and guildMemberJoinedListActive == nil  then
+            if guildSalesLotteryWanted and guildMemberJoinedListWanted == nil  then
                 newGSLChatErrorMessage = string.format(GetString(FCOGL_ERROR_GUILD_SALES_LOTTERY_PARAMETERS_MISSING), tos(FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS))
-            elseif not guildMemberJoinedListActive and guildSalesLotteryActive == nil then
+            elseif guildMemberJoinedListWanted and guildSalesLotteryWanted == nil then
                 newGSLChatErrorMessage = string.format(GetString(FCOGL_ERROR_GUILD_MEMBERS_JOIN_DATE_LIST_PARAMETERS_MISSING), tos(FCOGL_DEFAULT_GUILD_MEMBERS_JOIN_DATE_HISTORY_DAYS))
             else
                 newGSLChatErrorMessage = GetString(FCOGL_ERROR_SELECTED_GUILD_INVALID)
             end
         end
-    else
-        newGSLChatErrorMessage = string.format(GetString(FCOGL_ERROR_GUILD_SALES_LOTTERY_PARAMETERS_MISSING), tos(FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS))
-    end
+--    else
+--        newGSLChatErrorMessage = string.format(GetString(FCOGL_ERROR_GUILD_SALES_LOTTERY_PARAMETERS_MISSING), tos(FCOGL_DEFAULT_GUILD_SELL_HISTORY_DAYS))
+--    end
     dfa(newGSLChatErrorMessage)
 end
 
@@ -1895,7 +1895,7 @@ function FCOGuildLottery.RollTheDiceForGuildMembersJoinDate(noChatOutput)
 
     --Was the setting of the daysBefore slider changed /was the slash command used to change the daysBefore?
     --But no reloadui was done after that?
-    if FCOGuildLottery.MembersJoinDateDaysBeforeSliderWasChanged == true then
+    if FCOGuildLottery.guildMembersJoinedDateListDaysBeforeSliderWasChanged == true then
         FCOGuildLottery.StopGuildMembersJoinDateList(true, true, nil, nil, nil, nil)
         showReloadUIMessage("daysbefore")
         return
@@ -2150,7 +2150,7 @@ end
 function FCOGuildLottery.StartNewGuildSalesLottery(guildIndex, daysBefore, dataWasResetAlready)
 df("[FCOGuildLottery.StartNewGuildSalesLottery] - index: %s, daysBefore: %s, dataWasResetAlready: %s", tos(guildIndex), tos(daysBefore), tos(dataWasResetAlready))
     if not IsGuildIndexValid(guildIndex) or daysBefore == nil then
-        showNewGSLSlashCommandHelp((FCOGuildLottery.noGuildIndex ~= nil and guildIndex == FCOGuildLottery.noGuildIndex) or false, nil, nil)
+        showNewGSLSlashCommandHelp((FCOGuildLottery.noGuildIndex ~= nil and guildIndex == FCOGuildLottery.noGuildIndex) or false, true, nil)
         return
     end
     if checkAndShowNoTraderMessage(guildIndex) == true then
@@ -2169,7 +2169,7 @@ end
 function FCOGuildLottery.StartNewGuildMembersJoinDateList(guildIndex, daysBefore, dataWasResetAlready)
 df("[FCOGuildLottery.StartNewGuildMembersJoinDateList] - index: %s, daysBefore: %s, dataWasResetAlready: %s", tos(guildIndex), tos(daysBefore), tos(dataWasResetAlready))
     if not IsGuildIndexValid(guildIndex) or daysBefore == nil then
-        showNewGSLSlashCommandHelp((FCOGuildLottery.noGuildIndex ~= nil and guildIndex == FCOGuildLottery.noGuildIndex) or false, nil, nil)
+        showNewGSLSlashCommandHelp((FCOGuildLottery.noGuildIndex ~= nil and guildIndex == FCOGuildLottery.noGuildIndex) or false, nil, true)
         return
     end
 
@@ -2328,7 +2328,8 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
 --Slash Command functions
-local daysBeforeLastUsed
+local daysBeforeLastUsedGuildSalesLottery
+local daysBeforeLastUsedGuildMemberJoinedDateList
 function FCOGuildLottery.parseSlashCommandArguments(args, firstArg)
     --Parse the arguments string
     local options = {}
@@ -2382,8 +2383,8 @@ function FCOGuildLottery.parseSlashCommandArguments(args, firstArg)
             daysBefore = FCOGuildLottery.GetGuildSalesLotteryStartDate()
         end
         if guildIndex ~= nil and daysBefore ~= nil then
-            if daysBeforeLastUsed == nil then
-                daysBeforeLastUsed = daysBefore
+            if daysBeforeLastUsedGuildSalesLottery == nil then
+                daysBeforeLastUsedGuildSalesLottery = daysBefore
             else
                 FCOGuildLottery.guildLotteryDaysBeforeSliderWasChanged = true
             end
@@ -2423,10 +2424,10 @@ function FCOGuildLottery.parseSlashCommandArguments(args, firstArg)
             daysBefore = FCOGuildLottery.GetGuildMemberJoinedDateStartDate()
         end
         if guildIndex ~= nil and daysBefore ~= nil then
-            if daysBeforeLastUsed == nil then
-                daysBeforeLastUsed = daysBefore
+            if daysBeforeLastUsedGuildMemberJoinedDateList == nil then
+                daysBeforeLastUsedGuildMemberJoinedDateList = daysBefore
             else
-                FCOGuildLottery.membersDataDaysBeforeSliderWasChanged = true
+                FCOGuildLottery.guildMembersJoinedDateListDaysBeforeSliderWasChanged = true
             end
             FCOGuildLottery.settingsVars.settings.guildMembersDaysBefore = daysBefore
             return guildIndex, daysBefore
@@ -2441,7 +2442,7 @@ function FCOGuildLottery.GuildSalesLotterySlashCommand(args)
 
     --Is a guild sales lottery active so we can go on with this "dice roll"?
     if not FCOGuildLottery.IsGuildSalesLotteryActive() then
-        showNewGSLSlashCommandHelp(nil, false, nil)
+        showNewGSLSlashCommandHelp(nil, true, nil)
     else
         --Just roll next guild sales lottery dice
         FCOGuildLottery.RollTheDiceForGuildSalesLottery()
@@ -2454,7 +2455,7 @@ function FCOGuildLottery.GuildMembersJoinedListSlashCommand(args)
 
     --Is a guild sales lottery active so we can go on with this "dice roll"?
     if not FCOGuildLottery.IsGuildMembersJoinDateListActive() then
-        showNewGSLSlashCommandHelp(nil, nil, false)
+        showNewGSLSlashCommandHelp(nil, nil, true)
     else
         --Just roll next guild sales lottery dice
         FCOGuildLottery.RollTheDiceForGuildMembersJoinDate()

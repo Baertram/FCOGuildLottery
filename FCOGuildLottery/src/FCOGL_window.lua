@@ -2166,6 +2166,7 @@ function fcoglWindowClass:checkNewGuildSalesLotteryButtonEnabled()
     df("fcoglWindowClass:checkNewGuildSalesLotteryButtonEnabled")
     local newGuildSalesLotteryButton = self.frame:GetNamedChild("NewGuildSalesLottery")
     if not newGuildSalesLotteryButton then return end
+    local gotTrader = false
     local isEnabled = true
     if checkIfButtonIsEnabled(FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE) then
         isEnabled = false
@@ -2174,7 +2175,7 @@ function fcoglWindowClass:checkNewGuildSalesLotteryButtonEnabled()
         --No guildId selected?
         local selectedGuildDropsData = fcoglUI.getSelectedGuildsDropEntry()
         local guildIndex = selectedGuildDropsData.index
-        local gotTrader = selectedGuildDropsData.gotTrader
+        gotTrader = selectedGuildDropsData.gotTrader
         if guildIndex == nil or guildIndex == FCOGuildLottery.noGuildIndex or
                 not FCOGuildLottery.IsGuildIndexValid(guildIndex) or not gotTrader then
             isEnabled = false
@@ -2182,7 +2183,7 @@ function fcoglWindowClass:checkNewGuildSalesLotteryButtonEnabled()
     end
     newGuildSalesLotteryButton:SetEnabled(isEnabled)
     newGuildSalesLotteryButton:SetMouseEnabled(isEnabled)
-    return isEnabled
+    return isEnabled, gotTrader
 end
 
 function fcoglWindowClass:checkStopGuildMemberJoinedButtonEnabled(isEnabled)
@@ -2488,7 +2489,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 --Unhide buttons at the tab
                 self.frame:GetNamedChild("RollTheDice"):SetEnabled(true)
                 self.frame:GetNamedChild("RollTheDice"):SetHidden(false)
-                local isEnabled = self:checkNewGuildSalesLotteryButtonEnabled()
+                local isEnabled, gotTrader = self:checkNewGuildSalesLotteryButtonEnabled()
                 --self:checkRefreshGuildSalesLotteryButtonEnabled(isEnabled)
                 self:checkStopGuildSalesLotteryButtonEnabled(isEnabled)
                 self:UpdateGuildSalesDateStartLabel(isGuildSalesLotteryActive, isGuildMembersJoinDateListActive)
@@ -2502,9 +2503,9 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 local diceRollType, guildIndex = FCOGuildLottery.getCurrentDiceRollTypeAndGuildIndex()
                 fcoglUI.updateUIGuildsDropNow(diceRollType, guildIndex, true, true)
 
-                self.frame:GetNamedChild("NewGuildSalesLottery"):SetHidden(false)
+                self.frame:GetNamedChild("NewGuildSalesLottery"):SetHidden(not gotTrader)
                 --self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetHidden(false)
-                self.frame:GetNamedChild("StopGuildSalesLottery"):SetHidden(false)
+                self.frame:GetNamedChild("StopGuildSalesLottery"):SetHidden(not gotTrader)
 
                 self.frame:GetNamedChild("StartGuildMemberJoinedList"):SetHidden(false)
                 self.frame:GetNamedChild("StopGuildMemberJoinedList"):SetHidden(false)
@@ -2556,7 +2557,7 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 --Unhide buttons at the tab
                 self.frame:GetNamedChild("RollTheDice"):SetEnabled(true)
                 self.frame:GetNamedChild("RollTheDice"):SetHidden(false)
-                local isEnabled = self:checkNewGuildSalesLotteryButtonEnabled()
+                local isEnabled, gotTrader = self:checkNewGuildSalesLotteryButtonEnabled()
                 --self:checkRefreshGuildSalesLotteryButtonEnabled(isEnabled)
                 self:checkStopGuildSalesLotteryButtonEnabled(isEnabled)
                 self:UpdateGuildSalesDateStartLabel(isGuildSalesLotteryActive, isGuildMembersJoinDateListActive)
@@ -2570,9 +2571,9 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 local diceRollType, guildIndex = FCOGuildLottery.getCurrentDiceRollTypeAndGuildIndex()
                 fcoglUI.updateUIGuildsDropNow(diceRollType, guildIndex, true, true)
 
-                self.frame:GetNamedChild("NewGuildSalesLottery"):SetHidden(false)
+                self.frame:GetNamedChild("NewGuildSalesLottery"):SetHidden(not gotTrader)
                 --self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetHidden(false)
-                self.frame:GetNamedChild("StopGuildSalesLottery"):SetHidden(false)
+                self.frame:GetNamedChild("StopGuildSalesLottery"):SetHidden(not gotTrader)
 
                 self.frame:GetNamedChild("StartGuildMemberJoinedList"):SetHidden(false)
                 self.frame:GetNamedChild("StopGuildMemberJoinedList"):SetHidden(false)
