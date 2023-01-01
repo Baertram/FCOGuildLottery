@@ -60,10 +60,10 @@ local function buildDropdownEntries(diceRollType)
     if diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY then
         guildSalesLotterySavedDaysBeforeChoices = {}
         guildSalesLotterySavedDaysBeforeChoicesValues = {}
-        guildSalesLotteryChosenSavedDaysBefore = 0
+        guildSalesLotteryChosenSavedDaysBefore = "0"
 
-        tins(guildSalesLotterySavedDaysBeforeChoices, GetString(FCOGL_LAM_NONE))
-        tins(guildSalesLotterySavedDaysBeforeChoicesValues, 0)
+        tins(guildSalesLotterySavedDaysBeforeChoices, 1, GetString(FCOGL_LAM_NONE))
+        tins(guildSalesLotterySavedDaysBeforeChoicesValues, 1, "0")
 
         --Read the current SavedVariables for the guild sales lottery
         for guildId, daysBeforeTab in pairs(FCOGuildLottery.settingsVars.settings.diceRollGuildLotteryHistory) do
@@ -96,10 +96,10 @@ local function buildDropdownEntries(diceRollType)
     elseif diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE then
         guildMemberJoinedDateListSavedDaysBeforeChoices = {}
         guildMemberJoinedDateListSavedDaysBeforeChoicesValues = {}
-        guildMemberJoinedDateListChosenSavedDaysBefore = 0
+        guildMemberJoinedDateListChosenSavedDaysBefore = "0"
 
-        tins(guildMemberJoinedDateListSavedDaysBeforeChoices, GetString(FCOGL_LAM_NONE))
-        tins(guildMemberJoinedDateListSavedDaysBeforeChoicesValues, 0)
+        tins(guildMemberJoinedDateListSavedDaysBeforeChoices, 1, GetString(FCOGL_LAM_NONE))
+        tins(guildMemberJoinedDateListSavedDaysBeforeChoicesValues, 1, "0")
 
         --Read the current SavedVariables for the guild members joined date list
         for guildId, daysBeforeTab in pairs(FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory) do
@@ -133,12 +133,12 @@ end
 
 local function deleteChosenSavedGuildSalesLottery()
     if guildSalesLotterySavedDaysBeforeChoices == nil or guildSalesLotterySavedDaysBeforeChoicesValues == nil
-            or guildSalesLotteryChosenSavedDaysBefore == nil or guildSalesLotteryChosenSavedDaysBefore == 0 then return end
+            or guildSalesLotteryChosenSavedDaysBefore == nil or guildSalesLotteryChosenSavedDaysBefore == "0" then return end
     d("Delete Guild Sales Lottery - days before: " ..tos(guildSalesLotteryChosenSavedDaysBefore))
     local guildId, uniqueIdentifier, timeStamp = getDataOfSelectedDropdownEntry(guildSalesLotteryChosenSavedDaysBefore)
     if guildId == nil or uniqueIdentifier == nil or timeStamp == nil then
 d("<Exit: GuildId or other data missing!")
-        guildSalesLotteryChosenSavedDaysBefore = 0
+        guildSalesLotteryChosenSavedDaysBefore = "0"
         return
     end
 
@@ -159,17 +159,17 @@ d("<Exit: GuildId or other data missing!")
             FCOGL_LAM_DROPDOWN_CLEAR_SAVEDVARIABLES_GUILD_SALES_LOTERY:UpdateChoices(guildSalesLotterySavedDaysBeforeChoices, guildSalesLotterySavedDaysBeforeChoicesValues)
         end
     end
-    guildSalesLotteryChosenSavedDaysBefore = 0
+    guildSalesLotteryChosenSavedDaysBefore = "0"
 end
 
 local function deleteChosenSavedGuildMemberJoinedDateList()
     if guildMemberJoinedDateListSavedDaysBeforeChoices == nil or guildMemberJoinedDateListSavedDaysBeforeChoicesValues == nil
-        or guildMemberJoinedDateListChosenSavedDaysBefore == nil or guildMemberJoinedDateListChosenSavedDaysBefore == 0 then return end
+        or guildMemberJoinedDateListChosenSavedDaysBefore == nil or guildMemberJoinedDateListChosenSavedDaysBefore == "0" then return end
 d("Delete Guild Members Joined Date List - days before: " ..tos(guildMemberJoinedDateListChosenSavedDaysBefore))
     local guildId, uniqueIdentifier, timeStamp = getDataOfSelectedDropdownEntry(guildMemberJoinedDateListChosenSavedDaysBefore)
     if guildId == nil or uniqueIdentifier == nil or timeStamp == nil then
 d("<Exit: GuildId or other data missing!")
-        guildMemberJoinedDateListChosenSavedDaysBefore = 0
+        guildMemberJoinedDateListChosenSavedDaysBefore = "0"
         return
     end
     if FCOGuildLottery.settingsVars.settings.diceRollGuildMemberJoinedDateListHistory[guildId] ~= nil
@@ -188,7 +188,7 @@ d("<Exit: GuildId or other data missing!")
         end
 
     end
-    guildMemberJoinedDateListChosenSavedDaysBefore = 0
+    guildMemberJoinedDateListChosenSavedDaysBefore = "0"
 end
 
 function FCOGuildLottery.ShowLAMSettings()
@@ -522,7 +522,7 @@ function FCOGuildLottery.buildAddonMenu()
                     name = GetString(FCOGL_LAM_CLEAR_SAVEDVARIABLES_DELETE),
                     tooltip = GetString(FCOGL_LAM_CLEAR_SAVEDVARIABLES_DELETE_TT),
                     func = function() deleteChosenSavedGuildSalesLottery() end,
-                    disabled = function() return guildSalesLotteryChosenSavedDaysBefore == nil or guildSalesLotteryChosenSavedDaysBefore == 0 end,
+                    disabled = function() return guildSalesLotteryChosenSavedDaysBefore == nil or guildSalesLotteryChosenSavedDaysBefore == "0" end,
                 },
 
 
@@ -550,7 +550,7 @@ function FCOGuildLottery.buildAddonMenu()
                     name = GetString(FCOGL_LAM_CLEAR_SAVEDVARIABLES_DELETE),
                     tooltip = GetString(FCOGL_LAM_CLEAR_SAVEDVARIABLES_DELETE_TT),
                     func = function() deleteChosenSavedGuildMemberJoinedDateList() end,
-                    disabled = function() return guildMemberJoinedDateListChosenSavedDaysBefore == nil or guildMemberJoinedDateListChosenSavedDaysBefore == 0 end,
+                    disabled = function() return guildMemberJoinedDateListChosenSavedDaysBefore == nil or guildMemberJoinedDateListChosenSavedDaysBefore == "0" end,
                 },
 
 

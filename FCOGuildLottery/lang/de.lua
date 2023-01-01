@@ -197,7 +197,7 @@ FCOGuildLottery.lang["de"] = {
     SI_BINDING_NAME_FCOGL_RESET_GUILD_SALES     = "Gilden Verkaufs-Lotterie zurücksetzen",
     SI_BINDING_NAME_FCOGL_STOP_GUILD_SALES      = "Gilden Verkaufs-Lotterie stoppen",
 
-    FCOGL_RELOADUI_WARNING_WITH_TEXT            = "<<========== FEHLER ==========>>\nDu hast keinen /reloadui (Benutzeroberfläche neuladen) durchgeführt nach dem Verändern %s in den Einstellungen/per Chat Kommando!",
+    FCOGL_RELOADUI_WARNING_WITH_TEXT            = "<<========== FEHLER ==========>>\nDu hast keinen /reloadui (Benutzeroberfläche neuladen) durchgeführt nach dem Verändern %s in den Einstellungen/per Chat Kommando!\nBitte lade die Benutzeroberfläche nun neu!",
     FCOGL_RELOADUI_DAYSBEFORE                   = " des \'Tage rückwärts, von heute an\' Wertes"
 }
 local lang = FCOGuildLottery.lang["de"]

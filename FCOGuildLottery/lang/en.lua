@@ -142,7 +142,7 @@ FCOGuildLottery.lang["en"] = {
 
     FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_SHOW_UI_ON_DICE_ROLL_TT = "Automatically show the UI after a dice roll was done via a slash command.\n\nThe dice roll history will be expanded as well then.\nInfo: The dice roll history will not change to the dice throw type (e.g. /diceg1 should switch to the guild 1 dice history) if a guild sales lottery or guild member joined list is currently active!",
     FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_LEFT = "Hide members who left",
-    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_LEFT_TT = "Hide/filter the guild members which have left the guild again already",
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_LEFT_TT = "Hide/filter the guild members who have left the guild again already",
 
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM               = "Date from",
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM_TT            = "The start date of the guild sales lottery. Default value is today - 7 days (at midnight).",
@@ -192,7 +192,7 @@ FCOGuildLottery.lang["en"] = {
     SI_BINDING_NAME_FCOGL_STOP_GUILD_SALES      = "Stop guild sales lottery",
 
 
-    FCOGL_RELOADUI_WARNING_WITH_TEXT            = "<<========== ERROR ==========>>\nYou did not do a /reloadui after changing \'%s\' in the settings/via slash command!",
+    FCOGL_RELOADUI_WARNING_WITH_TEXT            = "<<========== ERROR ==========>>\nYou did not do a /reloadui after changing \'%s\' in the settings/via slash command!\nPlease reload the UI now!",
     FCOGL_RELOADUI_DAYSBEFORE                   = " the days before value"
 }
 local langEn = FCOGuildLottery.lang["en"]
