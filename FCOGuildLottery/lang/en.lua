@@ -141,8 +141,8 @@ FCOGuildLottery.lang["en"] = {
     FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_DAYS_BEFORE_TT = "The days the guild should read backwards from today and collect the member joined data. Default value is 31 days.\n\nAttention: The more days you select here the more guild member events need to be read! Make sure ALL the selected days are given in your guild  history, check the guild tabs and if \'LibHistoire\' did read all the needed data, is aligned and updated! Else you'll most probably not be able to start the dice rolls, or you'll get false results!",
 
     FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_SHOW_UI_ON_DICE_ROLL_TT = "Automatically show the UI after a dice roll was done via a slash command.\n\nThe dice roll history will be expanded as well then.\nInfo: The dice roll history will not change to the dice throw type (e.g. /diceg1 should switch to the guild 1 dice history) if a guild sales lottery or guild member joined list is currently active!",
-    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANDED = "Hide disbanded members",
-    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANDED_TT = "Hide/filter the guild members which have disbanded again already",
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_LEFT = "Hide members who left",
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_LEFT_TT = "Hide/filter the guild members which have left the guild again already",
 
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM               = "Date from",
     FCOGL_LAM_GUILD_LOTTERY_DATE_FROM_TT            = "The start date of the guild sales lottery. Default value is today - 7 days (at midnight).",

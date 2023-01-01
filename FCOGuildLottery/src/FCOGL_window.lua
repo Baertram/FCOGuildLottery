@@ -31,7 +31,8 @@ local bool2Str = locVars.boolean2String
 
 locVars.diceRollPrefix = GetString(FCOGL_DICE_PREFIX)
 
-
+local isGuildSalesLotteryActive = FCOGuildLottery.IsGuildSalesLotteryActive
+local isGuildMembersJoinDateListActive = FCOGuildLottery.IsGuildMembersJoinDateListActive
 
 --UI variables
 FCOGuildLottery.UI = FCOGuildLottery.UI or {}
@@ -606,17 +607,17 @@ end
 
 function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
     calledFromFilterFunction = calledFromFilterFunction or false
-    local listType = self:GetListType()
-    local guildSalesLotteryActive = FCOGuildLottery.IsGuildSalesLotteryActive()
-    local guildMemberJoinedListActive = FCOGuildLottery.IsGuildMembersJoinDateListActive()
+    local listType                           = self:GetListType()
+    local isGuildSalesLotteryCurrentlyActive     = isGuildSalesLotteryActive()
+    local isGuildMemberJoinedListCurrentlyActive = isGuildMembersJoinDateListActive()
 
-    df("list:BuildMasterList-calledFromFilterFunction: %s, currentTab: %s, listType: %s, guildLotteryActive: %s", tos(calledFromFilterFunction), tos(fcoglUI.CurrentTab), tos(listType), tos(guildSalesLotteryActive))
+    df("list:BuildMasterList-calledFromFilterFunction: %s, currentTab: %s, listType: %s, guildLotteryActive: %s", tos(calledFromFilterFunction), tos(fcoglUI.CurrentTab), tos(listType), tos(isGuildSalesLotteryCurrentlyActive))
     if listType == nil then return end
 
     if fcoglUI.CurrentTab == FCOGL_TAB_GUILDSALESLOTTERY then
         --Guild sales lottery is active?
         if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
-            if guildSalesLotteryActive == true then
+            if isGuildSalesLotteryCurrentlyActive == true then
                 self.masterList = {}
 
                 local rankingData = FCOGuildLottery.currentlyUsedGuildSalesLotteryMemberSellRank
@@ -631,7 +632,7 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
             end
             ------------------------------------------------------------------------------------------------------------------------
         elseif listType == FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE then
-            if guildMemberJoinedListActive == true then
+            if isGuildMemberJoinedListCurrentlyActive == true then
                 self.masterList = {}
 
                 local guildMembersJoinedListData = FCOGuildLottery.currentlyUsedGuildMembersJoinDateMemberListData
@@ -660,7 +661,7 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
 
             local tableWithLastDiceThrows
 
-            if guildSalesLotteryActive == true then
+            if isGuildSalesLotteryCurrentlyActive == true then
                 local currentGuildSalesLotteryGuildId = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId
                 local currentGuildSalesLotteryUniqueId = FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier
                 local currentlyUsedGuildSalesLotteryTimestamp = FCOGuildLottery.currentlyUsedGuildSalesLotteryTimestamp
@@ -668,7 +669,7 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
                     df("<<<ERROR: Current guild sales lottery guildId or uniqueId missing!")
                 end
                 tableWithLastDiceThrows = FCOGuildLottery.diceRollGuildLotteryHistory[currentGuildSalesLotteryGuildId][currentGuildSalesLotteryUniqueId][currentlyUsedGuildSalesLotteryTimestamp]
-            elseif guildMemberJoinedListActive == true then
+            elseif isGuildMemberJoinedListCurrentlyActive == true then
                 local currentlyUsedGuildMembersJoinDateGuildId = FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildId
                 local currentlyUsedGuildMembersJoinDateUniqueId = FCOGuildLottery.currentlyUsedGuildMembersJoinDateUniqueIdentifier
                 local currentlyUsedGuildMembersJoinDateTimestamp = FCOGuildLottery.currentlyUsedGuildMembersJoinDateTimestamp
@@ -692,13 +693,13 @@ function fcoglWindowClass:BuildMasterList(calledFromFilterFunction)
                 return false
             end
             local helperList = {}
-            if guildSalesLotteryActive == true then
+            if isGuildSalesLotteryCurrentlyActive == true then
                 for timeStamp, diceThrowData in pairs(tableWithLastDiceThrows) do
                     if timeStamp ~= "daysBefore" then
                         table.insert(helperList, diceThrowData)
                     end
                 end
-            elseif guildMemberJoinedListActive == true then
+            elseif isGuildMemberJoinedListCurrentlyActive == true then
                 for timeStamp, diceThrowData in pairs(tableWithLastDiceThrows) do
                     if timeStamp ~= "daysBefore" then
                         table.insert(helperList, diceThrowData)
@@ -1316,7 +1317,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
         --No guild selected!
         local lastSelectedIndex = comboBoxOwner:GetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType)
         --Currently guild sales lottery active?
-        local isGuildSalesLotteryCurrentlyActive = FCOGuildLottery.IsGuildSalesLotteryActive()
+        local isGuildSalesLotteryCurrentlyActive = isGuildSalesLotteryActive()
         if isGuildSalesLotteryCurrentlyActive == true then
             --Show ask dialog and reset the guild sales lottery to none if "yes" is chosen at the dialog
             --or reset to the before chosen dropdown entry
@@ -1363,7 +1364,7 @@ function fcoglWindowClass:InitializeComboBox(control, prefix, max, exclude, sear
         --Guild selected
         local lastSelectedIndex = comboBoxOwner:GetSearchBoxLastSelected(fcoglUI.CurrentTab, searchBoxType)
         --Is currently a guild sales lottery active? Then ask if it should aborted, If not: Switch back to active guildId
-        local isGuildSalesLotteryCurrentlyActive = FCOGuildLottery.IsGuildSalesLotteryActive()
+        local isGuildSalesLotteryCurrentlyActive = isGuildSalesLotteryActive()
         if isGuildSalesLotteryCurrentlyActive == true then
             --Show ask dialog and reset the guild sales lottery to the new guildId if "yes" is chosen at the dialog
             --or reset to the before chosen dropdown entry
@@ -2116,7 +2117,7 @@ end
 local function checkIfButtonIsEnabled(checkType)
     local currentlySeclectedGuildIndexAtDropdown = fcoglUI.getSelectedGuildsDropEntry().index
     if checkType == FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY then
-        if not FCOGuildLottery.IsGuildSalesLotteryActive() or ( FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= nil and
+        if not isGuildSalesLotteryActive() or ( FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= nil and
                 currentlySeclectedGuildIndexAtDropdown ~= nil and FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex ~= currentlySeclectedGuildIndexAtDropdown) then
             return false
         else
@@ -2124,7 +2125,7 @@ local function checkIfButtonIsEnabled(checkType)
         end
     end
     if checkType == FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE then
-        if not FCOGuildLottery.IsGuildMembersJoinDateListActive() or ( FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildIndex ~= nil and
+        if not isGuildMembersJoinDateListActive() or ( FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildIndex ~= nil and
                 currentlySeclectedGuildIndexAtDropdown ~= nil and FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildIndex ~= currentlySeclectedGuildIndexAtDropdown ) then
             return false
         else
@@ -2227,7 +2228,7 @@ function fcoglWindowClass:UpdateDiceHistoryGuildSalesDrop()
     local guildHistoryDrop = self.guildHistoryDrop
     if not guildHistoryDrop then return 0 end
     --Get all guild sales history data from the SavedVariables, for the currently selected guildId
-    if not FCOGuildLottery.IsGuildSalesLotteryActive() then return 0 end
+    if not isGuildSalesLotteryActive() then return 0 end
     --Get the guild sales history entries from the savedVariables (of the currently selected guildId)
     local guildId = fcoglUI.getSelectedGuildsDropEntry().id
     df(">guildId %s", tos(guildId))
@@ -2252,7 +2253,7 @@ function fcoglWindowClass:UpdateDiceHistoryGuildMembersJoinedDateListDrop()
     local guildHistoryDrop = self.guildMembersJoinedDateHistoryDrop
     if not guildHistoryDrop then return 0 end
     --Get all guild members joined date list data from the SavedVariables, for the currently selected guildId
-    if not FCOGuildLottery.IsGuildMembersJoinDateListActive() then return 0 end
+    if not isGuildMembersJoinDateListActive() then return 0 end
     --Get the guild members joined date list history entries from the savedVariables (of the currently selected guildId)
     local guildId = fcoglUI.getSelectedGuildsDropEntry().id
     df(">guildId %s", tos(guildId))
@@ -2278,7 +2279,7 @@ df("fcoglWindowClass:UpdateDiceHistoryInfoLabel")
     if not self.historyTypeLabel then return end
     self.historyTypeLabel:SetHidden(false)
     self.historyTypeLabel:SetText("")
-    if FCOGuildLottery.IsGuildSalesLotteryActive() then
+    if isGuildSalesLotteryActive() then
         self.historyTypeLabel:SetText(GetString(FCOGL_GUILD_SALES_LOTTERY_HISTORY))
 
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "GuildSalesHistory")
@@ -2303,7 +2304,7 @@ df("fcoglWindowClass:UpdateDiceHistoryInfoLabel")
         --Update the entries of the delete guild sales lottery history entries multi select dropdown
         fcoglUI.updateGuildSalesLotteryHistoryDeleteDropdownEntries(self.guildHistoryDeleteDrop)
 
-    elseif FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+    elseif isGuildMembersJoinDateListActive() then
         self.historyTypeLabel:SetText(GetString(FCOGL_GUILD_MEMBER_JOINED_LIST_HISTORY))
 
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "GuildMembersJoinedDateHistory")
@@ -2356,10 +2357,10 @@ function fcoglWindowClass:UpdateGuildSalesDateStartLabel(isGuildSalesLotteryActi
 df("fcoglWindowClass:UpdateGuildSalesDateStartLabel")
     if not self.guildSalesDateStartLabel then return end
     if isGuildSalesLotteryActive == nil then
-        isGuildSalesLotteryActive = FCOGuildLottery.IsGuildSalesLotteryActive()
+        isGuildSalesLotteryActive = isGuildSalesLotteryActive()
     end
     if isGuildMembersJoinDateListActive == nil then
-        isGuildMembersJoinDateListActive = FCOGuildLottery.IsGuildMembersJoinDateListActive()
+        isGuildMembersJoinDateListActive = isGuildMembersJoinDateListActive()
     end
 
     if not isGuildSalesLotteryActive then
@@ -2411,10 +2412,10 @@ df("fcoglWindowClass:UpdateGuildMemberListDateStartLabel")
     if not self.guildMembersListDateStartLabel then return end
 
     if isGuildSalesLotteryActive == nil then
-        isGuildSalesLotteryActive = FCOGuildLottery.IsGuildSalesLotteryActive()
+        isGuildSalesLotteryActive = isGuildSalesLotteryActive()
     end
     if isGuildMembersJoinDateListActive == nil then
-        isGuildMembersJoinDateListActive = FCOGuildLottery.IsGuildMembersJoinDateListActive()
+        isGuildMembersJoinDateListActive = isGuildMembersJoinDateListActive()
     end
 
     if not isGuildMembersJoinDateListActive then
@@ -2462,22 +2463,22 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
             --WLW_UpdateSceneFragmentTitle(WISHLIST_SCENE_NAME, TITLE_FRAGMENT, "Label", GetString(WISHLIST_TITLE) ..  " - " .. zo_strformat(GetString(WISHLIST_SETS_LOADED), 0))
             --updateSceneFragmentTitle(WISHLIST_SCENE_NAME, TITLE_FRAGMENT, "Label", GetString(WISHLIST_TITLE) .. " - " .. GetString(WISHLIST_BUTTON_SEARCH_TT):upper())
 
-            local isGuildSalesLotteryActive = FCOGuildLottery.IsGuildSalesLotteryActive()
-            local isGuildMembersJoinDateListActive = FCOGuildLottery.IsGuildMembersJoinDateListActive()
+            local isGuildSalesLotteryCurrentlyActive        = isGuildSalesLotteryActive()
+            local isGuildMembersJoinDateListCurrentlyActive = isGuildMembersJoinDateListActive()
 
 
             if listType == FCOGL_LISTTYPE_GUILD_SALES_LOTTERY then
                 --If no guild sales lottery is active: Hide the total list and it's sort headers!
 --d(">00000 GuildSalesLotteryActive: " ..tos(isGuildSalesLotteryActive))
                 --Show the left TLC's currently shown list control and hide all others
-                hideLeftTLCListControlsExceptThis((isGuildSalesLotteryActive == true and self) or nil, true)
+                hideLeftTLCListControlsExceptThis((isGuildSalesLotteryCurrentlyActive == true and self) or nil, true)
                 --Update the currently active listType
                 fcoglUI.CurrentListType = listType
 
                 --Hide the search dropdown and edit box?
-                self.searchDrop.m_container:SetHidden(not isGuildSalesLotteryActive)
-                self.searchBg:SetHidden(not isGuildSalesLotteryActive)
-                self.searchBox:SetHidden(not isGuildSalesLotteryActive)
+                self.searchDrop.m_container:SetHidden(not isGuildSalesLotteryCurrentlyActive)
+                self.searchBg:SetHidden(not isGuildSalesLotteryCurrentlyActive)
+                self.searchBox:SetHidden(not isGuildSalesLotteryCurrentlyActive)
                 self.searchBox:Clear()
 
                 --Hide currently unused tabs
@@ -2492,16 +2493,16 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 local isEnabled, gotTrader = self:checkNewGuildSalesLotteryButtonEnabled()
                 --self:checkRefreshGuildSalesLotteryButtonEnabled(isEnabled)
                 self:checkStopGuildSalesLotteryButtonEnabled(isEnabled)
-                self:UpdateGuildSalesDateStartLabel(isGuildSalesLotteryActive, isGuildMembersJoinDateListActive)
+                self:UpdateGuildSalesDateStartLabel(isGuildSalesLotteryCurrentlyActive, isGuildMembersJoinDateListCurrentlyActive)
 
                 local isEnabledNewGuildMemberList = self:checkNewGuildMemberJoinedButtonEnabled()
                 self:checkStopGuildMemberJoinedButtonEnabled(isEnabledNewGuildMemberList)
-                self:UpdateGuildMemberListDateStartLabel(isGuildSalesLotteryActive, isGuildMembersJoinDateListActive)
+                self:UpdateGuildMemberListDateStartLabel(isGuildSalesLotteryCurrentlyActive, isGuildMembersJoinDateListCurrentlyActive)
 
                 --Update the guild's dropdown box to select the currently active entry (if it was updated via slash commands)
                 -->Alsoupdate if guild sales lottery is enabled, but do not run the callback of the dropdown -> Just the visual update
                 local diceRollType, guildIndex = FCOGuildLottery.getCurrentDiceRollTypeAndGuildIndex()
-                fcoglUI.updateUIGuildsDropNow(diceRollType, guildIndex, true, true)
+                fcoglUI.updateUIGuildsDropNow(diceRollType, guildIndex, true, false, true)
 
                 self.frame:GetNamedChild("NewGuildSalesLottery"):SetHidden(not gotTrader)
                 --self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetHidden(false)
@@ -2538,14 +2539,14 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 --If no guild members joined list is active: Hide the total list and it's sort headers!
 --d(">00000 GuildMembersJoinedListActive: " ..tos(isGuildMembersJoinDateListActive))
                 --Show the left TLC's currently shown list control and hide all others
-                hideLeftTLCListControlsExceptThis((isGuildMembersJoinDateListActive == true and self) or nil, true)
+                hideLeftTLCListControlsExceptThis((isGuildMembersJoinDateListCurrentlyActive == true and self) or nil, true)
                 --Update the currently active listType
                 fcoglUI.CurrentListType = listType
 
                 --Hide the search dropdown and edit box?
-                self.searchDrop.m_container:SetHidden(not isGuildMembersJoinDateListActive)
-                self.searchBg:SetHidden(not isGuildMembersJoinDateListActive)
-                self.searchBox:SetHidden(not isGuildMembersJoinDateListActive)
+                self.searchDrop.m_container:SetHidden(not isGuildMembersJoinDateListCurrentlyActive)
+                self.searchBg:SetHidden(not isGuildMembersJoinDateListCurrentlyActive)
+                self.searchBox:SetHidden(not isGuildMembersJoinDateListCurrentlyActive)
                 self.searchBox:Clear()
 
                 --Hide currently unused tabs
@@ -2560,16 +2561,16 @@ function fcoglWindowClass:UpdateUI(state, blockDiceHistoryUpdate, diceHistoryOve
                 local isEnabled, gotTrader = self:checkNewGuildSalesLotteryButtonEnabled()
                 --self:checkRefreshGuildSalesLotteryButtonEnabled(isEnabled)
                 self:checkStopGuildSalesLotteryButtonEnabled(isEnabled)
-                self:UpdateGuildSalesDateStartLabel(isGuildSalesLotteryActive, isGuildMembersJoinDateListActive)
+                self:UpdateGuildSalesDateStartLabel(isGuildSalesLotteryCurrentlyActive, isGuildMembersJoinDateListCurrentlyActive)
 
                 local isEnabledNewGuildMemberList = self:checkNewGuildMemberJoinedButtonEnabled()
                 self:checkStopGuildMemberJoinedButtonEnabled(isEnabledNewGuildMemberList)
-                self:UpdateGuildMemberListDateStartLabel(isGuildSalesLotteryActive, isGuildMembersJoinDateListActive)
+                self:UpdateGuildMemberListDateStartLabel(isGuildSalesLotteryCurrentlyActive, isGuildMembersJoinDateListCurrentlyActive)
 
                 --Update the guild's dropdown box to select the currently active entry (if it was updated via slash commands)
                 -->Alsoupdate if guild sales lottery is enabled, but do not run the callback of the dropdown -> Just the visual update
                 local diceRollType, guildIndex = FCOGuildLottery.getCurrentDiceRollTypeAndGuildIndex()
-                fcoglUI.updateUIGuildsDropNow(diceRollType, guildIndex, true, true)
+                fcoglUI.updateUIGuildsDropNow(diceRollType, guildIndex, false, true, true)
 
                 self.frame:GetNamedChild("NewGuildSalesLottery"):SetHidden(not gotTrader)
                 --self.frame:GetNamedChild("ReloadGuildSalesLottery"):SetHidden(false)
@@ -2744,7 +2745,7 @@ local function deleteHistoryEntryNow(alsoDeleteSV, entryData, deleteSingleEntry)
         wasDeleted = false
         local guildId
         --Check which list is currently active
-        if FCOGuildLottery.IsGuildSalesLotteryActive() then
+        if isGuildSalesLotteryActive() then
             df(">guild sales lottery is active!")
             --Delete guild sales lottery entries
             local currentGuildSalesLotteryUniqueId
@@ -2805,7 +2806,7 @@ local function deleteHistoryEntryNow(alsoDeleteSV, entryData, deleteSingleEntry)
             end
 
         --Check which list is currently active
-        elseif FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+        elseif isGuildMembersJoinDateListActive() then
             df(">guild members joined date list is active!")
 
             --Delete guild members joined date list entries
@@ -3059,7 +3060,7 @@ end
 function fcoglUI.deleteGuildSalesLotteryHistoryTimestamp(entry)
     df("deleteGuildSalesLotteryHistoryTimestamp - name %s, guildId %s, timeStamp: %s", tos(entry.name), tos(entry.guildId), tos(entry.timestamp))
     local stopNow = false
-    if FCOGuildLottery.IsGuildSalesLotteryActive() == true and
+    if isGuildSalesLotteryActive() == true and
         entry.timestamp == FCOGuildLottery.currentlyUsedGuildSalesLotteryTimestamp and
         entry.guildId == FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId then
         stopNow = true
@@ -3081,11 +3082,11 @@ function fcoglUI.updateGuildSalesLotteryHistoryDeleteDropdownEntries(guildHistor
 
     local guildSalesLotteryHistoryEntriesOfGuild = {}
 
-    local guildSalesLotteryIsActive = FCOGuildLottery.IsGuildSalesLotteryActive()
+    local isGuildSalesLotteryCurrentlyActive = isGuildSalesLotteryActive()
 
     --Fill the table guildSalesLotteryHistoryEntriesOfGuild with the current guildId's SavedVariables of the guild sales
     --lottery history entries
-    if guildSalesLotteryIsActive == true then
+    if isGuildSalesLotteryCurrentlyActive == true then
         local currentGuildSalesLotteryGuildId = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildId
         local currentGuildSalesLotteryUniqueId = FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier
         local currentGuildSalesLotteryDaysBefore = FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore
@@ -3121,11 +3122,11 @@ function fcoglUI.updateGuildMembersJoinedDateListHistoryDeleteDropdownEntries(gu
 
     local guildMembersJoinedDateListHistoryEntriesOfGuild = {}
 
-    local guildMembersJoinedDateListIsActive = FCOGuildLottery.IsGuildMembersJoinDateListActive()
+    local isGuildMembersJoinedDateListCurrentlyActive = isGuildMembersJoinDateListActive()
 
     --Fill the table guildMembersJoinedDateListHistoryEntriesOfGuild with the current guildId's SavedVariables of the guild
     --Members Joined Date List history entries
-    if guildMembersJoinedDateListIsActive == true then
+    if isGuildMembersJoinedDateListCurrentlyActive == true then
         local currentGuildMembersJoinedDateListGuildId  = FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildId
         local currentGuildMembersJoinedDateListUniqueId   = FCOGuildLottery.currentlyUsedGuildMembersJoinDateUniqueIdentifier
         local currentGuildMembersJoinedDateListDaysBefore = FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore

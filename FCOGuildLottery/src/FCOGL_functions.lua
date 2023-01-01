@@ -233,20 +233,23 @@ function FCOGuildLottery.FormatDate(timeStamp)
     return os.date("%c", timeStamp)
 end
 
-local function updateUIGuildsDropNow(diceRollType, guildIndex, updateIfGuildSalesLottery, noCallBack)
+local function updateUIGuildsDropNow(diceRollType, guildIndex, updateIfGuildSalesLottery, updateIfGuildMemberJoinedDateList, noCallBack)
     updateIfGuildSalesLottery = updateIfGuildSalesLottery or false
     noCallBack = noCallBack or false
-    df(">updateUIGuildsDropNow - diceRollType %s, guildIndex %s, updateIfGuildSalesLottery %s, noCallBack %s", tos(diceRollType), tos(guildIndex), tos(updateIfGuildSalesLottery), tos(noCallBack))
+    df(">updateUIGuildsDropNow - diceRollType %s, guildIndex %s, updateIfGuildSalesLottery %s, updateIfGuildMemberJoinedDateList: %s, noCallBack %s",
+            tos(diceRollType), tos(guildIndex), tos(updateIfGuildSalesLottery), tos(updateIfGuildMemberJoinedDateList), tos(noCallBack))
     --Set the guilds dropdownbox at the UI, if no active guild sales lottery
     local fcoglUI = FCOGuildLottery.UI
     if updateIfGuildSalesLottery == true and FCOGuildLottery.IsGuildSalesLotteryActive() then
         if diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY and guildIndex ~= nil then
             fcoglUI.ChangeGuildsDropSelectedByGuildIndex(guildIndex, noCallBack)
         end
-    else
-        if diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE and guildIndex == nil then
+    elseif updateIfGuildMemberJoinedDateList == true and FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+        if diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE and guildIndex ~= nil then
             fcoglUI.ChangeGuildsDropSelectedByGuildIndex(guildIndex, noCallBack)
-        elseif diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC and guildIndex ~= nil then
+        end
+    else
+        if diceRollType == FCOGL_DICE_ROLL_TYPE_GUILD_GENERIC and guildIndex ~= nil then
             fcoglUI.ChangeGuildsDropSelectedByGuildIndex(guildIndex, noCallBack)
         elseif diceRollType == FCOGL_DICE_ROLL_TYPE_GENERIC and guildIndex == nil then
             fcoglUI.ChangeGuildsDropSelectedByIndex(MAX_GUILDS + 1, noCallBack)
@@ -299,7 +302,7 @@ df(">isWindowAlreadyShown: false, showUINow: true, showUIForDiceRollType: %s", t
         --Create (if not existing yet) and show the UI window, and the dice history according to setting
         fcoglUI.Show(true, hideHistory, nil)
 
-        updateUIGuildsDropNow(diceRollType, guildIndex, false)
+        updateUIGuildsDropNow(diceRollType, guildIndex, false, false, nil)
     elseif isWindowAlreadyShown == true then
 df(">isWindowAlreadyShown: true")
         --Should the dice history be shown?
@@ -312,7 +315,7 @@ df(">isWindowAlreadyShown: true")
                 FCOGuildLottery.settingsVars.settings.UIDiceHistoryWindow.isHidden = false
             end
         end
-        updateUIGuildsDropNow(diceRollType, guildIndex, false)
+        updateUIGuildsDropNow(diceRollType, guildIndex, false, false, nil)
     end
 end
 
@@ -321,6 +324,8 @@ function FCOGuildLottery.getCurrentDiceRollTypeAndGuildIndex()
     local guildIndex
     if FCOGuildLottery.IsGuildSalesLotteryActive() then
         guildIndex = FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildIndex
+    elseif FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+        guildIndex = FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildIndex
     else
         local guildId = FCOGuildLottery.currentlyUsedDiceRollGuildId
         if guildId == nil then
@@ -1606,7 +1611,7 @@ end
 
 function FCOGuildLottery.ReloadGuildSalesLotteryRanks()
     df("ReloadGuildSalesLotteryRanks")
-    if not FCOGuildLottery.IsGuildSalesLotteryActive() then return end
+    --if not FCOGuildLottery.IsGuildSalesLotteryActive() then return end
 end
 
 local function showAskDialogNow(guildIndex, daysBefore, startingNewList, callbackYes, callbackNo, dialogTextsTable, noStandardYesCallback, diceRollType)

@@ -149,8 +149,8 @@ FCOGuildLottery.lang["de"] = {
     FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_DAYS_BEFORE_TT = "Die Anzahl Tage die die Gilden Mitglieder Beitritts-Liste rückwärts lesen soll (von heute an), um das Raking aufzubauen. Der Standard Wert sind 31 Tage.\n\nAchtung: Je mehr Tage hier selektiert werden, desto mehr Gilden Historien Daten müssen gelesen werden. Stelle bitte sicher, dass diese Daten in der Gilden Historie der entsprechenden Gilde ermittelt wurde, prüfe den Gilden Historien Reiter und die \'LibHistoire\' Daten, ob diese aktualisiert und verbunden sind! Ansonsten musst du sehr wahrscheinlich per \'Benutzen\' Taste auf dem Historien Reiter die Daten manuell aktualisieren! Andernfalls erhältst du sehr wahrscheinlich falsche oder gar keine Werte!",
 
     FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_SHOW_UI_ON_DICE_ROLL_TT = "Zeige die Oberfläche automatisch an, wenn ein Würfel Wurf per Chat Kommando ausgeführt wurde.\n\nDie Würfel Wurf Historie wird dabei ebenfalls ausgeklappt.\nInfo: Die Würfel Historie wird jedoch nicht den Historientyp ändern (/diceg1 soll z.B. zur Gilde 1 Würfel Wurf Historie wechseln), wenn gerade eine Gilden Mitglieder Beitritts-Liste aktiv ist!!",
-    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANDED = "Verstecke ausgetretene Mitglieder",
-    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANDED_TT = "Verstecke/Filtere die Mitglieder welche bereits wieder aus der Gilde ausgetreten sind",
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_LEFT = "Verstecke ausgetretene Mitglieder",
+    FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_LEFT_TT = "Verstecke/Filtere die Mitglieder welche bereits wieder aus der Gilde ausgetreten sind",
 
 
     FCOGL_LAM_USE_24h_FORMAT                    = "Nutze 24 Stunden Format",

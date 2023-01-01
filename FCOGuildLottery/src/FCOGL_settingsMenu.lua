@@ -486,11 +486,11 @@ function FCOGuildLottery.buildAddonMenu()
         },
         {
             type    = "checkbox",
-            name    = GetString(FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANDED),
-            tooltip = GetString(FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_DISBANDED_TT),
-            getFunc = function() return settings.hideGuildMembersJoinedDateListDisbanded end,
-            setFunc = function(value) settings.hideGuildMembersJoinedDateListDisbanded = value end,
-            default = function() return defaults.hideGuildMembersJoinedDateListDisbanded end,
+            name    = GetString(FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_LEFT),
+            tooltip = GetString(FCOGL_LAM_GUILD_MEMBERS_JOINED_DATE_LIST_FILTER_ALREADY_LEFT_TT),
+            getFunc = function() return settings.hideGuildMembersJoinedDateListWhoLeftAlready end,
+            setFunc = function(value) settings.hideGuildMembersJoinedDateListWhoLeftAlready = value end,
+            default = function() return defaults.hideGuildMembersJoinedDateListWhoLeftAlready end,
         },
 
         --==============================================================================

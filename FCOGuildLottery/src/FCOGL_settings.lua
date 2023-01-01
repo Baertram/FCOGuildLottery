@@ -73,7 +73,7 @@ function FCOGuildLottery.getSettings()
         guildMembersDaysBefore = 31,
         guildMembersDateStart = 0,
         guildMembersDateStartSet = false,
-        hideGuildMembersJoinedDateListDisbanded = false,
+        hideGuildMembersJoinedDateListWhoLeftAlready = false,
 
         --UI
         -->Window
