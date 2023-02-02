@@ -1912,6 +1912,7 @@ function fcoglWindowClass:CreateDiceThrowHistoryEntry(diceRolledData)
         --rolledGuildMemberSecsSinceLogoff
         --rolledGuildMemberStatus
     ]]
+    local charName = (diceRolledData.characterId ~= nil and FCOGuildLottery.GetCharacterName(diceRolledData.characterId)) or nil
     local diceRolledHistoryLine = {
         type =      SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY, -- for the search method to work -> Find the processor in zo_stringsearch:Process()
         no =        diceRolledData.no,
@@ -1920,7 +1921,7 @@ function fcoglWindowClass:CreateDiceThrowHistoryEntry(diceRolledData)
         rolledGuildMemberName = diceRolledData.rolledGuildMemberName,
         guildId =   diceRolledData.guildId,
         guildIndex = diceRolledData.guildIndex,
-        nameText =  strfor("%s%s", (diceRolledData.guildId ~=nil and diceRolledData.rolledGuildMemberName) or diceRolledData.displayName, (diceRolledData.guildId == nil and " (" .. FCOGuildLottery.GetCharacterName(diceRolledData.characterId) .. ")") or ""),
+        nameText =  strfor("%s%s", (diceRolledData.guildId ~= nil and diceRolledData.rolledGuildMemberName) or diceRolledData.displayName, (diceRolledData.guildId == nil and diceRolledData.characterId ~= nil and " (" .. tos(charName) .. ")") or ""),
         roll =      diceRolledData.roll,
         rollText =  strfor("%s%s (%s)", locVars.diceRollPrefix, tos(diceRolledData.diceSides), tos(diceRolledData.roll)),
         timestamp = diceRolledData.timestamp,

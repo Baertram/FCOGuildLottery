@@ -2619,6 +2619,7 @@ function FCOGuildLottery.GetCharacterName(characterId)
     if FCOGuildLottery.characterData == nil then
         FCOGuildLottery.characterData = buildCharacterData(false)
     end
+    if characterId == nil then return end
     local characterName = FCOGuildLottery.characterData[characterId]
     return characterName
 end
