@@ -1912,6 +1912,7 @@ function fcoglWindowClass:CreateDiceThrowHistoryEntry(diceRolledData)
         --rolledGuildMemberSecsSinceLogoff
         --rolledGuildMemberStatus
     ]]
+--d("[FCOGL]CreateDiceThrowHistoryEntry-characterId: " ..tos(diceRolledData.characterId))
     local charName = (diceRolledData.characterId ~= nil and FCOGuildLottery.GetCharacterName(diceRolledData.characterId)) or nil
     local diceRolledHistoryLine = {
         type =      SCROLLLIST_DATATYPE_ROLLED_DICE_HISTORY, -- for the search method to work -> Find the processor in zo_stringsearch:Process()
@@ -2349,9 +2350,9 @@ df("fcoglWindowClass:UpdateDiceHistoryInfoLabel")
             self.historyTypeLabel:SetText(GetString(FCOGL_DICE_HISTORY_NORMAL))
         end
     end
-    self.historyTypeLabel:SetResizeToFitDescendents(true)
-    self.guildSalesHistoryInfoLabel:SetResizeToFitDescendents(true)
-    self.guildMembersJoinedDateHistoryInfoLabel:SetResizeToFitDescendents(true)
+    --self.historyTypeLabel:SetResizeToFitDescendents(true)
+    --self.guildSalesHistoryInfoLabel:SetResizeToFitDescendents(true)
+    --self.guildMembersJoinedDateHistoryInfoLabel:SetResizeToFitDescendents(true)
 end
 
 function fcoglWindowClass:UpdateGuildSalesDateStartLabel(isGuildSalesLotteryActive, isGuildMembersJoinDateListActive)
@@ -2366,12 +2367,12 @@ df("fcoglWindowClass:UpdateGuildSalesDateStartLabel")
 
     if not isGuildSalesLotteryActive then
         self.guildSalesDateStartLabel:SetHidden(true)
-        self.guildSalesDateStartLabel:SetResizeToFitDescendents(true)
+        --self.guildSalesDateStartLabel:SetResizeToFitDescendents(true)
         self.guildSalesDateStartLabel:SetText("")
     end
     if self.guildMembersListDateStartLabel ~= nil and not isGuildMembersJoinDateListActive then
         self.guildMembersListDateStartLabel:SetHidden(true)
-        self.guildMembersListDateStartLabel:SetResizeToFitDescendents(true)
+        --self.guildMembersListDateStartLabel:SetResizeToFitDescendents(true)
         self.guildMembersListDateStartLabel:SetText("")
     end
     if not isGuildSalesLotteryActive then return end
@@ -2421,12 +2422,12 @@ df("fcoglWindowClass:UpdateGuildMemberListDateStartLabel")
 
     if not isGuildMembersJoinDateListActive then
         self.guildMembersListDateStartLabel:SetHidden(true)
-        self.guildMembersListDateStartLabel:SetResizeToFitDescendents(true)
+        --self.guildMembersListDateStartLabel:SetResizeToFitDescendents(true)
         self.guildMembersListDateStartLabel:SetText("")
     end
     if self.guildSalesDateStartLabel ~= nil and not isGuildSalesLotteryActive then
         self.guildSalesDateStartLabel:SetHidden(true)
-        self.guildSalesDateStartLabel:SetResizeToFitDescendents(true)
+        --self.guildSalesDateStartLabel:SetResizeToFitDescendents(true)
         self.guildSalesDateStartLabel:SetText("")
     end
     if not isGuildMembersJoinDateListActive then return end
