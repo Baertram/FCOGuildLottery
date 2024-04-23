@@ -6,8 +6,8 @@ FCOGuildLottery.clientLang = GetCVar("language.2")
 ------------------------------------------------------------------------------------------------------------------------
 FCOGuildLottery.addonVars = {}
 local addonVars = FCOGuildLottery.addonVars
-addonVars.addonVersion		        = 0.2
-addonVars.addonSavedVarsVersion	    = "0.02"
+addonVars.addonVersion		        = 0.4
+addonVars.addonSavedVarsVersion	    = "0.02"                --Attention: Changing this ressts the SV!!!
 addonVars.addonName				    = "FCOGuildLottery"
 addonVars.addonNameShort		    = "FCOGL"
 addonVars.addonNameMenu  		    = "FCO GuildLottery"
@@ -57,17 +57,13 @@ FCOGuildLottery.noGuildIndex = MAX_GUILDS + 1 -- The index of the first non-guil
 FCOGuildLottery.libHistoireIsReady = false
 
 --LibHistoire
-if LibHistoire ~= nil then
-    FCOGuildLottery.LH = LibHistoire
-
-    --Adding a callback to the LibHistoire INITIALIZED event
-    FCOGuildLottery.LH:RegisterCallback(FCOGuildLottery.LH.callback.INITIALIZED, function()
-        FCOGuildLottery.libHistoireIsReady = true
-        --Further sales history read and build for the default 7 days backwards will be done at event_player_activated!
-    end)
-else
-    df(addonNamePre .. "!!!!! ERROR Mandatory library \'LibHistoire\' is not found !!!!!")
+local lh
+local function checkForLibHistoireReady()
+    lh = LibHistoire
+    FCOGuildLottery.LH = lh
+    return lh ~= nil and lh:IsReady()
 end
+FCOGuildLottery.CheckForLibHistoireReady = checkForLibHistoireReady
 
 ------------------------------------------------------------------------------------------------------------------------
 FCOGuildLottery.settingsVars = {}
@@ -89,11 +85,11 @@ FCOGuildLottery.lastRolledChatOutput = nil
 FCOGuildLottery.lastRolledGuildChatOutput = nil
 
 ------------------------------------------------------------------------------------------------------------------------
-FCOGuildLottery.guildSellListeners          = {}
+FCOGuildLottery.guildSellListeners          = {} --LibHistoire processors saved, for guild history "trader" category
 FCOGuildLottery.guildSellListenerCompleted  = {}
 FCOGuildLottery.guildSellStats              = {}
 
-FCOGuildLottery.guildMembersListeners          = {}
+FCOGuildLottery.guildMembersListeners          = {} --LibHistoire processors saved, for guild history "members" category
 FCOGuildLottery.guildMembersListenerCompleted  = {}
 FCOGuildLottery.guildMembersJoinedStats        = {}
 

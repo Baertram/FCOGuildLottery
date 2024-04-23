@@ -43,7 +43,7 @@ local function createLogger()
     logger = ldl:Create(addonVars.addonName)
     logger:SetEnabled(true)
 
-    subLoggerVerbose = logger:Create("verbose")
+    subLoggerVerbose = logger:Create("Verbose")
     subLoggerVerbose:SetEnabled(true)
 
     FCOGuildLottery.logger = logger
@@ -117,17 +117,16 @@ FCOGuildLottery.dfw = dfw
 
 --Verbose debug message formatted
 local function dfv(str, ...)
---[[
+--disabled, uncomment for debugging
     if not isDebuggingEnabled() then return end
     local noLogger = true
     if logger ~= nil and subLoggerVerbose ~= nil then
-        subLoggerVerbose:Verbose(string.format(str, ...)) Not working as long as Verbose is not explicitly enabled in LibDebugLogger/StartUpConfig.lua!
+        subLoggerVerbose:Verbose(string.format(str, ...)) --Not working as long as Verbose is not explicitly enabled in LibDebugLogger/StartUpConfig.lua!
         noLogger = false
     end
     if noLogger == true or isExtraChatOutputEnabled() then
         d(addonNamePre .. " VERBOSE " .. string.format(str, ...))
     end
-]]
 end
 FCOGuildLottery.dfv = dfv
 

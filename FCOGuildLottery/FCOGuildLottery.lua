@@ -13,6 +13,7 @@ local dfv   = FCOGuildLottery.dfv
 local dfw   = FCOGuildLottery.dfw
 
 local logger = FCOGuildLottery.logger
+local checkForLibHistoireReady = FCOGuildLottery.CheckForLibHistoireReady
 
 local em = EVENT_MANAGER
 
@@ -29,14 +30,16 @@ local function checkForHistyIsInitialized(isInitialCall)
             em:UnregisterForUpdate(uniqueName)
             dfe(addonNamePre .. "!!!!! \'LibHistoire\' was never initialized properly !!!!!")
         end
-        if FCOGuildLottery.libHistoireIsReady == true then
+        if checkForLibHistoireReady() == true then
             em:UnregisterForUpdate(uniqueName)
             df( ">>>>>>>>>> \'LibHistoire\' was initialized properly >>>>>>>>>>")
             --Get the default sales history time range of all guilds which own a guild store
-            FCOGuildLottery.GetDefaultSalesHistoryData()
+            --todo 20240422 Enable again after Member joined history processor was changed to LibHistoire API 2.0
+            --FCOGuildLottery.GetDefaultSalesHistoryData()
 
             --Get the default guild member history time range of all guilds
-            FCOGuildLottery.GetDefaultMemberHistoryData()
+            --todo 20240422 Enable again after Member joined history processor was changed to LibHistoire API 2.0
+            --FCOGuildLottery.GetDefaultMemberHistoryData()
         end
     end
     em:UnregisterForUpdate(uniqueName)
@@ -82,6 +85,13 @@ local function addonLoaded(eventName, addon)
     --[[LIBRARIES]]
     --LibAddonMenu-2.0
     FCOGuildLottery.LAM = LibAddonMenu2
+
+    --LibHistoire
+    checkForLibHistoireReady()
+    if FCOGuildLottery.LH == nil then
+        df(addonNamePre .. "!!!!! ERROR Mandatory library \'LibHistoire\' is not found !!!!!")
+        return
+    end
 
     --Get the SavedVariables
     FCOGuildLottery.getSettings()

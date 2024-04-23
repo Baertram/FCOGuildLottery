@@ -242,14 +242,14 @@ local function BuildMultiSelectDropdown(control, noSelectionStringText, multiSel
     dropdown:SetSortsItems(false)
 
     dropdown:ClearItems()
+
     if onDropDownHiddenFunc ~= nil and type(onDropDownHiddenFunc) == "function" then
         local function dropdownHiddenCallbackFunc()
             onDropDownHiddenFunc(dropdown)
         end
         dropdown:SetHideDropdownCallback(dropdownHiddenCallbackFunc)
     end
-    dropdown:SetNoSelectionText(noSelectionStringText)
-    dropdown:SetMultiSelectionTextFormatter(multiSelectionFormatterId)
+    dropdown:EnableMultiSelect(multiSelectionFormatterId, noSelectionStringText)
 
     updateDropdownEntries(dropdown, tabOfEntries)
 
@@ -303,6 +303,11 @@ function fcoglWindowClass:Setup(listType)
 
         self.masterList = { }
 
+        --The loading icon
+        self.frame.loading = self.frame:GetNamedChild("Loading")
+        self.frame.loading:SetHidden(true)
+        self.loading = self.frame.loading
+
         --Build the sortkeys depending on the settings
         --self:BuildSortKeys() --> Will be called internally in "self.sortHeaderGroup:SelectAndResetSortForKey"
         --Default values
@@ -322,13 +327,19 @@ function fcoglWindowClass:Setup(listType)
             return(ZO_TableOrderingFunction(listEntry1.data, listEntry2.data, self.currentSortKey, self.sortKeys, self.currentSortOrder))
         end
         --Search
-        self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("SearchDrop"))
+        self.searchDropCtrl = self.frame:GetNamedChild("SearchDrop")
+        self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.searchDropCtrl)
+        local searchDropBG = self.searchDropCtrl:GetNamedChild("BG")
+        searchDropBG:SetHidden(true)
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "name")
         if self.frame.searchDrop == nil then
             self.frame.searchDrop = self.searchDrop
         end
         --Guilds
-        self.guildsDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("GuildsDrop"))
+        self.guildsDropCtrl = self.frame:GetNamedChild("GuildsDrop")
+        self.guildsDrop = ZO_ComboBox_ObjectFromContainer(self.guildsDropCtrl)
+        local guildsDropBG = self.guildsDropCtrl:GetNamedChild("BG")
+        guildsDropBG:SetHidden(true)
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "guilds")
         if self.frame.guildsDrop == nil then
             self.frame.guildsDrop = self.guildsDrop
@@ -422,13 +433,19 @@ function fcoglWindowClass:Setup(listType)
             return(ZO_TableOrderingFunction(listEntry1.data, listEntry2.data, self.currentSortKey, self.sortKeys, self.currentSortOrder))
         end
         --Search
-        self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("SearchDrop"))
+        self.searchDropCtrl = self.frame:GetNamedChild("SearchDrop")
+        self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.searchDropCtrl)
+        local searchDropBG = self.searchDropCtrl:GetNamedChild("BG")
+        searchDropBG:SetHidden(true)
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "name")
         if self.frame.searchDrop == nil then
             self.frame.searchDrop = self.searchDrop
         end
         --Guilds
-        self.guildsDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("GuildsDrop"))
+        self.guildsDropCtrl = self.frame:GetNamedChild("GuildsDrop")
+        self.guildsDrop = ZO_ComboBox_ObjectFromContainer(self.guildsDropCtrl)
+        local guildsDropBG = self.guildsDropCtrl:GetNamedChild("BG")
+        guildsDropBG:SetHidden(true)
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "guilds")
         if self.frame.guildsDrop == nil then
             self.frame.guildsDrop = self.guildsDrop
@@ -513,7 +530,10 @@ function fcoglWindowClass:Setup(listType)
             return(ZO_TableOrderingFunction(listEntry1.data, listEntry2.data, self.currentSortKey, self.sortKeys, self.currentSortOrder))
         end
         --Search
-        self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("SearchDrop"))
+        self.searchDropCtrl = self.frame:GetNamedChild("SearchDrop")
+        self.searchDrop = ZO_ComboBox_ObjectFromContainer(self.searchDropCtrl)
+        local searchDropBG = self.searchDropCtrl:GetNamedChild("BG")
+        searchDropBG:SetHidden(true)
         self.initializeSearchDropdown(self, FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "name")
 
         --Search box and search functions
@@ -545,7 +565,12 @@ function fcoglWindowClass:Setup(listType)
         self.guildMembersJoinedDateHistoryInfoLabel = self.frame:GetNamedChild("GuildMembersJoinedDateHistoryInfoLabel")
 
         --Guild sales lottery dropdown and multi select dropdown, delete button
-        self.guildHistoryDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("GuildHistoryDrop"))
+        self.guildHistoryDropCtrl = self.frame:GetNamedChild("GuildHistoryDrop")
+        self.guildHistoryDrop = ZO_ComboBox_ObjectFromContainer(self.guildHistoryDropCtrl)
+        --self.guildHistoryDrop.m_font = "MyFontGame20" --Only changes the dropdwn entrie's font. selectedItemFont can be changed how?
+        self.guildHistoryDrop:SetSelectedItemFont("ZoFontGameSmall")
+        local guildHistoryDropBG = self.guildHistoryDropCtrl:GetNamedChild("BG")
+        guildHistoryDropBG:SetHidden(true)
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "GuildSalesHistory")
         self.guildHistoryDeleteDropContainer = self.frame:GetNamedChild("GuildHistoryDeleteDrop")
         self.guildHistoryDeleteDrop = BuildMultiSelectDropdown(self.guildHistoryDeleteDropContainer,
@@ -563,7 +588,11 @@ function fcoglWindowClass:Setup(listType)
         self.guildHistoryDeleteSelectedButton:SetMouseEnabled(false)
 
         --Guild members joined date dropdown and multi select dropdown, delete button
-        self.guildMembersJoinedDateHistoryDrop = ZO_ComboBox_ObjectFromContainer(self.frame:GetNamedChild("GuildMemberJoinedDateHistoryDrop"))
+        self.guildMembersJoinedDateHistoryDropCtrl = self.frame:GetNamedChild("GuildMemberJoinedDateHistoryDrop")
+        self.guildMembersJoinedDateHistoryDrop = ZO_ComboBox_ObjectFromContainer(self.guildMembersJoinedDateHistoryDropCtrl)
+        self.guildMembersJoinedDateHistoryDrop:SetSelectedItemFont("ZoFontGameSmall")
+        local guildMembersJoinedDateHistoryDropBG = self.guildMembersJoinedDateHistoryDropCtrl:GetNamedChild("BG")
+        guildMembersJoinedDateHistoryDropBG:SetHidden(true)
         self:initializeSearchDropdown(FCOGL_TAB_GUILDSALESLOTTERY, self.listType, "GuildMembersJoinedDateHistory")
         self.guildMembersJoinedDateHistoryDeleteDropContainer = self.frame:GetNamedChild("GuildMembersJoinedDateHistoryDeleteDrop")
         self.guildMembersJoinedDateHistoryDeleteDrop = BuildMultiSelectDropdown(self.guildMembersJoinedDateHistoryDeleteDropContainer,

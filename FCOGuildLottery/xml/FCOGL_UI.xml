@@ -1,12 +1,14 @@
 <GuiXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sir.insidi.at/or/schema/esoui.xsd">
     <!-- Fonts -->
 	<Font name="MyFontGame16" font="$(MEDIUM_FONT)|$(KB_16)|soft-shadow-thin" />
+	<Font name="MyFontGame15" font="$(MEDIUM_FONT)|$(KB_15)|soft-shadow-thin" />
     <Font name="MyFontGame20" font="$(BOLD_FONT)|$(KB_20)|soft-shadow-thik" />
 
     <Controls>
 <!-- ========================================================================================================================================================== -->
 		<!-- Virtual labels -->
         <Label name="FCOGLRowLabel" font="MyFontGame16" wrapMode="ELLIPSIS" horizontalAlignment="LEFT" verticalAlignment="CENTER" virtual="true" tier="LOW" layer="CONTROLS" level="1"/>
+        <Label name="FCOGLRowLabelSmall" font="MyFontGame15" wrapMode="ELLIPSIS" horizontalAlignment="LEFT" verticalAlignment="CENTER" virtual="true" tier="LOW" layer="CONTROLS" level="1"/>
 		<Label name="FCOGLSearchLabel" font="ZoFontGameLargeBold" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_NORMAL" virtual="true" tier="LOW" layer="CONTROLS" level="1"/>
 
 <!-- ========================================================================================================================================================== -->
@@ -139,7 +141,7 @@
 					<Dimensions x="230" y="30" />
 					<DimensionConstraints minX="230" minY="30" />
 				</Label>
-				<Label name="$(parent)Roll" inherits="FCOGLRowLabel">
+				<Label name="$(parent)Roll" inherits="FCOGLRowLabelSmall">
 					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)Name" />
 					<Dimensions x="85" y="30" />
 					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-15" />
@@ -167,7 +169,7 @@
 
 <!-- ========================================================================================================================================================== -->
 		<!-- Virtual comboboxes -->
-		<Control name="FCOGLMultiselectComboBox" mouseEnabled="true" inherits="ZO_MultiselectComboBox" virtual="true" tier="LOW" layer="CONTROLS" level="2">
+		<Control name="FCOGLMultiselectComboBox" mouseEnabled="true" inherits="ZO_ComboBox" virtual="true" tier="LOW" layer="CONTROLS" level="2">
 			<Dimensions x="230" y="28" />
 			<Controls>
 				<Backdrop name="$(parent)BGNew" inherits="FCOGL_MultiSeletComboBoxBG">
@@ -458,16 +460,8 @@
 					</Controls>
 				</Backdrop>
 
-				<Control name="$(parent)SearchDrop" resizeToFitDescendents="true" mouseEnabled="true" tier="LOW" layer="CONTROLS" level="1">
+				<Control name="$(parent)SearchDrop" inherits="ZO_ComboBox" resizeToFitDescendents="true" mouseEnabled="true" tier="LOW" layer="CONTROLS" level="1">
 					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$(parent)Search" />
-					<OnInitialized>
-						ZO_ComboBox:New(self)
-					</OnInitialized>
-					<OnMouseUp>
-						if button == MOUSE_BUTTON_INDEX_LEFT and upInside then
-							ZO_ComboBox_DropdownClicked(self)
-						end
-					</OnMouseUp>
 					<Controls>
 						<Label name="$(parent)Anchor" inherits="FCOGLSearchLabel">
 							<Anchor point="RIGHT" />
@@ -475,28 +469,20 @@
 						<Label name="$(parent)ColonText" text=":" inherits="FCOGLSearchLabel">
 							<Anchor point="RIGHT" relativeTo="$(parent)Anchor" relativePoint="LEFT" offsetX="-8" />
 						</Label>
-						<Label name="$(parent)SelectedItemText" inherits="FCOGLSearchLabel">
+						<Label name="$(parent)SelectedItemText" inherits="FCOGLSearchLabel" override="true">
 							<Anchor point="RIGHT" relativeTo="$(parent)ColonText" relativePoint="LEFT" offsetX="-1" />
 						</Label>
-						<Button name="$(parent)OpenDropdown" inherits="ZO_DropdownButton">
+						<Button name="$(parent)OpenDropdown" inherits="ZO_DropdownButton" override="true">
 							<Dimensions x="16" y="16" />
 							<Anchor point="RIGHT" relativeTo="$(parent)SelectedItemText" relativePoint="LEFT" offsetX="-3" />
 							<OnClicked>
-								ZO_ComboBox_DropdownClicked(self:GetParent())
+                                ZO_ComboBoxDropdown_Keyboard.OnClicked(self:GetParent(), button, true)
 							</OnClicked>
 						</Button>
 					</Controls>
 				</Control>
-				<Control name="$(parent)GuildsDrop" resizeToFitDescendents="true" mouseEnabled="true" tier="LOW" layer="CONTROLS" level="1">
+				<Control name="$(parent)GuildsDrop" inherits="ZO_ComboBox" resizeToFitDescendents="true" mouseEnabled="true" tier="LOW" layer="CONTROLS" level="1">
 					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$(parent)SearchDrop" offsetX="-10" />
-					<OnInitialized>
-						ZO_ComboBox:New(self)
-					</OnInitialized>
-					<OnMouseUp>
-							if (button == MOUSE_BUTTON_INDEX_LEFT and upInside) then
-								ZO_ComboBox_DropdownClicked(self)
-							end
-					</OnMouseUp>
                     <Controls>
                         <Label name="$(parent)Anchor" inherits="FCOGLSearchLabel">
                             <Anchor point="RIGHT" />
@@ -504,14 +490,14 @@
                         <Label name="$(parent)ColonText" text="" inherits="FCOGLSearchLabel">
                             <Anchor point="RIGHT" relativeTo="$(parent)Anchor" relativePoint="LEFT" offsetX="-8" />
                         </Label>
-                        <Label name="$(parent)SelectedItemText" inherits="FCOGLSearchLabel">
+                        <Label name="$(parent)SelectedItemText" inherits="FCOGLSearchLabel" override="true">
                             <Anchor point="RIGHT" relativeTo="$(parent)ColonText" relativePoint="LEFT" offsetX="-1" />
                         </Label>
-                        <Button name="$(parent)OpenDropdown" inherits="ZO_DropdownButton">
+                        <Button name="$(parent)OpenDropdown" inherits="ZO_DropdownButton" override="true">
                             <Dimensions x="16" y="16" />
                             <Anchor point="RIGHT" relativeTo="$(parent)SelectedItemText" relativePoint="LEFT" offsetX="-3" />
                             <OnClicked>
-                                ZO_ComboBox_DropdownClicked(self:GetParent())
+                                ZO_ComboBoxDropdown_Keyboard.OnClicked(self:GetParent(), button, true)
                             </OnClicked>
                         </Button>
                     </Controls>
@@ -607,6 +593,13 @@
 					<Anchor point="LEFT" relativeTo="$(parent)NewGuildSalesLottery" relativePoint="RIGHT"
 							offsetX="22"  offsetY="0" />
 				</Button>
+
+				<Control name="$(parent)Loading" inherits="ZO_Loading" tier="DT_CONTROLS" layer="DL_OVERLAY" level="99" hidden="true">
+                    <Anchor point="CENTER" relativeTo="$(parent)" relativePoint="CENTER"/>
+                    <OnInitialized>
+                        ZO_Loading_Initialize(self, GetString(SI_INTERFACE_OPTIONS_DEFERRED_LOADING_TEXT))
+                    </OnInitialized>
+                </Control>
 
 				<!--Background -->
 		    	<Backdrop name="$(parent)BG" alpha="1" inherits="FCOGL_WindowsBackdrop" centerColor="666666">
@@ -793,25 +786,18 @@
 					<Anchor point="TOPLEFT" relativeTo="$(parent)HistoryTypeLabel" relativePoint="BOTTOMLEFT" offsetX="0" offsetY="3" />
 					<Dimensions y="20" />
 				</Label>
-				<Control name="$(parent)GuildHistoryDrop" resizeToFitDescendents="true" mouseEnabled="true" tier="LOW" layer="CONTROLS" level="1">
-					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)HistoryTypeLabel" />
-					<OnInitialized>
-						ZO_ComboBox:New(self)
-					</OnInitialized>
-					<OnMouseUp>
-						if button == MOUSE_BUTTON_INDEX_LEFT and upInside then
-							ZO_ComboBox_DropdownClicked(self)
-						end
-					</OnMouseUp>
+				<Control name="$(parent)GuildHistoryDrop" inherits="ZO_ComboBox" resizeToFitDescendents="true" mouseEnabled="true" tier="LOW" layer="CONTROLS" level="1">
+					<DimensionConstraints minX="150" minY="31" maxY="31" />
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)HistoryTypeLabel" offsetY="-8" />
 					<Controls>
 						<Label name="$(parent)Anchor" inherits="FCOGLSearchLabel">
 							<Anchor point="RIGHT" />
 						</Label>
-						<Button name="$(parent)OpenDropdown" inherits="ZO_DropdownButton" tier="LOW" layer="CONTROLS" level="1">
+						<Button name="$(parent)OpenDropdown" inherits="ZO_DropdownButton" tier="LOW" layer="CONTROLS" level="1" override="true">
 							<Dimensions x="16" y="16" />
 							<Anchor point="RIGHT" relativeTo="$(parent)Anchor" relativePoint="LEFT" offsetX="-3" />
 							<OnClicked>
-								ZO_ComboBox_DropdownClicked(self:GetParent())
+                                ZO_ComboBoxDropdown_Keyboard.OnClicked(self:GetParent(), button, true)
 							</OnClicked>
 							<OnMouseEnter>
 								FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_GUILDSALESLOTTERY_HISTORY_DROP_TT))
@@ -822,25 +808,18 @@
 						</Button>
 					</Controls>
 				</Control>
-				<Control name="$(parent)GuildMemberJoinedDateHistoryDrop" resizeToFitDescendents="true" mouseEnabled="true" tier="LOW" layer="CONTROLS" level="1">
-					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)HistoryTypeLabel" />
-					<OnInitialized>
-						ZO_ComboBox:New(self)
-					</OnInitialized>
-					<OnMouseUp>
-						if button == MOUSE_BUTTON_INDEX_LEFT and upInside then
-							ZO_ComboBox_DropdownClicked(self)
-						end
-					</OnMouseUp>
+				<Control name="$(parent)GuildMemberJoinedDateHistoryDrop" inherits="ZO_ComboBox" resizeToFitDescendents="true" mouseEnabled="true" tier="LOW" layer="CONTROLS" level="1">
+					<DimensionConstraints minX="150" minY="31" maxY="31" />
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)HistoryTypeLabel" offsetY="-8" />
 					<Controls>
 						<Label name="$(parent)Anchor" inherits="FCOGLSearchLabel">
 							<Anchor point="RIGHT" />
 						</Label>
-						<Button name="$(parent)OpenDropdown" inherits="ZO_DropdownButton" tier="LOW" layer="CONTROLS" level="1">
+						<Button name="$(parent)OpenDropdown" inherits="ZO_DropdownButton" tier="LOW" layer="CONTROLS" level="1" override="true">
 							<Dimensions x="16" y="16" />
 							<Anchor point="RIGHT" relativeTo="$(parent)Anchor" relativePoint="LEFT" offsetX="-3" />
 							<OnClicked>
-								ZO_ComboBox_DropdownClicked(self:GetParent())
+                                ZO_ComboBoxDropdown_Keyboard.OnClicked(self:GetParent(), button, true)
 							</OnClicked>
 							<OnMouseEnter>
 								FCOGL.ShowTooltip(self, RIGHT, GetString(FCOGL_GUILDMEMBERSJOINEDDATE_DELETE_HISTORY_DROP_TT))
@@ -860,16 +839,8 @@
 					</Controls>
 				</Backdrop>
 
-				<Control name="$(parent)SearchDrop" resizeToFitDescendents="true" mouseEnabled="true" tier="LOW" layer="CONTROLS" level="1">
+				<Control name="$(parent)SearchDrop" inherits="ZO_ComboBox" resizeToFitDescendents="true" mouseEnabled="true" tier="LOW" layer="CONTROLS" level="1">
 					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$(parent)Search" />
-					<OnInitialized>
-						ZO_ComboBox:New(self)
-					</OnInitialized>
-					<OnMouseUp>
-						if button == MOUSE_BUTTON_INDEX_LEFT and upInside then
-							ZO_ComboBox_DropdownClicked(self)
-						end
-					</OnMouseUp>
 					<Controls>
 						<Label name="$(parent)Anchor" inherits="FCOGLSearchLabel">
 							<Anchor point="RIGHT" />
@@ -877,14 +848,14 @@
 						<Label name="$(parent)ColonText" text=":" inherits="FCOGLSearchLabel">
 							<Anchor point="RIGHT" relativeTo="$(parent)Anchor" relativePoint="LEFT" offsetX="-8" />
 						</Label>
-						<Label name="$(parent)SelectedItemText" inherits="FCOGLSearchLabel">
+						<Label name="$(parent)SelectedItemText" inherits="FCOGLSearchLabel" override="true">
 							<Anchor point="RIGHT" relativeTo="$(parent)ColonText" relativePoint="LEFT" offsetX="-1" />
 						</Label>
-						<Button name="$(parent)OpenDropdown" inherits="ZO_DropdownButton">
+						<Button name="$(parent)OpenDropdown" inherits="ZO_DropdownButton" override="true">
 							<Dimensions x="16" y="16" />
 							<Anchor point="RIGHT" relativeTo="$(parent)SelectedItemText" relativePoint="LEFT" offsetX="-3" />
 							<OnClicked>
-								ZO_ComboBox_DropdownClicked(self:GetParent())
+								ZO_ComboBoxDropdown_Keyboard.OnClicked(self:GetParent(), button, true)
 							</OnClicked>
 						</Button>
 					</Controls>
