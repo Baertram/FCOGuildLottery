@@ -2014,7 +2014,7 @@ df("showUIWindow: " ..tos(doShow))
     --Toggle show/hide
     if doShow == nil then
         --Recursively call
-        showUIWindow(windowFrame:IsControlHidden(), doShowDiceHistory, listTypeToUpdate)
+        showUIWindow(windowFrame:IsControlHidden(), nil, listTypeToUpdate)
         return
     else
         --Explicitly show/hide
