@@ -304,8 +304,8 @@ function fcoglWindowClass:Setup(listType)
         self.masterList = { }
 
         --The loading icon
-        self.frame.loading = self.frame:GetNamedChild("Loading")
-        self.frame.loading:SetHidden(true)
+        self.frame.loading = self.frame.loading or self.frame:GetNamedChild("Loading")
+        self.frame.loading:Hide()
         self.loading = self.frame.loading
 
         --Build the sortkeys depending on the settings
@@ -413,6 +413,11 @@ function fcoglWindowClass:Setup(listType)
         self:SetAlternateRowBackgrounds(true)
 
         self.masterList = { }
+
+        --The loading icon
+        self.frame.loading = self.frame.loading or self.frame:GetNamedChild("Loading")
+        self.frame.loading:Hide()
+        self.loading = self.frame.loading
 
         --Build the sortkeys depending on the settings
         --self:BuildSortKeys() --> Will be called internally in "self.sortHeaderGroup:SelectAndResetSortForKey"
@@ -2009,7 +2014,7 @@ df("showUIWindow: " ..tos(doShow))
     --Toggle show/hide
     if doShow == nil then
         --Recursively call
-        showUIWindow(windowFrame:IsControlHidden(), nil, listTypeToUpdate)
+        showUIWindow(windowFrame:IsControlHidden(), doShowDiceHistory, listTypeToUpdate)
         return
     else
         --Explicitly show/hide
@@ -2050,7 +2055,23 @@ df("Show: %s", tos(doShow))
     fcoglUI.createWindow()
     showUIWindow(doShow, doShowDiceHistory, listTypeToUpdate)
 end
-FCOGuildLottery.ToggleUI = fcoglUI.Show
+FCOGuildLottery.ToggleUI = function()
+    local doShowDiceHistory = false
+    local listTypeToUpdate = nil
+
+    --Is any guild sales lottery active at the moment?
+    --Or any member joined list?
+    --Then show the dice history and update teh list type
+    if FCOGuildLottery.IsGuildSalesLotteryActive() then
+        doShowDiceHistory = true
+        listTypeToUpdate = FCOGL_LISTTYPE_GUILD_SALES_LOTTERY
+    elseif FCOGuildLottery.IsGuildMembersJoinDateListActive() then
+        doShowDiceHistory = true
+        listTypeToUpdate = FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE
+    end
+
+    fcoglUI.Show(nil, doShowDiceHistory, listTypeToUpdate)
+end
 
 function fcoglUI.OnWindowMoveStop()
     local frameControl = fcoglUIwindowFrame or fcoglUIwindow.frame

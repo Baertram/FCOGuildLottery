@@ -25,6 +25,11 @@ local dfw   = FCOGuildLottery.dfw
 local fcoglUIwindow
 local fcoglUIwindowFrame
 
+--Last used variables
+local daysBeforeLastUsedGuildSalesLottery
+local daysBeforeLastUsedGuildMemberJoinedDateList
+
+
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
 --FUNCTIONS
@@ -119,6 +124,8 @@ local function resetCurrentGuildSalesLotteryData(startingNewLottery, guildIndex,
     FCOGuildLottery.currentlyUsedGuildSalesLotteryRolls         = nil
     FCOGuildLottery.currentlyUsedGuildSalesLotteryLastRolledChatOutput = nil
 
+    local lastUsedGuildSalesLotteryDaysBefore = FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore
+    FCOGuildLottery.lastUsedGuildSalesLotteryDaysBefore = lastUsedGuildSalesLotteryDaysBefore
     FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore = nil
     FCOGuildLottery.currentlyUsedGuildSalesLotteryStartTime  = nil
     FCOGuildLottery.currentlyUsedGuildSalesLotteryEndTime       = nil
@@ -156,6 +163,8 @@ local function resetCurrentGuildMembersJoinDateData(startingNewMembersJoinDate, 
     FCOGuildLottery.currentlyUsedGuildMembersJoinDateRolls         = nil
     FCOGuildLottery.currentlyUsedGuildMembersJoinDateLastRolledChatOutput = nil
 
+    local lastUsedGuildMembersJoinDateDaysBefore = FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore
+    FCOGuildLottery.lastUsedGuildMembersJoinDateDaysBefore = lastUsedGuildMembersJoinDateDaysBefore
     FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore = nil
     FCOGuildLottery.currentlyUsedGuildMembersJoinDateStartTime  = nil
     FCOGuildLottery.currentlyUsedGuildMembersJoinDateEndTime       = nil
@@ -179,17 +188,6 @@ local function resetCurrentGuildMembersJoinDateData(startingNewMembersJoinDate, 
         end
     end
 end
-
-local function updateLoadingIconVisibility(doHide)
-    fcoglUIwindow = fcoglUIwindow or FCOGuildLottery.UI.window
-    fcoglUIwindowFrame = fcoglUIwindowFrame or FCOGuildLottery.UI.window.frame
-    if doHide then
-        fcoglUIwindowFrame.loading:Hide()
-    else
-        fcoglUIwindowFrame.loading:Show()
-    end
-end
-
 
 function FCOGuildLottery.IsGuildSalesLotteryActive()
     local retVar = (FCOGuildLottery.currentlyUsedGuildSalesLotteryUniqueIdentifier ~= nil and
@@ -319,6 +317,18 @@ local function isUICreatedAndShown()
 end
 FCOGuildLottery.UI.isUICreatedAndShown = isUICreatedAndShown
 
+local function updateLoadingIconHiddenState(doHide)
+    local fcoglUI = FCOGuildLottery.UI
+    fcoglUIwindow = fcoglUIwindow or (fcoglUI and fcoglUI.window)
+    fcoglUIwindowFrame = fcoglUIwindowFrame or (fcoglUIwindow and fcoglUIwindow.frame)
+    if fcoglUIwindowFrame == nil then return end
+
+    if doHide then
+        fcoglUIwindowFrame.loading:Hide()
+    else
+        fcoglUIwindowFrame.loading:Show()
+    end
+end
 
 local function checkIfUIShouldBeShownOrUpdated(diceRollType, hideHistory, guildIndex)
     df("checkIfUIShouldBeShownOrUpdated - diceRollType %s, hideHistory %s, guildIndex %s", tos(diceRollType), tos(hideHistory), tos(guildIndex))
@@ -355,6 +365,7 @@ df(">isWindowAlreadyShown: true")
         updateUIGuildsDropNow(diceRollType, guildIndex, false, false, nil)
     end
 end
+
 
 function FCOGuildLottery.getCurrentDiceRollTypeAndGuildIndex()
     local diceRollType = FCOGuildLottery.currentlyUsedDiceRollType
@@ -769,12 +780,12 @@ function FCOGuildLottery.AddTradeSellEvent(guildId, uniqueIdentifier, eventType,
 end
 local addTradeSellEvent = FCOGuildLottery.AddTradeSellEvent
 
-function FCOGuildLottery.AddMemberJoinedEvent(guildId, uniqueIdentifier, eventType, eventId, eventTime, param1, param2, param3, param4, param5, param6)
+function FCOGuildLottery.AddMemberJoinedEvent(guildId, uniqueIdentifier, eventType, eventId, eventTime, joinerDisplayName, optionalInviterDisplayName)
     if not checkForLibHistoireReady() or not guildId or not uniqueIdentifier or not eventId then return end
---dfv( "AddMemberJoinedEvent - guildId: %s, uniqueIdentifier: %s, seller: %s, buyer: %s, quantity: %s, itemlink: %s, price: %s, tax: %s ", tos(guildId), tos(uniqueIdentifier), tos(param1), tos(param2), tos(param3), tos(param4), tos(param5), tos(param6))
+--dfv( "AddMemberJoinedEvent - guildId: %s, uniqueIdentifier: %s, joinerDisplayName: %s, optionalInviterDisplayName: %s, tos(guildId), tos(uniqueIdentifier), tos(joinerDisplayName), tos(optionalInviterDisplayName))
     FCOGuildLottery.guildMembersJoinedStats[guildId][uniqueIdentifier] = FCOGuildLottery.guildMembersJoinedStats[guildId][uniqueIdentifier] or {}
     local eventTimeFormated = os.date("%c", eventTime)
-    local eventKey = param1 .. "_" .. Id64ToString(eventId) .. "_" .. eventTime .. "_"  .. "_" .. eventTimeFormated
+    local eventKey = joinerDisplayName .. "_" .. Id64ToString(eventId) .. "_" .. eventTime .. "_"  .. "_" .. eventTimeFormated
     --local processor = getMemberEventProcessorForGuildId(guildId)
     --local eventKey = processor:GetKey()
     FCOGuildLottery.guildMembersJoinedStats[guildId][uniqueIdentifier][eventKey] = {
@@ -793,11 +804,12 @@ function FCOGuildLottery.AddMemberJoinedEvent(guildId, uniqueIdentifier, eventTy
                 end
             end
         ]]
-        joinerDisplayName           = param1, --joinerDisplayName
-        optionalInviterDisplayName  = param2, --optionalInviterDisplayName
+        joinerDisplayName           = joinerDisplayName, --joinerDisplayName
+        optionalInviterDisplayName  = optionalInviterDisplayName, --optionalInviterDisplayName
     }
 end
 local addMemberJoinedEvent = FCOGuildLottery.AddMemberJoinedEvent
+
 
 local function libHistoireGuildHistoryTraderEventErrorProcessor(reason, guildId, processor)
     local guildIdOfListener = guildId or processor:GetGuildId()
@@ -836,7 +848,73 @@ local function libHistoireGuildHistoryTraderEventErrorProcessor(reason, guildId,
     end
 end
 
-local eventsReceivedCounter = 0
+local guildMemberJoinedEventsReceivedCounter = 0
+local function libHistoireGuildHistoryMemberJoinedEventProcessor(event, guildId, processor, uniqueIdentifier, wasMissed)
+    wasMissed = wasMissed or false
+    local info = event:GetEventInfo()
+    local eventType = info.eventType
+    --Member joined events
+    if eventType == GUILD_HISTORY_ROSTER_EVENT_JOIN then
+        --Params as of "ConvertEvent":
+        --GUILD_EVENT_GUILD_JOIN, oldEventId, eventTime, DecorateDisplayName(info.actingDisplayName), DecorateDisplayName(info.targetDisplayName)
+        local eventId = event:GetEventId()
+        local eventTime = event:GetEventTimestampS()
+        local guildIdOfListener = guildId or processor:GetGuildId()
+        if not wasMissed then
+            guildMemberJoinedEventsReceivedCounter = guildMemberJoinedEventsReceivedCounter + 1
+            if guildMemberJoinedEventsReceivedCounter == 1 then
+                df(">!!!!! [FIRST EVENT!]Members joined listener:NextEvent - guildId: %s, eventType: %s, eventTime: %s", tos(guildIdOfListener), tos(eventType), tos(eventTime))
+            end
+            --dfv(">Sold items listener:NextEvent - guildId: %s, eventType: %s, eventTime: %s", tos(guildIdOfListener), tos(eventType), tos(eventTime))
+
+            FCOGuildLottery.guildMembersListenerCompleted[guildIdOfListener] = false
+            --addMemberJoinedEvent(guildId, uniqueIdentifier, eventType, eventId, eventTime, joinerDisplayName, optionalInviterDisplayName)
+            addMemberJoinedEvent(guildIdOfListener, uniqueIdentifier, eventType, eventId, eventTime, DecorateDisplayName(info.actingDisplayName), DecorateDisplayName(info.targetDisplayName))
+        else
+            --Missed event
+            --dfw( "Missed member joined event detected-eventId: %s, guildId: %s, eventTime: %s, seller: %s, buyer: %s, quantity: %s, itemLink: %s, price: %s, tax: %s", tos(eventId), tos(guildIdOfListener), tos(eventTime), tos(DecorateDisplayName(info.sellerDisplayName)), tos(DecorateDisplayName(info.buyerDisplayName)), tos(info.quantity), tos(info.itemLink), tos(info.price), tos(info.tax))
+        end
+    end
+end
+
+local function libHistoireGuildHistoryMemberJoinedEventErrorProcessor(reason, guildId, processor)
+    local guildIdOfListener = guildId or processor:GetGuildId()
+    local stopReasons = lh.StopReason
+
+    if (reason == stopReasons.ITERATION_COMPLETED) then
+        -- all events in the time range have been processed
+        df( "<<<~~~~~~~~~~ CollectGuildMemberStats - end for guildId: %s ~~~~~~~~~~<<<", tos(guildIdOfListener) )
+        FCOGuildLottery.guildMembersListenerCompleted[guildIdOfListener] = true
+
+        --Start the first dice throw for the guild sales history now
+        FCOGuildLottery.RollTheDiceForMemberJoinedNow(FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildId or guildId, FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildIndex, false)
+
+    elseif reason == stopReasons.LAST_CACHED_EVENT_REACHED then
+        -- all events in the time range have been processed but there could be more as you selected until "today"
+        -->Counts as finished too in our case
+        df( "<<<LAST CACHED EVENT REACHED !!!!! CollectGuildMemberStats - end for guildId: %s !!!!! <<<", tos(guildIdOfListener) )
+        FCOGuildLottery.guildMembersListenerCompleted[guildIdOfListener] = true
+
+        --Start the first dice throw for the guild sales history now
+        FCOGuildLottery.RollTheDiceForMemberJoinedNow(FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildId or guildId, FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildIndex, false)
+
+
+    elseif reason == stopReasons.MANAGED_RANGE_LOST then
+        FCOGuildLottery.guildMembersListenerCompleted[guildIdOfListener] = false
+        dfe( "<<<MANAGED RANGED LOST !!!!! CollectGuildMemberStats - end for guildId: %s !!!!! <<<", tos(guildIdOfListener) )
+        dfe( "Guild member joined history listener stopped early! guildId: %s, name: %q, reason: %s", tos(guildId), tos(GetGuildName(guildId)), tos(reason) )
+    elseif reason == stopReasons.MANUAL_STOP then
+        FCOGuildLottery.guildMembersListenerCompleted[guildIdOfListener] = false
+        dfw( "<<<MANUAL STOP !!!!! CollectGuildMemberStats - end for guildId: %s !!!!! <<<", tos(guildIdOfListener) )
+        dfw( "Guild member joined history listener stopped early! guildId: %s, name: %q, reason: %s", tos(guildId), tos(GetGuildName(guildId)), tos(reason) )
+    else
+        FCOGuildLottery.guildMembersListenerCompleted[guildIdOfListener] = false
+        dfe( "<<<ERROR !!!!! CollectGuildMemberStats - end for guildId: %s !!!!! <<<", tos(guildIdOfListener) )
+        dfe( "Guild member joined history listener stopped early! guildId: %s, name: %q, reason: %s", tos(guildId), tos(GetGuildName(guildId)), tos(reason) )
+    end
+end
+
+local guildSalesEventsReceivedCounter = 0
 local function libHistoireGuildHistoryTraderEventProcessor(event, guildId, processor, uniqueIdentifier, wasMissed)
     wasMissed = wasMissed or false
     local info = event:GetEventInfo()
@@ -849,8 +927,8 @@ local function libHistoireGuildHistoryTraderEventProcessor(event, guildId, proce
         local eventTime = event:GetEventTimestampS()
         local guildIdOfListener = guildId or processor:GetGuildId()
         if not wasMissed then
-            eventsReceivedCounter = eventsReceivedCounter + 1
-            if eventsReceivedCounter == 1 then
+            guildSalesEventsReceivedCounter = guildSalesEventsReceivedCounter + 1
+            if guildSalesEventsReceivedCounter == 1 then
                 df(">!!!!! [FIRST EVENT!]Sold items listener:NextEvent - guildId: %s, eventType: %s, eventTime: %s", tos(guildIdOfListener), tos(eventType), tos(eventTime))
             end
             --dfv(">Sold items listener:NextEvent - guildId: %s, eventType: %s, eventTime: %s", tos(guildIdOfListener), tos(eventType), tos(eventTime))
@@ -860,7 +938,7 @@ local function libHistoireGuildHistoryTraderEventProcessor(event, guildId, proce
             addTradeSellEvent(guildIdOfListener, uniqueIdentifier, eventType, eventId, eventTime, DecorateDisplayName(info.sellerDisplayName), DecorateDisplayName(info.buyerDisplayName), info.quantity, info.itemLink, info.price, info.tax)
         else
             --Missed event
-            --dfw( "Missed event detected-eventId: %s, guildId: %s, eventTime: %s, seller: %s, buyer: %s, quantity: %s, itemLink: %s, price: %s, tax: %s", tos(eventId), tos(guildIdOfListener), tos(eventTime), tos(DecorateDisplayName(info.sellerDisplayName)), tos(DecorateDisplayName(info.buyerDisplayName)), tos(info.quantity), tos(info.itemLink), tos(info.price), tos(info.tax))
+            --dfw( "Missed guild sales event detected-eventId: %s, guildId: %s, eventTime: %s, seller: %s, buyer: %s, quantity: %s, itemLink: %s, price: %s, tax: %s", tos(eventId), tos(guildIdOfListener), tos(eventTime), tos(DecorateDisplayName(info.sellerDisplayName)), tos(DecorateDisplayName(info.buyerDisplayName)), tos(info.quantity), tos(info.itemLink), tos(info.price), tos(info.tax))
         end
     end
 end
@@ -907,7 +985,7 @@ function FCOGuildLottery.CollectGuildSellStats(guildId, startDate, endDate, uniq
     --Reset the link to the current processor
     setSellEventProcessorForGuildId(guildId, nil)
     FCOGuildLottery.guildSellListenerCompleted[guildId] = false
-    eventsReceivedCounter = 0
+    guildSalesEventsReceivedCounter                     = 0
 
     --Get guild history category "trader"
     local category = GUILD_HISTORY_EVENT_CATEGORY_TRADER
@@ -941,53 +1019,6 @@ function FCOGuildLottery.CollectGuildSellStats(guildId, startDate, endDate, uniq
     end
 end
 
---[[
-function FCOGuildLottery.CompareMMAndFCOGLGuildSalesData(guildIndex)
-    if not IsGuildIndexValid(guildIndex) then return end
-    local guildName = GetGuildName(GetGuildId(guildIndex))
-    dfa("CompareMMAndFCOGLGuildSalesData - guildIndex: %s, name: %s", tos(guildIndex), guildName)
-    if FCOGuildLottery._FCOGL7DaysData and FCOGuildLottery._FCOGL7DaysData[guildName] then
-        if FCOGuildLottery._mm7DaysData and FCOGuildLottery._mm7DaysData[guildName] then
-            local mmSalesData = FCOGuildLottery._mm7DaysData[guildName]
-            local fcoglSalesData = FCOGuildLottery._FCOGL7DaysData[guildName]
-
-            local countMM = NonContiguousCount(mmSalesData)
-            local countFCOGL = NonContiguousCount(fcoglSalesData)
-            dfa("Count MM/FCOGL: %s/%s", tos(countMM), tos(countFCOGL))
-            local tabToUse, tabToCompare
-            tabToUse = (countMM > countFCOGL) and mmSalesData or fcoglSalesData
-            tabToCompare = (countMM > countFCOGL) and fcoglSalesData or mmSalesData
-            FCOGuildLottery._missing7DaysData = {}
-            local missingTabKey
-            if countMM > countFCOGL then
-                missingTabKey = "FCOGL"
-            else
-                missingTabKey = "MM"
-            end
-            local foundMissing = 0
-            local foundEqual = 0
-            FCOGuildLottery._missing7DaysData[missingTabKey] = {}
-            FCOGuildLottery._equal7DaysData = {}
-            for key, data in pairs(tabToUse) do
-                if tabToCompare[key] == nil then
-                    FCOGuildLottery._missing7DaysData[missingTabKey][key] = data
-                    foundMissing = foundMissing + 1
-                else
-                    FCOGuildLottery._equal7DaysData[key] = data
-                    foundEqual = foundEqual + 1
-                end
-            end
-            dfa("Found %s equal events. Found %s missing events in %s!", tos(foundEqual), tos(foundMissing), missingTabKey)
-        else
-            dfe("MasterMerchant guild sales data is missing for guild \'%s\'!", guildName)
-        end
-    else
-        dfe("FCOGuildHistory guild sales data is missing for guild \'%s\'!", guildName)
-    end
-
-end
-]]
-
 
 --Get guild members statistics from LibHistoire stored events
 function FCOGuildLottery.CollectGuildMemberStats(guildId, startDate, endDate, uniqueIdentifier)
@@ -996,78 +1027,70 @@ function FCOGuildLottery.CollectGuildMemberStats(guildId, startDate, endDate, un
         dfe( "CollectGuildMemberStats - Mandatory library \LibHistoire\' not found, or not ready yet!")
         return
     elseif guildId == nil or uniqueIdentifier == nil or uniqueIdentifier == "" or startDate == nil or endDate == nil or
-           startDate == nil or endDate == nil then
+            startDate == nil or endDate == nil then
         dfe( "CollectGuildMemberStats - Either guildId: %s, startTradingDay: %s, endTradingDay: %s or uniqueIdentifier: %s are not given!", tos(guildId),tos(startDate),tos(endDate),tos(uniqueIdentifier))
         return
     elseif startDate and endDate and startDate > endDate then
         dfe( "CollectGuildMemberStats - startTradingDay: " ..tos(startDate) .. " is newer than endTradingDay: " ..tos(endDate))
     end
---d(">>listener 0")
+    --d(">>listener 0")
 
-    --Create the listener for the guild history member entries
-    local listener
-    local existingListener = getMemberEventProcessorForGuildId(guildId)
-    if existingListener == nil then
-        listener = lh:CreateGuildHistoryListener(guildId, GUILD_HISTORY_GENERAL_ROSTER)
-        df(">New guild roster listener created for guildId: %s", tos(guildId))
-    else
-        listener = existingListener
-        df(">re-using existing guild roster listener for guildId: %s", tos(guildId))
-    end
-    if listener == nil then
-        dfe( "CollectGuildMemberStats - Guild roster listener could not be found/created! GuildId: " ..tos(guildId) .. ", startTradingDay: " ..tos(startDate).. ", endTradingDay: " ..tos(endDate).. ", uniqueIdentifier: " ..tos(uniqueIdentifier))
-        return
-    end
-    setMemberEventProcessorForGuildId(guildId, listener)
---d(">>listener 1")
     --Did the timeframe change?
     if FCOGuildLottery.currentlyUsedGuildMembersJoinDateStartTime == nil or startDate ~= FCOGuildLottery.currentlyUsedGuildMembersJoinDateStartTime or
             FCOGuildLottery.currentlyUsedGuildMembersJoinDateEndTime == nil or endDate ~= FCOGuildLottery.currentlyUsedGuildMembersJoinDateEndTime or
             FCOGuildLottery.currentlyUsedGuildMembersJoinDateUniqueIdentifier == nil or uniqueIdentifier ~= FCOGuildLottery.currentlyUsedGuildMembersJoinDateUniqueIdentifier then
         df(">Guild roster listener's timeFrame changed: %s to %s", os.date("%c", startDate), os.date("%c", endDate))
---d(string.format(">listener's timeFrame changed: %s to %s", os.date("%c", startDate), os.date("%c", endDate)))
-
-        --Stop the listener if we want to set a new timeframe!
-        if listener:IsRunning() then
-            df(">>Guild roster listener needed to be stopped")
-            listener:Stop()
-        end
-        --Slightly difference to MM data. maybe because SetTimeFrame includes the start but excludes the end?
-        --listener:SetTimeFrame(startTradingDay, endTradingDay)
-        listener:SetAfterEventTime(startDate) --Excluding the start
-        listener:SetBeforeEventTime(endDate) --Including the end
-
-        --Create / reset the guildSalesStats for the current guildId, and the flag "callback completed"
-        FCOGuildLottery.guildMembersListenerCompleted[guildId] = false
         FCOGuildLottery.guildMembersJoinedStats[guildId] = FCOGuildLottery.guildMembersJoinedStats[guildId] or {}
+    end
 
-        --Add the callbacks to the listener
-        if existingListener == nil then
-            listener:SetNextEventCallback(function(eventType, eventId, eventTime, ...) --param1, param2
-                if eventType == GUILD_EVENT_GUILD_JOIN then
-                    local guildIdOfListener = listener:GetGuildId()
-                    --dfv(">listener:SetNextEventCallback - guildId: %s, eventType: %s, eventTime: %s", tos(guildIdOfListener), tos(eventType), tos(eventTime))
-                    FCOGuildLottery.guildMembersListenerCompleted[guildIdOfListener] = false
-                    addMemberJoinedEvent(guildIdOfListener, uniqueIdentifier, eventType, eventId, eventTime, ...)
-                end
-            end)
-            --Events are still coming in from guild history
-            listener:SetMissedEventCallback(function(eventType, eventId, eventTime, param1, param2, param3, param4, param5, param6)
-                if eventType == GUILD_EVENT_GUILD_JOIN then
-                    local guildIdOfListener = listener:GetGuildId()
-                    dfw( "Missed event detected-eventId: %s, guildId: %s, eventTime: %s, seller: %s, buyer: %s, quantity: %s, itemLink: %s, price: %s, tax: %s", tos(eventId), tos(guildIdOfListener), tos(eventTime), tos(param1), tos(param2), tos(param3), tos(param4), tos(param5), tos(param6))
-                end
-            end)
-
-            listener:SetIterationCompletedCallback(function()
-                local guildIdOfListener = listener:GetGuildId()
-                df( "<<<~~~~~~~~~~ CollectGuildMemberStats - end for guildId: %s ~~~~~~~~~~<<<", tos(guildIdOfListener) )
-                FCOGuildLottery.guildMembersListenerCompleted[guildIdOfListener] = true
-            end)
+    --Create the listener for the guild history member joined - NEW API
+    local existingProcessor = getMemberEventProcessorForGuildId(guildId)
+    if existingProcessor ~= nil then
+        if existingProcessor:IsRunning() then
+            if existingProcessor:Stop() then
+                df(">>!!!Existing and active member joined processor stopped!!!")
+            else
+                df(">>!!!Existing and active member joined processor could NOT be stopped!!!")
+                return
+            end
         end
+    end
 
-        df( ">>>~~~~~~~~~~ CollectGuildMemberStats - listener started for guildId: %s ~~~~~~~~~~>>>", tos(guildId) )
-        listener:Start()
+    --Reset the link to the current processor
+    setMemberEventProcessorForGuildId(guildId, nil)
+    FCOGuildLottery.guildMembersListenerCompleted[guildId] = false
+    guildMemberJoinedEventsReceivedCounter = 0
+
+
+    --Get guild history category "roster"
+    local category = GUILD_HISTORY_EVENT_CATEGORY_ROSTER
+    local processor = lh:CreateGuildHistoryProcessor(guildId, category, addonName)
+    if not processor then
+        -- the processor could not be created
+        df(">New member joined processor could NOT be created for guildId: %s", tos(guildId))
+        return
+    end
+    df(">New member joined processor created for guildId: %s", tos(guildId))
+
+    --Create a new listener and directly start it
+    local listenerStarted = processor:StartIteratingTimeRange(startDate, endDate,
+            function(event) libHistoireGuildHistoryMemberJoinedEventProcessor(event, guildId, processor, uniqueIdentifier, nil) end ,
+            function(reason) libHistoireGuildHistoryMemberJoinedEventErrorProcessor(reason, guildId, processor) end
+    )
+    if not listenerStarted then
+        dfe( "CollectGuildMemberStats - Listener member joined coud not be found/created! GuildId: " ..tos(guildId) .. ", startTradingDay: " ..tos(startDate).. ", endTradingDay: " ..tos(endDate).. ", uniqueIdentifier: " ..tos(uniqueIdentifier))
+        return
+    else
+        df( ">>>~~~~~~~~~~ CollectGuildMemberStats - listener started for guildId: %s, name: %q ~~~~~~~~~~>>>", tos(guildId),tos(GetGuildName(guildId)) )
+
+        --Set event missed callback
+        processor:SetMissedEventCallback(function(event) libHistoireGuildHistoryMemberJoinedEventProcessor(event, guildId, processor, uniqueIdentifier, true) end)
+
+        df(">Member joined listener running for guildId: %s", tos(guildId))
+
+        --Update the link to the current processor
+        setSellEventProcessorForGuildId(guildId, processor)
+        FCOGuildLottery.guildMembersListenerCompleted[guildId] = false
     end
 end
 
@@ -1891,9 +1914,46 @@ function FCOGuildLottery.BuildGuildMembersJoinedList(guildId, daysBefore, startT
     return guildMembersJoinedListMemberCount
 end
 
+function FCOGuildLottery.RollTheDiceForMemberJoinedNow(guildId, guildIndex, noChatOutput)
+    updateLoadingIconHiddenState(true)
+
+    --Set the dice roll type
+    FCOGuildLottery.currentlyUsedDiceRollType = FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE
+    local rolledData, countJoinedMembers
+    if guildId ~= nil and guildId ~= 0 then
+        countJoinedMembers = FCOGuildLottery.BuildGuildMembersJoinedList(
+                guildId,
+                FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore,
+                FCOGuildLottery.currentlyUsedGuildMembersJoinDateStartTime,
+                FCOGuildLottery.currentlyUsedGuildMembersJoinDateEndTime,
+                FCOGuildLottery.currentlyUsedGuildMembersJoinDateUniqueIdentifier
+        )
+    end
+    if countJoinedMembers ~= nil and countJoinedMembers > 0 then
+        --Roll the dice with the number of guild sales members rank of that guildId
+        rolledData = FCOGuildLottery.RollTheDice(countJoinedMembers, noChatOutput)
+        if rolledData ~= nil and rolledData.timestamp ~= nil then
+            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId] = FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId] or {}
+            local currentlyUsedGuildMembersJoinDateUniqueIdentifier = FCOGuildLottery.currentlyUsedGuildMembersJoinDateUniqueIdentifier
+            local currentlyUsedGuildMembersJoinDateTimestamp = FCOGuildLottery.currentlyUsedGuildMembersJoinDateTimestamp
+            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier] = FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier] or {}
+            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp] = FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp] or {}
+            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp]["daysBefore"] = FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore
+            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp][rolledData.timestamp] = rolledData
+
+            local showUiIfHidden = getSettingsForCurrentlyUsedDiceRollType()
+            FCOGuildLottery.UI.RefreshWindowLists(showUiIfHidden, FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE)
+            FCOGuildLottery.UpdateMaxDiceSides(countJoinedMembers)
+        end
+    else
+        resetCurrentGuildMembersJoinDateData()
+        showGuildEventsNoMemberJoinedMessage(guildId, guildIndex)
+    end
+
+end
 
 function FCOGuildLottery.RollTheDiceForGuildSalesLotteryNow(guildId, guildIndex, noChatOutput)
-    updateLoadingIconVisibility(true)
+    updateLoadingIconHiddenState(true)
 
     --Set the dice roll type
     FCOGuildLottery.currentlyUsedDiceRollType = FCOGL_DICE_ROLL_TYPE_GUILD_SALES_LOTTERY
@@ -1986,7 +2046,7 @@ function FCOGuildLottery.RollTheDiceForGuildSalesLottery(noChatOutput)
         FCOGuildLottery.currentlyUsedGuildSalesLotteryGuildName     = GetGuildName(guildId)
 
         --Show the "Loading..." icon now
-        updateLoadingIconVisibility(false)
+        updateLoadingIconHiddenState(false)
 
         --Update the LibHistoire data of the guild's sell history
         local uniqueIdentifier, timeStart, timeEnd = FCOGuildLottery.PrepareSellStatsOfGuild(guildId, FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore)
@@ -2041,7 +2101,8 @@ function FCOGuildLottery.RollTheDiceForGuildMembersJoinDate(noChatOutput)
     end
 
     --Build the unique identifier and set the other needed variables
-    if not isGuildMembersJoinDateListActive() then
+    local isAGuildMemberJoinedDateListActive = isGuildMembersJoinDateListActive()
+    if not isAGuildMemberJoinedDateListActive then
         --Which guildIndex and Id should be used? And how many days backwards?
         -->All chosen via the slash command /gsl /guildsaleshistory or /dicegsl
         guildIndex = FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildIndex
@@ -2077,6 +2138,9 @@ function FCOGuildLottery.RollTheDiceForGuildMembersJoinDate(noChatOutput)
         FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildId        = guildId
         FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildName      = GetGuildName(guildId)
 
+        --Show the "Loading..." icon now
+        updateLoadingIconHiddenState(false)
+
         --Update the LibHistoire data of the guild's member history
         local uniqueIdentifier, timeStart, timeEnd = FCOGuildLottery.PrepareMembersStatsOfGuild(guildId, FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore)
         FCOGuildLottery.currentlyUsedGuildMembersJoinDateEndTime       = timeEnd
@@ -2093,43 +2157,18 @@ function FCOGuildLottery.RollTheDiceForGuildMembersJoinDate(noChatOutput)
         FCOGuildLottery.currentlyUsedGuildMembersJoinDateMemberCount   = 0
 
         FCOGuildLottery.currentlyUsedGuildMembersJoinDateRolls             = {}
+
+        --Get the membersRanking, or build it, and throw a dice then
+        --FCOGuildLottery.RollTheDiceForMemberJoinedNow(guildId, guildIndex, noChatOutput)
+        -->This must be done at the LibHistoire callback as the cached events have been all received!
+        ---> See FCOGuildLottery.CollectGuildMemberStats() -> event listener for good events -> libHistoireGuildHistoryMemberJoinedEventErrorProcessor
     else
         guildId     = FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildId
         guildIndex  = FCOGuildLottery.currentlyUsedGuildMembersJoinDateGuildIndex
         df(">Use existing guild members data id %s, \'%s\' >>>>>>>>>>>>>>>>>>>>", tos(guildId), os.date("%c", FCOGuildLottery.currentlyUsedGuildMembersJoinDateTimestamp))
-    end
 
-    --Set the dice roll type
-    FCOGuildLottery.currentlyUsedDiceRollType = FCOGL_DICE_ROLL_TYPE_GUILD_MEMBERS_JOIN_DATE
-    local rolledData, countJoinedMembers
-    if guildId ~= nil and guildId ~= 0 then
-        countJoinedMembers = FCOGuildLottery.BuildGuildMembersJoinedList(
-                guildId,
-                FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore,
-                FCOGuildLottery.currentlyUsedGuildMembersJoinDateStartTime,
-                FCOGuildLottery.currentlyUsedGuildMembersJoinDateEndTime,
-                FCOGuildLottery.currentlyUsedGuildMembersJoinDateUniqueIdentifier
-        )
-    end
-    if countJoinedMembers ~= nil and countJoinedMembers > 0 then
-        --Roll the dice with the number of guild sales members rank of that guildId
-        rolledData = FCOGuildLottery.RollTheDice(countJoinedMembers, noChatOutput)
-        if rolledData ~= nil and rolledData.timestamp ~= nil then
-            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId] = FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId] or {}
-            local currentlyUsedGuildMembersJoinDateUniqueIdentifier = FCOGuildLottery.currentlyUsedGuildMembersJoinDateUniqueIdentifier
-            local currentlyUsedGuildMembersJoinDateTimestamp = FCOGuildLottery.currentlyUsedGuildMembersJoinDateTimestamp
-            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier] = FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier] or {}
-            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp] = FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp] or {}
-            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp]["daysBefore"] = FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore
-            FCOGuildLottery.diceRollGuildMemberJoinedDateListHistory[guildId][currentlyUsedGuildMembersJoinDateUniqueIdentifier][currentlyUsedGuildMembersJoinDateTimestamp][rolledData.timestamp] = rolledData
-
-            local showUiIfHidden = getSettingsForCurrentlyUsedDiceRollType()
-            FCOGuildLottery.UI.RefreshWindowLists(showUiIfHidden, FCOGL_LISTTYPE_GUILD_MEMBERS_JOIN_DATE)
-            FCOGuildLottery.UpdateMaxDiceSides(countJoinedMembers)
-        end
-    else
-        resetCurrentGuildMembersJoinDateData()
-        showGuildEventsNoMemberJoinedMessage(guildId, guildIndex)
+        --Get the membersRanking, or build it, and throw a dice then
+        FCOGuildLottery.RollTheDiceForMemberJoinedNow(guildId, guildIndex, noChatOutput)
     end
 end
 
@@ -2467,8 +2506,6 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
 --Slash Command functions
-local daysBeforeLastUsedGuildSalesLottery
-local daysBeforeLastUsedGuildMemberJoinedDateList
 function FCOGuildLottery.parseSlashCommandArguments(args, firstArg)
     --Parse the arguments string
     local options = {}
@@ -2523,15 +2560,20 @@ function FCOGuildLottery.parseSlashCommandArguments(args, firstArg)
         end
         if guildIndex ~= nil and daysBefore ~= nil then
             if daysBeforeLastUsedGuildSalesLottery == nil then
-                if FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore ~= nil then
-                    daysBeforeLastUsedGuildSalesLottery = FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore
-                end
-            end
-            if daysBeforeLastUsedGuildSalesLottery == nil then
                 daysBeforeLastUsedGuildSalesLottery = daysBefore
             else
+                if FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore ~= nil then
+                    daysBeforeLastUsedGuildSalesLottery = FCOGuildLottery.currentlyUsedGuildSalesLotteryDaysBefore
+                elseif FCOGuildLottery.lastUsedGuildSalesLotteryDaysBefore ~= nil then
+                    daysBeforeLastUsedGuildSalesLottery = FCOGuildLottery.lastUsedGuildSalesLotteryDaysBefore
+                end
+            end
+            --todo: 20240424 Still needed with LibHistoire 2.x API?
+            --[[
+            if daysBeforeLastUsedGuildSalesLottery ~= daysBefore then
                 FCOGuildLottery.guildLotteryDaysBeforeSliderWasChanged = true
             end
+            ]]
             FCOGuildLottery.settingsVars.settings.guildLotteryDaysBefore = daysBefore
             return guildIndex, daysBefore
         end
@@ -2569,15 +2611,20 @@ function FCOGuildLottery.parseSlashCommandArguments(args, firstArg)
         end
         if guildIndex ~= nil and daysBefore ~= nil then
             if daysBeforeLastUsedGuildMemberJoinedDateList == nil then
-                if FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore ~= nil then
-                    daysBeforeLastUsedGuildMemberJoinedDateList = FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore
-                end
-            end
-            if daysBeforeLastUsedGuildMemberJoinedDateList == nil then
                 daysBeforeLastUsedGuildMemberJoinedDateList = daysBefore
             else
+                if FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore ~= nil then
+                    daysBeforeLastUsedGuildSalesLottery = FCOGuildLottery.currentlyUsedGuildMembersJoinDateDaysBefore
+                elseif FCOGuildLottery.lastUsedGuildMembersJoinDateDaysBefore ~= nil then
+                    daysBeforeLastUsedGuildSalesLottery = FCOGuildLottery.lastUsedGuildMembersJoinDateDaysBefore
+                end
+            end
+            --todo: 20240424 Still needed with LibHistoire 2.x API?
+            --[[
+            if daysBeforeLastUsedGuildSalesLottery ~= daysBefore then
                 FCOGuildLottery.guildMembersJoinedDateListDaysBeforeSliderWasChanged = true
             end
+            ]]
             FCOGuildLottery.settingsVars.settings.guildMembersDaysBefore = daysBefore
             return guildIndex, daysBefore
         end
@@ -2587,10 +2634,12 @@ end
 
 --Start (if not started yet) or roll a dice for the current guild sales lottery, via slash command
 function FCOGuildLottery.GuildSalesLotterySlashCommand(args)
+    df( "GuildSalesLotterySlashCommand - args: " ..tos(args))
     if isGuildMembersJoinDateListActive() then return end
 
     --Is a guild sales lottery active so we can go on with this "dice roll"?
     if not isGuildSalesLotteryActive() then
+    df( ">no guild sales lottery active")
         showNewGSLSlashCommandHelp(nil, true, nil)
     else
         --Just roll next guild sales lottery dice
@@ -2600,10 +2649,12 @@ end
 
 --Start (if not started yet) or roll a dice for the current guild member joined list, via slash command
 function FCOGuildLottery.GuildMembersJoinedListSlashCommand(args)
+    df( "GuildMembersJoinedListSlashCommand - args: " ..tos(args))
     if isGuildSalesLotteryActive() then return end
 
     --Is a guild sales lottery active so we can go on with this "dice roll"?
     if not isGuildMembersJoinDateListActive() then
+    df( ">no members joined list active")
         showNewGSLSlashCommandHelp(nil, nil, true)
     else
         --Just roll next guild sales lottery dice
@@ -2617,6 +2668,7 @@ function FCOGuildLottery.NewGuildSalesLotterySlashCommand(args)
     --FCOGuildLottery.ResetCurrentGuildSalesLotteryData(false, true)
     local guildIndex, daysBefore = FCOGuildLottery.parseSlashCommandArguments(args, "/newgsl")
 --d("GuildIndex: " .. guildIndex .. ", daysBefore: " .. daysBefore)
+    df( "------------[ NewGuildSalesLotterySlashCommand - guildIndex: %s, daysBefore: %s ]------------ ", tos(guildIndex), tos(daysBefore))
     FCOGuildLottery.StartNewGuildSalesLottery(guildIndex, daysBefore, false)
 end
 
@@ -2624,6 +2676,7 @@ function FCOGuildLottery.NewGuildMembersJoinedListSlashCommand(args)
     --FCOGuildLottery.ResetCurrentGuildMembersJoinDateData(false, true)
     local guildIndex, daysBefore = FCOGuildLottery.parseSlashCommandArguments(args, "/newgmj")
 --d("GuildIndex: " .. guildIndex .. ", daysBefore: " .. daysBefore)
+    df( "------------[ NewGuildMembersJoinedListSlashCommand - guildIndex: %s, daysBefore: %s ]------------ ", tos(guildIndex), tos(daysBefore))
     FCOGuildLottery.StartNewGuildMembersJoinDateList(guildIndex, daysBefore, false)
 end
 
@@ -2804,5 +2857,3 @@ end
 function FCOGuildLottery.HideTooltip()
     ZO_Tooltips_HideTextTooltip()
 end
-
-

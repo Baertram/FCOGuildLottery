@@ -166,6 +166,6 @@ FCOGuildLottery.Localization.No = GetString(SI_NO)
 FCOGuildLottery.prevVars = {
     doNotRunOnTextChanged = false
 }
-FCOGuildLottery.guildLotteryDaysBeforeSliderWasChanged = false
 
+FCOGuildLottery.guildLotteryDaysBeforeSliderWasChanged = false
 FCOGuildLottery.guildMembersJoinedDateListDaysBeforeSliderWasChanged = false
